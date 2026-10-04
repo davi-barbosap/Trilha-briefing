@@ -1,0 +1,66 @@
+# O que o mercado e os clientes reais mostram. Cada afirmação diz de onde veio (fonte) e se já foi confirmada (status).
+personas:
+  - id: profissional-travado
+    nome: Profissional travado
+    quem_e: "28–40 anos, analista ou coordenador, entende inglês escrito mas trava para falar em reunião"
+    dores:
+      - { texto: "Fico calado na reunião com o time de fora mesmo sabendo o assunto", fonte: cliente, status: validada, evidencia: "8 de 12 entrevistas" }
+      - { texto: "Já fiz curso e larguei no meio", fonte: dados, status: validada, evidencia: "motivo mais citado nas conversas do Kommo" }
+    desejos:
+      - { texto: "Conseguir falar numa reunião sem ensaiar antes", fonte: cliente }
+      - { texto: "Ser considerado para a vaga que pede inglês", fonte: cliente }
+    objecoes:
+      - { texto: "Não tenho tempo fixo na semana", fonte: dados, status: validada, evidencia: "conversas do Kommo, set/2026" }
+      - { texto: "Já tentei e não funcionou comigo", fonte: cliente }
+      - { texto: "Aplicativo é mais barato", fonte: mercado }
+    ganchos:
+      - { texto: "Você entende tudo, mas a frase não sai na hora", fonte: assessor }
+      - { texto: "A reunião em inglês que você deixou alguém falar por você", fonte: assessor }
+    nivel_consciencia: consciente_da_solucao
+    onde_esta: [Instagram, LinkedIn, Google]
+    gatilho_compra: "reunião com equipe estrangeira, processo seletivo ou promoção à vista"
+  - id: viajante
+    nome: Viajante adiado
+    quem_e: "35–55 anos, quer viajar sozinho ou visitar filho fora e tem vergonha de depender de alguém"
+    dores:
+      - { texto: "Na última viagem dependi do meu filho para tudo", fonte: cliente }
+    desejos:
+      - { texto: "Pedir, perguntar e resolver sozinho na viagem", fonte: cliente }
+    objecoes:
+      - { texto: "Na minha idade é difícil aprender", fonte: cliente }
+    ganchos:
+      - { texto: "A viagem em que você vai pedir o próprio café", fonte: assessor }
+    nivel_consciencia: consciente_do_problema
+    onde_esta: [Instagram, Facebook]
+    gatilho_compra: "viagem marcada para os próximos 6 meses"
+
+escuta:
+  - { fonte: entrevistas com alunos atuais, quantidade: 12, data: 2026-09-20, resumo: "travar na fala é a dor nº 1; turma pequena é o motivo de escolha" }
+  - { fonte: conversas do Kommo (leads perdidos), quantidade: 40, data: 2026-09-25, resumo: "horário e preço são as objeções mais comuns" }
+  - { fonte: avaliações do Google, quantidade: 87, data: 2026-09-25 }
+
+concorrentes:
+  - { nome: Rede Nacional A, promessa: "fluência garantida", posicionamento_preco: media, fortes: [marca conhecida, muitas unidades], fracos: [turmas de 15, rotatividade de professor], canais: [Google, Meta, TV], aprender: "promessa genérica abre espaço para prova específica" }
+  - { nome: Escola Local B, promessa: "inglês com nativos", posicionamento_preco: acima, fortes: [professores nativos], fracos: [horário só à noite], canais: [Instagram], aprender: "nativo é desejo, mas não resolve horário" }
+  - { nome: Aplicativos, promessa: "aprenda 10 minutos por dia", posicionamento_preco: abaixo, fortes: [preço, conveniência], fracos: [não treina conversa ao vivo], canais: [Meta, App Store], aprender: "concorrente de preço; o argumento é conversa real" }
+
+unicidade: "turmas de até 6 com reposição de aula em qualquer horário da grade"
+
+swot:
+  forcas: [{ texto: "Nota 4,9 com 87 avaliações no Google", fonte: dados, status: validada, evidencia: "perfil do Google, 25/09/2026" }, "Turmas pequenas"]
+  fraquezas: ["Marca pouco conhecida fora do bairro", { texto: "Só uma consultora para atender", fonte: cliente }]
+  oportunidades: ["Empresas exigindo inglês em vagas de nível médio", "Aulas online ampliam a área atendida"]
+  ameacas: ["Aplicativos baratos", "Desistência alta no 2º mês no setor"]
+
+sazonalidade:
+  - { periodo: janeiro–fevereiro, efeito: alta, motivo: "metas de ano novo e volta às aulas" }
+  - { periodo: julho, efeito: alta, motivo: "segundo semestre" }
+  - { periodo: novembro–dezembro, efeito: baixa, motivo: "festas e 13º vai para viagem" }
+
+maturidade:                     # 0 a 3 por dimensão (nota de maturidade do Trilha)
+  rastreamento: 1
+  crm: 2
+  capacidade_criativa: 1
+  historico_conta: 1
+  verba: 2
+  observacoes: "Kommo em uso, sem UTM nem motivo de perda; pixel instalado sem eventos"

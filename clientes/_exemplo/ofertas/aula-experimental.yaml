@@ -1,0 +1,26 @@
+# Degrau de entrada: a aula experimental é a isca que leva à oferta principal.
+id: aula-experimental
+nome: Aula experimental
+tipo: aula gratuita
+degrau: isca
+personas: [profissional-travado, viajante]
+problema: "Não sabe se aguenta o ritmo nem se a turma é do seu nível"
+big_idea:
+  mecanismo_unico: "Uma aula de verdade, com turma, em vez de uma demonstração de vendas"
+promessa:
+  texto: "Saia da primeira aula tendo falado mais inglês do que no último mês"
+  resultado: "falar ao menos 20 minutos na aula"
+  prazo: "1 aula de 60 minutos"
+  condicao: "para adultos que já entendem o básico"
+diferenciais: ["Aula real, com turma", "Sem compromisso", "Presencial ou online"]
+como_funciona:
+  - { titulo: "Escolha o horário", texto: "A consultora confirma pelo WhatsApp." }
+  - { titulo: "Participe da aula", texto: "Turma real, do seu nível." }
+  - { titulo: "Converse com a coordenação", texto: "Só se quiser seguir." }
+objecoes:
+  - { eixo: confianca, objecao: "Vão me empurrar matrícula", resposta: "A conversa com a coordenação só acontece se você pedir.", fonte: assessor }
+  - { eixo: nivel, objecao: "Meu inglês é muito ruim", resposta: "O nivelamento coloca você numa turma do seu ritmo.", fonte: assessor }
+  - { eixo: tempo, objecao: "Não tenho tempo agora", resposta: "São 60 minutos, no horário que você escolher.", fonte: assessor }
+inversao_risco: "Gratuita e sem compromisso"
+aderencia: { aderencia_digital: alta, justificativa: "isca já usada com conversão de 1 em 3 que comparecem" }
+cta: "Quero minha aula experimental"

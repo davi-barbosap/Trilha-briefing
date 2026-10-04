@@ -1,0 +1,79 @@
+# O plano: por quê, o quê, quem, como, quando e quanto. Só vai para o cliente quando `lacunas` não acusar bloqueio.
+objetivo:
+  descricao: "Matrículas previsíveis vindas de mídia paga, sem depender só de indicação"
+  metrica: matrículas por mês vindas de mídia paga
+  meta: 25
+  prazo: "31/03/2027"
+  baseline: 0
+
+krs:
+  - { descricao: "Aulas experimentais agendadas por mídia paga", metrica: agendamentos/mês, meta: 90, baseline: 0 }
+  - { descricao: "Comparecimento à aula experimental", metrica: "% dos agendados", meta: 60, baseline: 45 }
+  - { descricao: "Primeiro contato com o lead em até 30 min no horário comercial", metrica: "% dos leads", meta: 80 }
+
+metrica_principal: agendamento   # aula experimental agendada
+
+economia:                        # mesmos campos do perfil.yaml do Trilha
+  modelo_receita: recorrencia
+  mensalidade: 460
+  meses_retencao: 10
+  margem_contribuicao: 0.45
+  pct_investivel: 0.3
+  taxa_fechamento: 0.08          # lead → matrícula
+  taxa_qualificacao: 0.4
+  taxa_agendamento: 0.2
+  estimados: [meses_retencao, taxa_qualificacao]
+
+orcamento:
+  verba_validacao: 8000          # o máximo que a escola aceita investir até saber se funciona
+  semanas_validacao: 8
+  verba_mensal: 5000
+  teto_mensal: 6000
+
+abordagem: direta_com_inbound    # anúncio que leva à aula experimental + conteúdo que constrói a marca
+
+canais:
+  - { canal: busca_marca, plataforma: google, papel: proteger quem já procura pelo nome, status: ativo, verba_pct: 10, justificativa: "87 avaliações no Google: já existe busca pelo nome" }
+  - { canal: busca_produto, plataforma: google, papel: capturar demanda, status: ativo, verba_pct: 35, justificativa: "'curso de inglês para adultos' tem busca local com intenção" }
+  - { canal: interesses, plataforma: meta, papel: gerar demanda, status: ativo, verba_pct: 45, justificativa: "persona consciente da solução, mas ainda não procurando: gancho 'travar na reunião'" }
+  - { canal: remarketing, plataforma: meta, papel: recuperar quem visitou, status: teste, verba_pct: 10, justificativa: "público pequeno no começo; liga quando houver 1.000 visitas" }
+  - { canal: busca_concorrente, plataforma: google, status: descartado, justificativa: "cliente não quer comparação nominal" }
+  - { canal: organico, plataforma: instagram, papel: construir marca, status: ativo, justificativa: "linha editorial da plataforma" }
+
+grade:                           # públicos × argumentos; o código vai na UTM e na mensagem do WhatsApp
+  - { codigo: PT01, publico: "Profissional travado (Meta)", argumento: "Você entende, mas a frase não sai", persona: profissional-travado, oferta: aula-experimental, nivel_consciencia: consciente_da_solucao, formato: reels com aluno, prioridade: 1 }
+  - { codigo: PT02, publico: "Profissional travado (Meta)", argumento: "Turma de até 6: você fala em todas as aulas", persona: profissional-travado, oferta: aula-experimental, formato: vídeo da turma, prioridade: 1 }
+  - { codigo: PT03, publico: "Profissional travado (Meta)", argumento: "Repõe em qualquer horário", persona: profissional-travado, oferta: conversacao-adultos, formato: carrossel, prioridade: 2 }
+  - { codigo: GB01, publico: "Busca 'inglês para adultos' (Google)", argumento: "Turma de até 6: você fala em todas as aulas", oferta: aula-experimental, prioridade: 1 }
+  - { codigo: VA01, publico: "Viajante (Meta)", argumento: "Resolva sozinho na próxima viagem", persona: viajante, oferta: aula-experimental, nivel_consciencia: consciente_do_problema, formato: reels, prioridade: 3 }
+
+premissas:
+  - "A consultora responde em até 30 min no horário comercial"
+  - "A escola tem vagas em turmas de manhã, almoço e noite"
+  - "Gravação de 2 depoimentos em vídeo por mês"
+restricoes:
+  - "Sem promessa de fluência em prazo fixo"
+  - "Verba máxima de R$ 6.000/mês"
+
+riscos:
+  - { descricao: "Consultora não dá conta do volume de leads", categoria: recurso, probabilidade: 4, impacto: 4, resposta: "raio-x semanal do tempo de primeiro contato; bot de agendamento fora do horário" }
+  - { descricao: "Lead agenda e não comparece", categoria: qualidade, probabilidade: 3, impacto: 4, resposta: "confirmação na véspera e no dia; medir comparecimento por criativo" }
+  - { descricao: "Pouca produção de vídeo", categoria: recurso, probabilidade: 3, impacto: 3, resposta: "roteiro mensal com 4 vídeos gravados em uma tarde" }
+  - { descricao: "Baixa em novembro e dezembro", categoria: externo, probabilidade: 5, impacto: 2, resposta: "reduzir verba e acumular público para janeiro" }
+
+marcos:
+  - { nome: Fundação, quando: "semanas 1–2", entrega: "UTMs, campos e motivos de perda no Kommo, pixel e conversões, primeiros criativos", responsavel: assessor }
+  - { nome: Validação, quando: "semanas 3–10", entrega: "custo por agendamento e comparecimento por criativo", responsavel: assessor }
+  - { nome: Decisão, quando: "semana 10", entrega: "seguir, ajustar ou parar, com os números da validação", responsavel: "assessor + Marina" }
+  - { nome: Campanha de volta às aulas, quando: "15/01", entrega: "criativos e página da campanha", responsavel: assessor }
+
+medicao:                         # saber medir antes de lançar
+  utm_padrao: true
+  campos_crm: true
+  evento_conversao: true
+  etapas_e_motivos_perda: true
+  codigo_criativo: true
+  relatorio_definido: true
+  notas: "Configurados na fundação, antes de ligar as campanhas. Relatório semanal às quintas para Marina."
+
+aprovado_em: 2026-10-10

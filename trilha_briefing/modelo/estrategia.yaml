@@ -1,0 +1,27 @@
+# O plano. Só vai para o cliente quando `python -m trilha_briefing lacunas` não acusar bloqueio.
+objetivo: null                    # { descricao, metrica, meta, prazo, baseline }
+krs: []                           # { descricao, metrica, meta, baseline }
+metrica_principal: lead_qualificado   # lead | lead_qualificado | agendamento | venda
+economia: null                    # mesmos campos do economia do perfil.yaml do Trilha
+orcamento:
+  verba_validacao: null           # o máximo que o cliente aceita perder até saber se funciona
+  semanas_validacao: null
+  verba_mensal: null
+  teto_mensal: null
+  moeda: BRL
+abordagem: null                   # direta | inbound | direta_com_inbound
+canais: []                        # { canal, plataforma, papel, status: ativo|teste|futuro|descartado, verba_pct, justificativa, aprovado_cliente }
+grade: []                         # { codigo, publico, argumento, persona, oferta, nivel_consciencia, formato, prioridade }
+premissas: []
+restricoes: []
+riscos: []                        # { descricao, categoria, probabilidade 1–5, impacto 1–5, resposta }
+marcos: []                        # { nome, quando, entrega, responsavel }
+medicao:
+  utm_padrao: false
+  campos_crm: false
+  evento_conversao: false
+  etapas_e_motivos_perda: false
+  codigo_criativo: false
+  relatorio_definido: false
+  notas: ""
+aprovado_em: null

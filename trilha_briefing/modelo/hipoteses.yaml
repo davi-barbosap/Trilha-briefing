@@ -1,0 +1,10 @@
+# Uma variável por teste, critério de sucesso definido antes, volume mínimo para concluir.
+hipoteses: []
+#  - id: h01-nome
+#    hipotese: ""
+#    variavel: criativo           # criativo | publico | objetivo | pagina | oferta | canal | copy | atendimento
+#    metrica: ""
+#    criterio_sucesso: ""
+#    minimo_conversoes: 30
+#    horizonte: nucleo            # nucleo | adjacente | ruptura
+#    resultado: planejada         # planejada | rodando | validada | refutada | inconclusiva

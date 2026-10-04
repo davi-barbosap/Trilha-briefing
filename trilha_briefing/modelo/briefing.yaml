@@ -1,0 +1,41 @@
+# O que o cliente diz. Ele responde o questionário (python -m trilha_briefing questionario)
+# e o assessor transcreve e completa no kickoff. Exemplo preenchido: clientes/_exemplo/
+cliente:
+  id: ID_DO_CLIENTE               # igual ao nome da pasta
+  nome: PREENCHER
+  segmento: PREENCHER             # texto livre: odontologia, escola de idiomas, software B2B…
+  playbook: padrao                # playbooks/<playbook>/ no Trilha
+  cidade_atuacao: ""
+  site: ""
+  redes: []
+  whatsapp: ""                    # 55 + DDD + número, só dígitos
+  tempo_mercado: ""
+
+negocio:
+  o_que_vende: PREENCHER
+  modelo_receita: venda_direta    # venda_direta | comissao | recorrencia
+  tipo_compra: misto              # necessidade (puxa busca) | desejo (puxa descoberta) | misto
+  como_vende_hoje: []
+  ciclo_venda_dias: null
+  time_comercial: ""
+  crm: ""
+
+resultado_desejado:
+  em_12_meses: PREENCHER          # o que precisa ser verdade daqui a 12 meses
+  conhecido_por: ""
+  sucesso_significa: ""
+
+historico:
+  funcionou: []                   # texto solto ou { texto, fonte, status, evidencia }
+  nao_funcionou: []
+  ja_investiu_em_midia: ""
+
+restricoes:
+  verba_mensal_max: null
+  prazos: []
+  regras_legais: []               # conselho profissional, publicidade regulada, LGPD
+  nao_pode: []
+
+stakeholders: []                  # { nome, papel, influencia: alta|media|baixa, interesse: alta|media|baixa, espera }
+preenchido_por: [assessor]        # acrescente cliente quando ele responder o questionário
+data: null

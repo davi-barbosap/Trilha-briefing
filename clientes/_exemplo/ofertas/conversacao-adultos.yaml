@@ -1,0 +1,64 @@
+# Oferta principal. Big idea, promessa e antes/depois alimentam anúncios e a landing page.
+id: conversacao-adultos
+nome: Inglês para falar no trabalho
+tipo: curso
+degrau: principal
+personas: [profissional-travado]
+problema: "Adulto que entende inglês, mas trava para falar em reunião e entrevista"
+
+big_idea:
+  oportunidade: "Vagas de nível médio pedindo inglês para reuniões, não só leitura"
+  inimigo: "Aula em que o professor fala e o aluno só escuta"
+  mecanismo_unico: "Turma de até 6 em que você fala a maior parte da aula, treinando as situações do seu trabalho"
+
+promessa:
+  texto: "Fale nas reuniões em inglês em 4 meses, treinando com as situações do seu trabalho"
+  resultado: "conduzir uma reunião de 15 minutos em inglês"
+  prazo: "4 meses"
+  condicao: "para quem já entende inglês escrito e frequenta 2 aulas por semana"
+
+antes_depois:
+  - { dimensao: dia_a_dia, antes: "Prepara o que vai falar e mesmo assim trava", depois: "Responde na hora, sem roteiro" }
+  - { dimensao: sentir, antes: "Vergonha de deixar o colega falar por você", depois: "Confiança para pedir a palavra" }
+  - { dimensao: status, antes: "Fica de fora das reuniões com a matriz", depois: "É chamado para as reuniões que importam" }
+
+diferenciais:
+  - { texto: "Turmas de até 6 alunos", fonte: cliente, status: validada, evidencia: "grade de turmas" }
+  - { texto: "Reposição em qualquer horário da grade", fonte: cliente, status: validada, evidencia: "regulamento" }
+  - { texto: "Aulas com situações do seu trabalho: reunião, apresentação, entrevista", fonte: cliente }
+  - "Presencial ou online, na mesma turma"
+
+raridade: "única escola da região com turma de até 6 e reposição livre"
+
+como_funciona:
+  - { titulo: "Aula experimental", texto: "Uma aula de verdade, com turma, para você ver se o ritmo serve." }
+  - { titulo: "Nivelamento", texto: "15 minutos de conversa para achar a turma certa." }
+  - { titulo: "Turma de até 6", texto: "Duas aulas por semana, presencial ou online." }
+  - { titulo: "Revisão a cada mês", texto: "O professor mostra o que você já fala e o próximo passo." }
+
+objecoes:
+  - { eixo: tempo, objecao: "Não tenho horário fixo", resposta: "Você repõe em qualquer horário da grade, presencial ou online.", fonte: dados, status: validada }
+  - { eixo: confianca, objecao: "Já tentei e larguei", resposta: "Turma de até 6: você fala em todas as aulas e o professor acompanha a sua evolução todo mês.", fonte: cliente }
+  - { eixo: preco, objecao: "Aplicativo é mais barato", resposta: "Aplicativo treina vocabulário; a reunião pede conversa ao vivo. Aqui é isso que você treina.", fonte: mercado }
+
+inversao_risco: "Se depois do primeiro mês não fizer sentido, você cancela sem multa"
+escassez: { texto: "Turmas com 6 alunos fecham quando lotam", real: true, evidencia: "limite pedagógico da escola" }
+
+condicoes:
+  faixa_preco: "R$ 420 a R$ 520 por mês"
+  ticket_medio: 460
+  pagamento: "mensalidade no cartão ou boleto"
+  posicionamento_preco: "acima de aplicativo, na média das escolas de rede"
+
+aderencia:
+  perfil_compradores: "analistas e coordenadores 28–40 anos, empresas com time fora do Brasil"
+  reputacao: ativo
+  reputacao_nota: "nota 4,9 no Google"
+  vendas_fora_do_digital: { canais: [indicação, Google Meu Negócio], ritmo: "~20 matrículas/mês", avaliacao: boa }
+  aderencia_digital: alta
+  justificativa: "público ativo no digital, decisão em menos de 2 semanas, aula experimental como degrau"
+
+cta: "Agendar aula experimental"
+qualificacao:
+  rotulo: "Para que você precisa do inglês?"
+  opcoes: ["Trabalho", "Viagem", "Ainda estou vendo"]

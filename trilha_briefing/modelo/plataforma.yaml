@@ -1,0 +1,34 @@
+# A marca: quem é, como quer ser lembrada, como fala.
+jornada: { resultado: "", conhecido_por: "", fazer: [], aprender: [] }
+associacoes: { queremos: [], nao_queremos: [] }
+posicionamento:
+  para_quem: ""
+  categoria: ""
+  diferenca: ""
+  razoes_para_acreditar: []
+  percepcao_atual: ""
+  percepcao_desejada: ""
+historia: { catalisador: "", verdade_central: "", prova: "" }
+voz:
+  assinatura: null                # marca | pessoa | marca_pessoa
+  nome_pessoa: ""
+  abordagem: null                 # scripted | conversacional | misto
+  tom: []
+  assim_sim: []                   # 3 a 5 exemplos aprovados
+  assim_nao: []                   # 3 a 5 exemplos reprovados, com o motivo
+  termos_obrigatorios: []
+  termos_proibidos: []
+identidade_visual:
+  cores: {}                       # primaria, secundaria, fundo, texto (#RRGGBB)
+  tipografia: {}                  # titulos, texto
+  logo: ""
+  estilo_imagem: ""
+temas: []                         # { nome, peso (%), formatos, canais, exemplo } — pesos somam 100
+compliance:
+  registros_profissionais: []
+  avisos_legais: []
+  promessas_proibidas: []
+  politica_privacidade_url: ""
+  base_legal_lgpd: consentimento
+atendimento: { sla_resposta: "", handoff: "", canais: [], horario_comercial: "" }
+preco: {}                         # anuncio | whatsapp | landing → nunca | a_partir_de | parcela | valor_cheio
