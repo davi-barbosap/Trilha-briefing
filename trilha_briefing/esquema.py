@@ -562,6 +562,7 @@ class Estrategia(_Base):
     objetivo: Objetivo | None = None
     krs: list[Kr] = Field(default_factory=list)
     metrica_principal: MetricaPrincipal = "lead_qualificado"
+    evento_otimizacao: MetricaPrincipal | None = None  # o que a campanha otimiza; vazio = a métrica principal
     economia: Economia | None = None
     orcamento: Orcamento = Field(default_factory=Orcamento)
     abordagem: Literal["direta", "inbound", "direta_com_inbound"] | None = None
@@ -582,9 +583,12 @@ class Hipotese(_Base):
     id: Id
     hipotese: str
     variavel: Literal["criativo", "publico", "objetivo", "pagina", "oferta", "canal", "copy", "atendimento"]
+    codigos: list[str] = Field(default_factory=list)  # células da grade em teste (PT01, PT02…)
     metrica: str
     criterio_sucesso: str
-    minimo_conversoes: int = Field(default=30, ge=1)
+    evento: MetricaPrincipal | None = None  # em que etapa do funil se conta o volume; vazio = a métrica principal
+    minimo_conversoes: int = Field(default=30, ge=1)  # por variação
+    variacoes: int = Field(default=2, ge=1)  # quantas versões disputam (A/B = 2)
     horizonte: Literal["nucleo", "adjacente", "ruptura"] = "nucleo"
     inicio: date | None = None
     fim: date | None = None
@@ -703,6 +707,13 @@ def _referencias(lidos: dict[str, Any], ofertas: list[Oferta], pasta: Path) -> d
         erros["estrategia.yaml"] = "; ".join(problemas)
     hip = lidos.get("hipoteses", Hipoteses()).hipoteses
     ids = [h.id for h in hip]
+    problemas = []
     if len(ids) != len(set(ids)):
-        erros["hipoteses.yaml"] = "ids de hipótese repetidos"
+        problemas.append("ids de hipótese repetidos")
+    for h in hip:
+        faltam = [x for x in h.codigos if x not in codigos]
+        if faltam:
+            problemas.append(f"{h.id}: códigos fora da grade {faltam}")
+    if problemas:
+        erros["hipoteses.yaml"] = "; ".join(problemas)
     return erros

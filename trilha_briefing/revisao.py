@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 import unicodedata
 
-from trilha_briefing.economia import calcular, conversoes_na_validacao
+from trilha_briefing.economia import calcular, conversoes_no_teto
 from trilha_briefing.esquema import ClienteCompleto, Item
 
 def _brl(v: float) -> str:
@@ -111,15 +111,34 @@ def revisar(c: ClienteCompleto) -> list[str]:
         teto = est.orcamento.teto_mensal or c.briefing.restricoes.verba_mensal_max
         if verba and teto and verba > teto:
             avisos.append(f"verba mensal acima do teto combinado ({_brl(teto)})")
-    conv = conversoes_na_validacao(est)
-    # O volume que a validação precisa é o dos testes do núcleo (os que decidem se a estratégia segue).
-    minimo = max((h.minimo_conversoes for h in c.hipoteses.hipoteses if h.horizonte == "nucleo"), default=30)
-    if conv is not None and conv < minimo:
-        avisos.append(
-            f"a verba de validação compra no máximo {conv:.0f} conversões de {est.metrica_principal} (no custo máximo): "
-            f"abaixo de {minimo}, o teste tende a terminar inconclusivo. Aumente a verba, alongue o prazo "
-            "ou valide por uma métrica mais acima no funil"
-        )
+    # Volume: cada teste do núcleo precisa de mínimo × variações eventos dentro da verba de validação.
+    testes = [h for h in c.hipoteses.hipoteses if h.horizonte == "nucleo" and h.resultado in ("planejada", "rodando")]
+    for h in testes or [None]:
+        evento = (h.evento if h else None) or est.metrica_principal
+        precisa = h.minimo_conversoes * h.variacoes if h else 30
+        conv = conversoes_no_teto(est, evento)
+        if conv is not None and conv < precisa:
+            nome = f"hipótese {h.id}" if h else "a validação"
+            avisos.append(
+                f"{nome} precisa de {precisa} {evento} ({h.minimo_conversoes} × {h.variacoes} variações)"
+                if h else f"{nome} precisa de ao menos {precisa} {evento}"
+            )
+            avisos[-1] += (
+                f", mas a verba de validação compra {conv:.0f} se o custo ficar no teto (e menos, se ficar acima): "
+                "aumente a verba, alongue o prazo, reduza as variações ou meça numa etapa mais acima do funil"
+            )
+
+    # Evento de otimização: a plataforma precisa de ~50 eventos por semana para aprender.
+    if est.economia and est.orcamento.verba_mensal:
+        n = calcular(est.economia)
+        evento = est.evento_otimizacao or est.metrica_principal
+        precisa = n.verba_para_otimizar.get(evento)
+        viaveis = n.degraus_viaveis(est.orcamento.verba_mensal)
+        if precisa and precisa > est.orcamento.verba_mensal and viaveis:
+            avisos.append(
+                f"otimizar por {evento} pede {_brl(precisa)}/mês (50 por semana no custo máximo); com "
+                f"{_brl(est.orcamento.verba_mensal)}, otimize por {viaveis[-1]} e acompanhe {evento} no CRM"
+            )
 
     # Canais
     for cp in est.canais:

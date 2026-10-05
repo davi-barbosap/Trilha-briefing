@@ -108,11 +108,16 @@ def cmd_economia(a) -> int:
     for evento, custo in n.custo_max.items():
         marca = "←" if evento == est.metrica_principal else " "
         print(f"  custo máx. {evento:<17} {_brl(custo)} {marca}")
-    print(f"Verba mínima viável/mês:  {_brl(n.verba_minima_viavel)}  (50 leads/semana no CPL máximo)")
     print(f"Margem/CAC no teto:       {n.ltv_cac_no_teto:.1f}×")
+    verba = est.orcamento.verba_mensal
+    evento = est.evento_otimizacao or est.metrica_principal
+    print(f"Verba/mês para otimizar por cada evento (50 por semana no custo máximo){'' if verba is None else f' — plano: {_brl(verba)}'}:")
+    for degrau, v in n.verba_para_otimizar.items():
+        ok = "" if verba is None else ("✓" if v <= verba else "✗")
+        print(f"  {ok:1} {degrau:<17} {_brl(v)}{'  ← evento de otimização' if degrau == evento else ''}")
     conv = conversoes_na_validacao(est)
     if conv is not None:
-        print(f"Validação: {_brl(est.orcamento.verba_validacao)} compram até {conv:.0f} conversões de {est.metrica_principal} no custo máximo")
+        print(f"Validação: {_brl(est.orcamento.verba_validacao)} compram {conv:.0f} {est.metrica_principal} se o custo ficar no teto (menos, se ficar acima)")
     if est.economia.estimados:
         print(f"Estimados (trocar por dado real): {', '.join(est.economia.estimados)}")
     return 0

@@ -12,6 +12,7 @@ krs:
   - { descricao: "Primeiro contato com o lead em até 30 min no horário comercial", metrica: "% dos leads", meta: 80 }
 
 metrica_principal: agendamento   # aula experimental agendada
+evento_otimizacao: lead          # a verba não sustenta 50 agendamentos por semana; o agendamento é acompanhado no Kommo
 
 economia:                        # mesmos campos do perfil.yaml do Trilha
   modelo_receita: recorrencia

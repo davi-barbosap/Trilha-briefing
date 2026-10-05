@@ -161,7 +161,8 @@ def gerar_html(c: ClienteCompleto) -> str:
         conv = conversoes_na_validacao(est)
         if conv is not None:
             corpo += (f"<p class=\"nota\">A verba de validação é o máximo que se aceita investir até saber se funciona. "
-                      f"No custo máximo, ela compra cerca de {conv:.0f} {escape(est.metrica_principal.replace('_', ' '))}s.</p>")
+                      f"Se o custo ficar no teto, ela compra cerca de {conv:.0f} conversões em "
+                      f"{escape(est.metrica_principal.replace('_', ' '))}; se ficar acima, menos.</p>")
     ativos = [cp for cp in est.canais if cp.status != "descartado"]
     if ativos:
         linhas = "".join(

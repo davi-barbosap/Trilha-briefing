@@ -116,7 +116,21 @@ class TestRevisao(Base):
         self.assertIn("termo proibido", avisos)
         self.assertIn("escassez sem evidência", avisos)
         self.assertIn("busca_concorrente sem aprovação", avisos)
-        self.assertIn("inconclusivo", avisos)
+        self.assertIn("h01-gancho-travar precisa de 100 lead (50 × 2 variações)", avisos)
+
+    def test_volume_conta_todas_as_variacoes(self):
+        # R$ 8.000 / R$ 49,68 = 161 leads: cabem 50 × 2 variações, não 50 × 4
+        self.assertFalse(any("h01" in a for a in revisar(carregar_cliente(EXEMPLO))))
+        self.editar("hipoteses.yaml", lambda d: d["hipoteses"][0].update(variacoes=4))
+        self.assertTrue(any("h01-gancho-travar precisa de 200 lead" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_evento_de_otimizacao_inviavel(self):
+        def est(d):
+            d["orcamento"].update(verba_mensal=30000, teto_mensal=30000)
+            d["evento_otimizacao"] = "agendamento"
+        self.editar("estrategia.yaml", est)
+        avisos = revisar(carregar_cliente(self.pasta))
+        self.assertTrue(any("otimizar por agendamento" in a and "otimize por lead_qualificado" in a for a in avisos))
 
     def test_hipotese_concluida_sem_volume(self):
         def hip(d):
