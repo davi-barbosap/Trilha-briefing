@@ -12,6 +12,13 @@ Cada arquivo responde a uma pergunta:
 
 Afirmações importantes (dores, objeções, diferenciais…) são `Item`: dizem de onde vieram
 (`fonte`) e se já foram confirmadas (`status`). Um texto solto vira hipótese de fonte não informada.
+
+Fontes:
+    empresa     o que o dono e o time da empresa dizem (opinião de quem vende)
+    consumidor  o que quem compra disse: entrevistas, conversas, avaliações (escuta)
+    mercado     concorrentes, buscas, anúncios ativos, notícias do setor
+    dados       números do CRM, das plataformas, do sistema da empresa
+    assessor    conclusão do assessor a partir das demais
 """
 
 from __future__ import annotations
@@ -24,9 +31,12 @@ from typing import Annotated, Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-Fonte = Literal["cliente", "mercado", "dados", "assessor", "nao_informada"]
+Fonte = Literal["empresa", "consumidor", "mercado", "dados", "assessor", "nao_informada"]
+FONTES_DE_ESCUTA = ("consumidor", "dados")
 Status = Literal["hipotese", "validada", "refutada"]
 Nivel = Literal["alta", "media", "baixa"]
+Situacao = Literal["ok", "pendente", "nao_tem", "nao_sei"]
+Cor = Annotated[str, Field(pattern=r"^#[0-9a-fA-F]{6}$")]
 NivelConsciencia = Literal[
     "inconsciente", "consciente_do_problema", "consciente_da_solucao", "consciente_do_produto", "pronto_para_comprar"
 ]
@@ -36,6 +46,16 @@ Id = Annotated[str, Field(pattern=r"^[a-z0-9_][a-z0-9_-]{0,63}$")]
 
 class _Base(BaseModel):
     model_config = ConfigDict(extra="forbid")
+
+
+def _fonte_sem_ambiguidade(v: Any) -> Any:
+    """'cliente' não é fonte: ninguém sabe se é a empresa ou quem compra dela."""
+    if isinstance(v, dict) and v.get("fonte") == "cliente":
+        raise ValueError(
+            "fonte 'cliente' é ambígua: use 'empresa' (o que a empresa diz) "
+            "ou 'consumidor' (o que quem compra disse, na escuta)"
+        )
+    return v
 
 
 class Item(_Base):
@@ -49,7 +69,7 @@ class Item(_Base):
     @model_validator(mode="before")
     @classmethod
     def _de_texto(cls, v: Any) -> Any:
-        return {"texto": v} if isinstance(v, str) else v
+        return _fonte_sem_ambiguidade({"texto": v} if isinstance(v, str) else v)
 
 
 # ---------- briefing.yaml: o que o cliente diz ----------
@@ -60,11 +80,27 @@ class Cliente(_Base):
     nome: str
     segmento: str  # texto livre: odontologia, escola de idiomas, software B2B, loja de móveis…
     playbook: str = "padrao"  # playbooks/<playbook>/ no Trilha
-    cidade_atuacao: str = ""
     site: str = ""
     redes: list[str] = Field(default_factory=list)
     whatsapp: Annotated[str, Field(pattern=r"^(55\d{10,11})?$")] = ""  # 55 + DDD + número, só dígitos
     tempo_mercado: str = ""
+
+
+class Area(_Base):
+    """Onde a empresa atende: define a geografia das campanhas."""
+
+    alcance: Literal["local", "regional", "nacional", "online"]
+    cidades: list[str] = Field(default_factory=list)
+    raio_km: float | None = Field(default=None, gt=0)
+    observacoes: str = ""
+
+    def descricao(self) -> str:
+        partes = [", ".join(self.cidades) or self.alcance]
+        if self.raio_km:
+            partes.append(f"raio de {self.raio_km:g} km")
+        if self.observacoes:
+            partes.append(self.observacoes)
+        return " · ".join(partes)
 
 
 class Negocio(_Base):
@@ -75,6 +111,7 @@ class Negocio(_Base):
     ciclo_venda_dias: int | None = None
     time_comercial: str = ""  # quem atende o lead, quantas pessoas, que papéis
     crm: str = ""
+    marketplaces: list[str] = Field(default_factory=list)  # onde a categoria já é comprada (iFood, Mercado Livre…)
 
 
 class Resultado(_Base):
@@ -98,6 +135,53 @@ class Restricoes(_Base):
     nao_pode: list[str] = Field(default_factory=list)
 
 
+class Capacidade(_Base):
+    """Quanto a operação aguenta. Verba que gera mais do que isso queima lead."""
+
+    leads_dia: int | None = Field(default=None, ge=0)  # contatos novos por dia que o time atende bem
+    clientes_novos_mes: int | None = Field(default=None, ge=0)  # clientes novos por mês que a operação entrega
+    observacoes: str = ""
+
+
+class Aprovacao(_Base):
+    """Quem aprova anúncio e texto do lado do cliente. É o gargalo mais comum do dia a dia."""
+
+    responsavel: str = ""
+    prazo_horas: int | None = Field(default=None, gt=0)
+    substituto: str = ""
+
+
+class Acessos(_Base):
+    """O que a fundação precisa para começar. ok | pendente | nao_tem (precisa criar) | nao_sei."""
+
+    meta_business: Situacao = "nao_sei"
+    conta_anuncios_meta: Situacao = "nao_sei"
+    pixel_meta: Situacao = "nao_sei"
+    google_ads: Situacao = "nao_sei"
+    tag_google: Situacao = "nao_sei"
+    gtm: Situacao = "nao_sei"
+    ga4: Situacao = "nao_sei"
+    crm: Situacao = "nao_sei"
+    dominio: Situacao = "nao_sei"
+
+    def pendentes(self) -> list[str]:
+        return [k for k in type(self).model_fields if getattr(self, k) != "ok"]
+
+
+class Ativos(_Base):
+    """Material que a empresa já tem para criativos e páginas."""
+
+    logo_editavel: Situacao = "nao_sei"
+    manual_marca: Situacao = "nao_sei"
+    fotos_reais: Situacao = "nao_sei"
+    videos_reais: Situacao = "nao_sei"
+    politica_privacidade: Situacao = "nao_sei"
+    lista_clientes_autorizada: Situacao = "nao_sei"  # para públicos semelhantes, com base legal
+
+    def pendentes(self) -> list[str]:
+        return [k for k in type(self).model_fields if getattr(self, k) != "ok"]
+
+
 class Pessoa(_Base):
     """Quem decide ou é afetado do lado do cliente: influência × interesse."""
 
@@ -110,11 +194,16 @@ class Pessoa(_Base):
 
 class Briefing(_Base):
     cliente: Cliente
+    area: Area | None = None
     negocio: Negocio
+    capacidade: Capacidade = Field(default_factory=Capacidade)
     resultado_desejado: Resultado
     historico: Historico = Field(default_factory=Historico)
     restricoes: Restricoes = Field(default_factory=Restricoes)
     stakeholders: list[Pessoa] = Field(default_factory=list)
+    aprovacao: Aprovacao = Field(default_factory=Aprovacao)
+    acessos: Acessos = Field(default_factory=Acessos)
+    ativos: Ativos = Field(default_factory=Ativos)
     preenchido_por: list[Literal["cliente", "assessor"]] = Field(default_factory=list)
     data: date | None = None
 
@@ -142,6 +231,14 @@ class Escuta(_Base):
     quantidade: int = Field(ge=0)
     data: date | None = None
     resumo: str = ""
+
+
+class NaoAtender(_Base):
+    """Persona negativa: quem não deve virar lead, e como filtrar antes de pagar por ele."""
+
+    perfil: str
+    motivo: str = ""
+    como_filtrar: str = ""  # exclusão de público, palavra-chave negativa, pergunta de qualificação
 
 
 class Concorrente(_Base):
@@ -184,6 +281,7 @@ class Maturidade(_Base):
 class Pesquisa(_Base):
     personas: list[Persona] = Field(default_factory=list)
     escuta: list[Escuta] = Field(default_factory=list)
+    nao_atender: list[NaoAtender] = Field(default_factory=list)
     concorrentes: list[Concorrente] = Field(default_factory=list)
     unicidade: str = ""  # o que só este cliente tem, depois de olhar os concorrentes
     swot: Swot = Field(default_factory=Swot)
@@ -234,11 +332,25 @@ class Voz(_Base):
     termos_proibidos: list[str] = Field(default_factory=list)
 
 
+CHAVES_COR = {"primaria", "secundaria", "fundo", "texto", "apoio"}
+PRECO_CANAIS = {"anuncio", "whatsapp", "landing"}
+PRECO_REGRAS = {"nunca", "a_partir_de", "parcela", "valor_cheio"}
+
+
 class IdentidadeVisual(_Base):
-    cores: dict[str, str | list[str]] = Field(default_factory=dict)  # primaria, secundaria, fundo, texto, apoio
+    cores: dict[str, Cor | list[Cor]] = Field(default_factory=dict)  # primaria, secundaria, fundo, texto (#RRGGBB), apoio
     tipografia: dict[str, str] = Field(default_factory=dict)  # titulos, texto
     logo: str = ""
     estilo_imagem: str = ""
+
+    @model_validator(mode="after")
+    def _chaves(self) -> IdentidadeVisual:
+        estranhas = set(self.cores) - CHAVES_COR
+        if estranhas:
+            raise ValueError(f"cores aceita {sorted(CHAVES_COR)}; recebeu {sorted(estranhas)}")
+        if isinstance(self.cores.get("apoio", []), str):
+            raise ValueError("cores.apoio é uma lista de cores")
+        return self
 
 
 class Tema(_Base):
@@ -278,6 +390,15 @@ class Plataforma(_Base):
     atendimento: Atendimento = Field(default_factory=Atendimento)
     preco: dict[str, str] = Field(default_factory=dict)  # anuncio | whatsapp | landing → nunca, a_partir_de, parcela, valor_cheio
 
+    @model_validator(mode="after")
+    def _preco(self) -> Plataforma:
+        canais = set(self.preco) - PRECO_CANAIS
+        regras = set(self.preco.values()) - PRECO_REGRAS
+        if canais or regras:
+            raise ValueError(f"preco: canais {sorted(PRECO_CANAIS)} com regras {sorted(PRECO_REGRAS)}; "
+                             f"recebeu {sorted(canais | regras)}")
+        return self
+
 
 # ---------- provas.yaml ----------
 
@@ -306,8 +427,12 @@ class Provas(_Base):
     historias: list[HistoriaCliente] = Field(default_factory=list)
 
     def utilizaveis(self, tipo: str | None = None) -> list[Prova]:
-        """Provas que podem ir para anúncio e página: número com fonte, depoimento autorizado."""
-        ok = [p for p in self.provas if (p.fonte if p.tipo == "numero" else p.autorizado)]
+        """Provas que podem ir para anúncio e página.
+
+        Fato (número, autoridade, mídia, certificação) precisa de fonte; pessoa (depoimento, case)
+        precisa de autorização de uso de nome e imagem.
+        """
+        ok = [p for p in self.provas if (p.autorizado if p.tipo in ("depoimento", "case") else p.fonte)]
         return [p for p in ok if tipo is None or p.tipo == tipo]
 
 
@@ -346,6 +471,8 @@ class ObjecaoOferta(_Base):
     resposta: str = ""
     fonte: Fonte = "nao_informada"
     status: Status = "hipotese"
+
+    _fonte = model_validator(mode="before")(classmethod(lambda cls, v: _fonte_sem_ambiguidade(v)))
 
 
 class Escassez(_Base):
@@ -398,6 +525,8 @@ class Oferta(_Base):
     diferenciais: list[Item] = Field(default_factory=list)
     raridade: str = ""
     como_funciona: list[Passo] = Field(default_factory=list)
+    subtitulo: str = ""  # topo da página: dor + como a oferta resolve; vazio = 3 primeiros diferenciais
+    beneficios: list[Passo] = Field(default_factory=list)  # 4 a 8 { titulo, texto } escritos para a página
     objecoes: list[ObjecaoOferta] = Field(default_factory=list)
     inversao_risco: str = ""  # o que o cliente deixa de arriscar: garantia, teste, devolução
     escassez: Escassez | None = None
@@ -510,6 +639,7 @@ class Risco(_Base):
     probabilidade: int = Field(ge=1, le=5)
     impacto: int = Field(ge=1, le=5)
     resposta: str = ""
+    interno: bool = False  # fica fora da apresentação ao cliente (ex.: risco que envolve uma pessoa do time dele)
 
     @property
     def nota(self) -> int:
@@ -542,6 +672,7 @@ class Estrategia(_Base):
     objetivo: Objetivo | None = None
     krs: list[Kr] = Field(default_factory=list)
     metrica_principal: MetricaPrincipal = "lead_qualificado"
+    evento_otimizacao: MetricaPrincipal | None = None  # o que a campanha otimiza; vazio = a métrica principal
     economia: Economia | None = None
     orcamento: Orcamento = Field(default_factory=Orcamento)
     abordagem: Literal["direta", "inbound", "direta_com_inbound"] | None = None
@@ -562,9 +693,12 @@ class Hipotese(_Base):
     id: Id
     hipotese: str
     variavel: Literal["criativo", "publico", "objetivo", "pagina", "oferta", "canal", "copy", "atendimento"]
+    codigos: list[str] = Field(default_factory=list)  # células da grade em teste (PT01, PT02…)
     metrica: str
     criterio_sucesso: str
-    minimo_conversoes: int = Field(default=30, ge=1)
+    evento: MetricaPrincipal | None = None  # em que etapa do funil se conta o volume; vazio = a métrica principal
+    minimo_conversoes: int = Field(default=30, ge=1)  # por variação
+    variacoes: int = Field(default=2, ge=1)  # quantas versões disputam (A/B = 2)
     horizonte: Literal["nucleo", "adjacente", "ruptura"] = "nucleo"
     inicio: date | None = None
     fim: date | None = None
@@ -683,6 +817,13 @@ def _referencias(lidos: dict[str, Any], ofertas: list[Oferta], pasta: Path) -> d
         erros["estrategia.yaml"] = "; ".join(problemas)
     hip = lidos.get("hipoteses", Hipoteses()).hipoteses
     ids = [h.id for h in hip]
+    problemas = []
     if len(ids) != len(set(ids)):
-        erros["hipoteses.yaml"] = "ids de hipótese repetidos"
+        problemas.append("ids de hipótese repetidos")
+    for h in hip:
+        faltam = [x for x in h.codigos if x not in codigos]
+        if faltam:
+            problemas.append(f"{h.id}: códigos fora da grade {faltam}")
+    if problemas:
+        erros["hipoteses.yaml"] = "; ".join(problemas)
     return erros

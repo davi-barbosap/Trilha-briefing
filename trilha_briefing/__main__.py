@@ -1,7 +1,7 @@
 """Linha de comando do trilha-briefing.
 
     python -m trilha_briefing novo <id>                       cria clientes/<id>/ a partir do modelo
-    python -m trilha_briefing questionario [--assessor]       perguntas do kickoff para o cliente
+    python -m trilha_briefing questionario [--para cliente|reuniao|assessor]   perguntas do briefing
     python -m trilha_briefing validar <pasta>                 confere o esquema de todos os arquivos
     python -m trilha_briefing lacunas <pasta>                 o que falta por etapa e o que bloqueia a aprovação
     python -m trilha_briefing revisar <pasta>                 avisos críticos (promessa, prova, verba, canais…)
@@ -10,6 +10,7 @@
     python -m trilha_briefing grade <pasta>                   grade públicos × argumentos com códigos
     python -m trilha_briefing exportar <pasta> --para trilha|lp [--saida dist]
     python -m trilha_briefing apresentar <pasta> [--saida dist]
+    python -m trilha_briefing fechar-ciclo <pasta> --nome 2026-T4   guarda o estado antes da revisão trimestral
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from pathlib import Path
 
 from trilha_briefing import questionario
 from trilha_briefing.apresentar import apresentar
+from trilha_briefing.ciclo import fechar_ciclo
 from trilha_briefing.canais import recomendacoes_gerais, sugerir
 from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ErroCliente, carregar_cliente
@@ -58,7 +60,7 @@ def cmd_novo(a) -> int:
 
 
 def cmd_questionario(a) -> int:
-    print(questionario.gerar(a.cliente, a.assessor))
+    print(questionario.gerar(a.cliente, para="assessor" if a.assessor else a.para))
     return 0
 
 
@@ -87,13 +89,21 @@ def cmd_lacunas(a) -> int:
     return 0
 
 
+ICONE = {"bloqueia": "✗", "atencao": "⚠", "sugestao": "·"}
+ROTULO = {"bloqueia": "Bloqueia", "atencao": "Atenção", "sugestao": "Sugestão"}
+
+
 def cmd_revisar(a) -> int:
     c = _carregar(a.pasta)
     avisos = revisar(c)
-    for av in avisos:
-        print(f"⚠ {av}")
+    for nivel in ICONE:
+        do_nivel = [av for av in avisos if av.nivel == nivel]
+        if do_nivel:
+            print(f"{ROTULO[nivel]} ({len(do_nivel)})")
+            for av in do_nivel:
+                print(f"  {ICONE[nivel]} {av.texto}")
     print(f"{len(avisos)} aviso(s).")
-    return 0
+    return 1 if any(av.nivel == "bloqueia" for av in avisos) else 0
 
 
 def cmd_economia(a) -> int:
@@ -108,11 +118,16 @@ def cmd_economia(a) -> int:
     for evento, custo in n.custo_max.items():
         marca = "←" if evento == est.metrica_principal else " "
         print(f"  custo máx. {evento:<17} {_brl(custo)} {marca}")
-    print(f"Verba mínima viável/mês:  {_brl(n.verba_minima_viavel)}  (50 leads/semana no CPL máximo)")
     print(f"Margem/CAC no teto:       {n.ltv_cac_no_teto:.1f}×")
+    verba = est.orcamento.verba_mensal
+    evento = est.evento_otimizacao or est.metrica_principal
+    print(f"Verba/mês para otimizar por cada evento (50 por semana no custo máximo){'' if verba is None else f' — plano: {_brl(verba)}'}:")
+    for degrau, v in n.verba_para_otimizar.items():
+        ok = "" if verba is None else ("✓" if v <= verba else "✗")
+        print(f"  {ok:1} {degrau:<17} {_brl(v)}{'  ← evento de otimização' if degrau == evento else ''}")
     conv = conversoes_na_validacao(est)
     if conv is not None:
-        print(f"Validação: {_brl(est.orcamento.verba_validacao)} compram até {conv:.0f} conversões de {est.metrica_principal} no custo máximo")
+        print(f"Validação: {_brl(est.orcamento.verba_validacao)} compram {conv:.0f} {est.metrica_principal} se o custo ficar no teto (menos, se ficar acima)")
     if est.economia.estimados:
         print(f"Estimados (trocar por dado real): {', '.join(est.economia.estimados)}")
     return 0
@@ -174,11 +189,26 @@ def cmd_apresentar(a) -> int:
     return 0
 
 
+def cmd_fechar_ciclo(a) -> int:
+    try:
+        destino = fechar_ciclo(a.pasta, a.nome)
+    except ErroCliente as e:
+        print(f"✗ {a.pasta}: arquivos com erro; corrija antes de fechar o ciclo\n{e}")
+        return 1
+    except (ValueError, FileExistsError) as e:
+        print(f"✗ {e}")
+        return 1
+    print(f"✓ {destino} (cópia dos arquivos + resumo.md). Agora revise o plano com os dados do ciclo.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="trilha_briefing", description="Briefing, marca e estratégia por cliente")
     sub = ap.add_subparsers(dest="comando", required=True)
     s = sub.add_parser("novo"); s.add_argument("id"); s.add_argument("--pasta", default="clientes"); s.set_defaults(f=cmd_novo)
-    s = sub.add_parser("questionario"); s.add_argument("--cliente", default=""); s.add_argument("--assessor", action="store_true")
+    s = sub.add_parser("questionario"); s.add_argument("--cliente", default="")
+    s.add_argument("--para", choices=["cliente", "reuniao", "assessor"], default="cliente")
+    s.add_argument("--assessor", action="store_true", help="o mesmo que --para assessor")
     s.set_defaults(f=cmd_questionario)
     for nome, f in (("validar", cmd_validar), ("lacunas", cmd_lacunas), ("revisar", cmd_revisar),
                     ("economia", cmd_economia), ("canais", cmd_canais), ("grade", cmd_grade)):
@@ -186,6 +216,8 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--para", choices=["trilha", "lp"], required=True)
     s.add_argument("--saida", default="dist"); s.add_argument("--oferta"); s.add_argument("--origem", choices=["meta", "google"])
     s.set_defaults(f=cmd_exportar)
+    s = sub.add_parser("fechar-ciclo"); s.add_argument("pasta"); s.add_argument("--nome", required=True)
+    s.set_defaults(f=cmd_fechar_ciclo)
     s = sub.add_parser("apresentar"); s.add_argument("pasta"); s.add_argument("--saida", default="dist"); s.set_defaults(f=cmd_apresentar)
     a = ap.parse_args(argv)
     return a.f(a)

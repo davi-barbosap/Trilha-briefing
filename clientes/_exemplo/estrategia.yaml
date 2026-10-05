@@ -12,6 +12,7 @@ krs:
   - { descricao: "Primeiro contato com o lead em até 30 min no horário comercial", metrica: "% dos leads", meta: 80 }
 
 metrica_principal: agendamento   # aula experimental agendada
+evento_otimizacao: lead          # a verba não sustenta 50 agendamentos por semana; o agendamento é acompanhado no Kommo
 
 economia:                        # mesmos campos do perfil.yaml do Trilha
   modelo_receita: recorrencia
@@ -56,7 +57,7 @@ restricoes:
   - "Verba máxima de R$ 6.000/mês"
 
 riscos:
-  - { descricao: "Consultora não dá conta do volume de leads", categoria: recurso, probabilidade: 4, impacto: 4, resposta: "raio-x semanal do tempo de primeiro contato; bot de agendamento fora do horário" }
+  - { descricao: "Consultora não dá conta do volume de leads", categoria: recurso, probabilidade: 4, impacto: 4, resposta: "raio-x semanal do tempo de primeiro contato; bot de agendamento fora do horário", interno: true }
   - { descricao: "Lead agenda e não comparece", categoria: qualidade, probabilidade: 3, impacto: 4, resposta: "confirmação na véspera e no dia; medir comparecimento por criativo" }
   - { descricao: "Pouca produção de vídeo", categoria: recurso, probabilidade: 3, impacto: 3, resposta: "roteiro mensal com 4 vídeos gravados em uma tarde" }
   - { descricao: "Baixa em novembro e dezembro", categoria: externo, probabilidade: 5, impacto: 2, resposta: "reduzir verba e acumular público para janeiro" }

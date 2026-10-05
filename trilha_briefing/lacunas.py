@@ -5,9 +5,15 @@ Lacuna é informação que ainda não existe. Não é julgamento de qualidade: i
 
 from __future__ import annotations
 
-from trilha_briefing.esquema import ClienteCompleto
+from trilha_briefing.esquema import FONTES_DE_ESCUTA, ClienteCompleto, Persona
+from trilha_briefing.revisao import bloqueantes
 
 ETAPAS = ("briefing", "pesquisa", "plataforma", "provas", "ofertas", "estrategia")
+
+
+def escutada(p: Persona) -> bool:
+    """A persona tem ao menos uma objeção vinda de quem compra (escuta ou dados), não da empresa."""
+    return any(o.fonte in FONTES_DE_ESCUTA for o in p.objecoes)
 
 
 def _briefing(c: ClienteCompleto) -> list[str]:
@@ -24,6 +30,16 @@ def _briefing(c: ClienteCompleto) -> list[str]:
         f.append("verba mensal máxima (restricoes.verba_mensal_max)")
     if not b.stakeholders:
         f.append("quem decide do lado do cliente (stakeholders)")
+    if b.area is None:
+        f.append("área de atuação: cidades, raio ou online (area)")
+    if b.capacidade.leads_dia is None or b.capacidade.clientes_novos_mes is None:
+        f.append("capacidade: contatos por dia que o time atende e clientes novos por mês que a operação entrega")
+    if not b.aprovacao.responsavel or b.aprovacao.prazo_horas is None:
+        f.append("quem aprova anúncio e texto, e em quanto tempo (aprovacao)")
+    if b.acessos.pendentes():
+        f.append(f"acessos pendentes: {', '.join(b.acessos.pendentes())}")
+    if b.ativos.pendentes():
+        f.append(f"ativos a conferir: {', '.join(b.ativos.pendentes())}")
     if "cliente" not in b.preenchido_por:
         f.append("o cliente ainda não respondeu o questionário (preenchido_por)")
     return f
@@ -40,10 +56,14 @@ def _pesquisa(c: ClienteCompleto) -> list[str]:
                                 ("ganchos", pe.ganchos)) if not v]
         if pe.nivel_consciencia is None:
             falta.append("nível de consciência")
+        if pe.objecoes and not escutada(pe):
+            falta.append("objeção vinda da escuta (consumidor ou dados)")
         if falta:
             f.append(f"persona {pe.id}: {', '.join(falta)}")
     if not p.escuta:
         f.append("escuta: de onde vieram dores e objeções (entrevistas, CRM, avaliações)")
+    if not p.nao_atender:
+        f.append("quem não atender (persona negativa) e como filtrar")
     if len(p.concorrentes) < 3:
         f.append(f"benchmark com {len(p.concorrentes)} concorrente(s); o mínimo útil é 3, o ideal 5")
     if not p.unicidade:
@@ -180,16 +200,18 @@ def bloqueios_aprovacao(c: ClienteCompleto) -> list[str]:
         b.append(f"medição não pronta ({', '.join(e.medicao.pendentes())}): sem isso não há como saber se funcionou")
     if e.economia is None or e.orcamento.verba_validacao is None:
         b.append("sem economia unitária ou sem verba de validação: não há teto de custo nem limite de perda combinado")
-    escutadas = any(
-        it.fonte in ("cliente", "dados", "mercado") for p in c.pesquisa.personas for it in p.objecoes
-    )
-    if not c.pesquisa.escuta or not escutadas:
-        b.append("objeções sem escuta real: as personas ainda são opinião")
     principal = c.oferta_principal()
+    personas = [c.persona(pid) for pid in (principal.personas if principal else [])]
+    sem_escuta = [p.id for p in personas if p and not escutada(p)]
+    if not c.pesquisa.escuta:
+        b.append("nenhum registro de escuta: as personas ainda são opinião da empresa")
+    elif sem_escuta or not personas:
+        b.append(f"persona(s) da oferta principal sem objeção vinda da escuta: {', '.join(sem_escuta) or 'nenhuma persona ligada'}")
     if principal is None or principal.promessa is None:
         b.append("oferta principal sem promessa")
     if not (c.provas.utilizaveis("numero") or c.provas.utilizaveis("depoimento")):
         b.append("nenhuma prova utilizável (número com fonte ou depoimento autorizado)")
     if not any(cp.status == "ativo" for cp in e.canais):
         b.append("nenhum canal ativo")
+    b += [f"revisão: {a.texto}" for a in bloqueantes(c)]
     return b

@@ -13,7 +13,11 @@ from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ErroCliente, Item, carregar_cliente
 from trilha_briefing.exportar import exportar_lp, oferta_trilha, pagina_lp, perfil_parcial
 from trilha_briefing.lacunas import bloqueios_aprovacao, lacunas
-from trilha_briefing.revisao import revisar
+from trilha_briefing.revisao import revisar as _revisar
+
+
+def revisar(c):
+    return [a.texto for a in _revisar(c)]
 
 EXEMPLO = Path(__file__).parent.parent / "clientes" / "_exemplo"
 
@@ -50,6 +54,12 @@ class TestEsquema(Base):
     def test_texto_solto_vira_hipotese_sem_fonte(self):
         it = Item.model_validate("Turmas pequenas")
         self.assertEqual((it.fonte, it.status), ("nao_informada", "hipotese"))
+
+    def test_fonte_cliente_e_recusada(self):
+        self.editar("briefing.yaml", lambda d: d["historico"]["funcionou"].append({"texto": "x", "fonte": "cliente"}))
+        with self.assertRaises(ErroCliente) as e:
+            carregar_cliente(self.pasta)
+        self.assertIn("ambígua", e.exception.erros["briefing.yaml"])
 
     def test_persona_inexistente_na_oferta(self):
         self.editar("ofertas/aula-experimental.yaml", lambda d: d["personas"].append("fantasma"))
@@ -110,7 +120,21 @@ class TestRevisao(Base):
         self.assertIn("termo proibido", avisos)
         self.assertIn("escassez sem evidência", avisos)
         self.assertIn("busca_concorrente sem aprovação", avisos)
-        self.assertIn("inconclusivo", avisos)
+        self.assertIn("h01-gancho-travar precisa de 100 lead (50 × 2 variações)", avisos)
+
+    def test_volume_conta_todas_as_variacoes(self):
+        # R$ 8.000 / R$ 49,68 = 161 leads: cabem 50 × 2 variações, não 50 × 4
+        self.assertFalse(any("h01" in a for a in revisar(carregar_cliente(EXEMPLO))))
+        self.editar("hipoteses.yaml", lambda d: d["hipoteses"][0].update(variacoes=4))
+        self.assertTrue(any("h01-gancho-travar precisa de 200 lead" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_evento_de_otimizacao_inviavel(self):
+        def est(d):
+            d["orcamento"].update(verba_mensal=30000, teto_mensal=30000)
+            d["evento_otimizacao"] = "agendamento"
+        self.editar("estrategia.yaml", est)
+        avisos = revisar(carregar_cliente(self.pasta))
+        self.assertTrue(any("otimizar por agendamento" in a and "otimize por lead_qualificado" in a for a in avisos))
 
     def test_hipotese_concluida_sem_volume(self):
         def hip(d):
@@ -118,12 +142,84 @@ class TestRevisao(Base):
         self.editar("hipoteses.yaml", hip)
         self.assertTrue(any("trate como inconclusiva" in a for a in revisar(carregar_cliente(self.pasta))))
 
+    def test_objecao_so_da_empresa_bloqueia_aprovacao(self):
+        def so_empresa(d):
+            for o in d["personas"][0]["objecoes"]:
+                o["fonte"] = "empresa"
+        self.editar("pesquisa.yaml", so_empresa)
+        bloqueios = bloqueios_aprovacao(carregar_cliente(self.pasta))
+        self.assertTrue(any("profissional-travado" in b for b in bloqueios))
+
     def test_sem_escuta_bloqueia_aprovacao(self):
         self.editar("pesquisa.yaml", lambda d: d.update(escuta=[]))
         self.assertTrue(any("escuta" in b for b in bloqueios_aprovacao(carregar_cliente(self.pasta))))
 
 
+class TestGravidade(Base):
+    def test_exemplo_sem_bloqueio_e_cli_ok(self):
+        self.assertFalse([a for a in _revisar(carregar_cliente(EXEMPLO)) if a.nivel == "bloqueia"])
+        self.assertEqual(main(["revisar", str(EXEMPLO)]), 0)
+
+    def test_bloqueio_vira_lacuna_e_cli_falha(self):
+        self.editar("briefing.yaml", lambda d: d["negocio"].update(modelo_receita="venda_direta"))
+        c = carregar_cliente(self.pasta)
+        self.assertTrue(any("modelo de receita diferente" in b for b in bloqueios_aprovacao(c)))
+        self.assertEqual(main(["revisar", str(self.pasta)]), 1)
+
+    def test_ticket_divergente(self):
+        self.editar("ofertas/conversacao-adultos.yaml", lambda d: d["condicoes"].update(ticket_medio=900))
+        self.assertTrue(any("ticket da oferta principal" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_prova_de_autoridade_precisa_de_fonte_nao_de_autorizacao(self):
+        from trilha_briefing.esquema import Prova, Provas
+        p = Provas(provas=[Prova(tipo="certificacao", texto="ISO 9001", fonte="certificado nº 123")])
+        self.assertEqual(len(p.utilizaveis()), 1)
+
+    def test_melhorar_nao_e_adjetivo_vago(self):
+        def dif(d):
+            d["diferenciais"] = ["Aulas para melhorar a pronúncia", "O melhor método", "Turmas de até 6"]
+        self.editar("ofertas/conversacao-adultos.yaml", dif)
+        vagos = [a for a in revisar(carregar_cliente(self.pasta)) if "adjetivo sem fato" in a]
+        self.assertEqual(len(vagos), 1)
+        self.assertIn("O melhor método", vagos[0])
+
+
+class TestBriefingCompleto(Base):
+    def test_cor_e_preco_validados_na_origem(self):
+        self.editar("plataforma.yaml", lambda d: d["identidade_visual"]["cores"].update(primaria="azul"))
+        with self.assertRaises(ErroCliente):
+            carregar_cliente(self.pasta)
+        shutil.rmtree(self.pasta)
+        shutil.copytree(EXEMPLO, self.pasta)
+        self.editar("plataforma.yaml", lambda d: d["preco"].update(anuncio="sob_consulta"))
+        with self.assertRaises(ErroCliente):
+            carregar_cliente(self.pasta)
+
+    def test_lacunas_do_briefing(self):
+        def tira(d):
+            d.pop("area")
+            d["capacidade"] = {}
+            d["aprovacao"] = {}
+        self.editar("briefing.yaml", tira)
+        faltas = " | ".join(lacunas(carregar_cliente(self.pasta))["briefing"])
+        for trecho in ("área de atuação", "capacidade", "quem aprova", "acessos pendentes"):
+            self.assertIn(trecho, faltas)
+
+    def test_verba_acima_da_capacidade(self):
+        self.editar("briefing.yaml", lambda d: d["capacidade"].update(leads_dia=2))
+        self.assertTrue(any("o time atende bem 2" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_persona_negativa_e_lacuna(self):
+        self.editar("pesquisa.yaml", lambda d: d.update(nao_atender=[]))
+        self.assertTrue(any("persona negativa" in f for f in lacunas(carregar_cliente(self.pasta))["pesquisa"]))
+
+
 class TestCanais(Base):
+    def test_marketplace_so_quando_existe(self):
+        self.assertNotIn("marketplace", [s.canal for s in sugerir(carregar_cliente(EXEMPLO))])
+        self.editar("briefing.yaml", lambda d: d["negocio"].update(marketplaces=["Mercado Livre"]))
+        self.assertIn("marketplace", [s.canal for s in sugerir(carregar_cliente(self.pasta))])
+
     def test_desejo_puxa_descoberta(self):
         antes = [s.canal for s in sugerir(carregar_cliente(EXEMPLO))]
         self.editar("briefing.yaml", lambda d: d["negocio"].update(tipo_compra="desejo"))
@@ -150,12 +246,32 @@ class TestExportar(Base):
         o = c.oferta("conversacao-adultos")
         meta, pend = pagina_lp(c, o, "meta")
         google, _ = pagina_lp(c, o, "google")
-        self.assertEqual(pend, [])
+        self.assertEqual(pend, [])  # a oferta principal do exemplo tem benefícios escritos
         self.assertIn("dor", meta)
         self.assertNotIn("dor", google)
         self.assertIn("prova_social", google)
         self.assertTrue(4 <= len(meta["beneficios"]["itens"]) <= 8)
         self.assertEqual(meta["contato"]["whatsapp"], "5541900000000")
+
+    def test_whatsapp_ausente_nao_passa_por_valido(self):
+        self.editar("briefing.yaml", lambda d: d["cliente"].update(whatsapp=""))
+        c = carregar_cliente(self.pasta)
+        pagina, pend = pagina_lp(c, c.oferta("conversacao-adultos"), "meta")
+        self.assertNotRegex(pagina["contato"]["whatsapp"], r"^55\d{10,11}$")
+        self.assertTrue(any("whatsapp" in p for p in pend))
+
+    def test_subtitulo_nao_repete_a_solucao(self):
+        c = carregar_cliente(EXEMPLO)
+        pagina, _ = pagina_lp(c, c.oferta("conversacao-adultos"), "meta")
+        self.assertNotEqual(pagina["topo"]["subtitulo"], pagina["dor"]["solucao"])
+
+    def test_beneficios_escritos_tem_prioridade(self):
+        itens = [{"titulo": f"Benefício {i}", "texto": f"Texto {i}"} for i in range(5)]
+        self.editar("ofertas/conversacao-adultos.yaml", lambda d: d.update(beneficios=itens))
+        c = carregar_cliente(self.pasta)
+        pagina, pend = pagina_lp(c, c.oferta("conversacao-adultos"), "meta")
+        self.assertEqual(pagina["beneficios"]["itens"], itens)
+        self.assertEqual(pend, [])
 
     def test_pendencias_ficam_no_arquivo(self):
         c = carregar_cliente(EXEMPLO)
@@ -174,13 +290,54 @@ class TestApresentar(Base):
         self.assertNotIn("nao_informada", html)
         self.assertLess(html.index("Inglês para falar no trabalho"), html.index("Aula experimental</h3>"))
 
+    def test_hipotese_marcada_e_risco_interno_fora(self):
+        html = gerar_html(carregar_cliente(EXEMPLO))
+        self.assertIn("Já tentei e não funcionou comigo</li>", html)  # validada: sem marca
+        self.assertIn("Aplicativo é mais barato <span class=\"hip\">a confirmar</span>", html)
+        self.assertNotIn("Consultora não dá conta", html)
+        self.assertIn("Lead agenda e não comparece", html)
+
 
 class TestCli(Base):
-    def test_questionario(self):
-        texto = questionario.gerar("Escola", assessor=True)
-        self.assertIn("1. O que vocês vendem?", texto)
-        self.assertIn("→ `briefing: negocio.o_que_vende`", texto)
-        self.assertNotIn("→", questionario.gerar("Escola"))
+    def test_questionario_tres_momentos(self):
+        cliente = questionario.gerar("Escola")
+        self.assertIn("O que vocês vendem?", cliente)
+        self.assertNotIn("→", cliente)
+        self.assertNotIn("●", cliente)
+        reuniao = questionario.gerar("Escola", para="reuniao")
+        self.assertIn("● Se precisar escolher um", reuniao)
+        self.assertIn("Roteiro das entrevistas", reuniao)
+        assessor = questionario.gerar("Escola", assessor=True)
+        self.assertIn("→ `briefing.capacidade.leads_dia`", assessor)
+        self.assertIn("◆ Avaliações no Google", assessor)
+        self.assertEqual(assessor.count("→"), len(questionario.perguntas()))
+
+    def test_campos_do_questionario_existem(self):
+        # Cada "arquivo.campo" citado no questionário precisa existir no esquema.
+        from trilha_briefing import esquema as e
+        modelos = {"briefing": e.Briefing, "pesquisa": e.Pesquisa, "plataforma": e.Plataforma, "estrategia": e.Estrategia,
+                   "ofertas": e.Oferta}
+        import re
+        for _, _, _, campo in questionario.perguntas():
+            for arquivo, caminho in re.findall(r"\b(briefing|pesquisa|plataforma|estrategia|ofertas)\.([a-z0-9_.\[\]]+)", campo):
+                modelo = modelos[arquivo]
+                for parte in caminho.replace("[]", "").split(".")[:2]:
+                    self.assertIn(parte, modelo.model_fields, f"{arquivo}.{caminho} ({campo})")
+                    anotacao = modelo.model_fields[parte].annotation
+                    filhos = [a for a in getattr(anotacao, "__args__", (anotacao,)) if isinstance(a, type) and hasattr(a, "model_fields")]
+                    if not filhos:
+                        break
+                    modelo = filhos[0]
+
+    def test_fechar_ciclo(self):
+        self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "2026-T4"]), 0)
+        destino = self.pasta / "historico" / "2026-T4"
+        self.assertTrue((destino / "estrategia.yaml").exists())
+        self.assertTrue((destino / "ofertas" / "conversacao-adultos.yaml").exists())
+        self.assertIn("h01-gancho-travar", (destino / "resumo.md").read_text(encoding="utf-8"))
+        carregar_cliente(self.pasta)  # o histórico não atrapalha a leitura
+        self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "2026-T4"]), 1)
+        self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "../fora"]), 1)
 
     def test_novo(self):
         self.assertEqual(main(["novo", "cliente-novo", "--pasta", str(self.tmp)]), 0)

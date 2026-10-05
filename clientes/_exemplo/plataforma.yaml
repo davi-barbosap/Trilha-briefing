@@ -14,7 +14,7 @@ posicionamento:
   categoria: "uma escola de conversação em turmas pequenas"
   diferenca: "faz cada aluno falar a maior parte da aula, com reposição em qualquer horário"
   razoes_para_acreditar:
-    - { texto: "Turmas de até 6 alunos", fonte: cliente, status: validada, evidencia: "grade de turmas" }
+    - { texto: "Turmas de até 6 alunos", fonte: empresa, status: validada, evidencia: "grade de turmas" }
     - { texto: "Nota 4,9 com 87 avaliações no Google", fonte: dados, status: validada, evidencia: "perfil do Google" }
   percepcao_atual: "uma escola de bairro simpática"
   percepcao_desejada: "a referência para adulto que precisa falar inglês no trabalho"

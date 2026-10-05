@@ -14,7 +14,7 @@ canais: []                        # { canal, plataforma, papel, status: ativo|te
 grade: []                         # { codigo, publico, argumento, persona, oferta, nivel_consciencia, formato, prioridade }
 premissas: []
 restricoes: []
-riscos: []                        # { descricao, categoria, probabilidade 1–5, impacto 1–5, resposta }
+riscos: []                        # { descricao, categoria, probabilidade 1–5, impacto 1–5, resposta, interno }
 marcos: []                        # { nome, quando, entrega, responsavel }
 medicao:
   utm_padrao: false

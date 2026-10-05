@@ -4,14 +4,14 @@ personas:
     nome: Profissional travado
     quem_e: "28–40 anos, analista ou coordenador, entende inglês escrito mas trava para falar em reunião"
     dores:
-      - { texto: "Fico calado na reunião com o time de fora mesmo sabendo o assunto", fonte: cliente, status: validada, evidencia: "8 de 12 entrevistas" }
+      - { texto: "Fico calado na reunião com o time de fora mesmo sabendo o assunto", fonte: consumidor, status: validada, evidencia: "8 de 12 entrevistas" }
       - { texto: "Já fiz curso e larguei no meio", fonte: dados, status: validada, evidencia: "motivo mais citado nas conversas do Kommo" }
     desejos:
-      - { texto: "Conseguir falar numa reunião sem ensaiar antes", fonte: cliente }
-      - { texto: "Ser considerado para a vaga que pede inglês", fonte: cliente }
+      - { texto: "Conseguir falar numa reunião sem ensaiar antes", fonte: consumidor, evidencia: "entrevistas com alunos" }
+      - { texto: "Ser considerado para a vaga que pede inglês", fonte: consumidor }
     objecoes:
       - { texto: "Não tenho tempo fixo na semana", fonte: dados, status: validada, evidencia: "conversas do Kommo, set/2026" }
-      - { texto: "Já tentei e não funcionou comigo", fonte: cliente }
+      - { texto: "Já tentei e não funcionou comigo", fonte: consumidor, status: validada, evidencia: "5 de 12 entrevistas" }
       - { texto: "Aplicativo é mais barato", fonte: mercado }
     ganchos:
       - { texto: "Você entende tudo, mas a frase não sai na hora", fonte: assessor }
@@ -23,11 +23,11 @@ personas:
     nome: Viajante adiado
     quem_e: "35–55 anos, quer viajar sozinho ou visitar filho fora e tem vergonha de depender de alguém"
     dores:
-      - { texto: "Na última viagem dependi do meu filho para tudo", fonte: cliente }
+      - { texto: "Na última viagem dependi do meu filho para tudo", fonte: empresa }
     desejos:
-      - { texto: "Pedir, perguntar e resolver sozinho na viagem", fonte: cliente }
+      - { texto: "Pedir, perguntar e resolver sozinho na viagem", fonte: empresa }
     objecoes:
-      - { texto: "Na minha idade é difícil aprender", fonte: cliente }
+      - { texto: "Na minha idade é difícil aprender", fonte: empresa }
     ganchos:
       - { texto: "A viagem em que você vai pedir o próprio café", fonte: assessor }
     nivel_consciencia: consciente_do_problema
@@ -39,6 +39,11 @@ escuta:
   - { fonte: conversas do Kommo (leads perdidos), quantidade: 40, data: 2026-09-25, resumo: "horário e preço são as objeções mais comuns" }
   - { fonte: avaliações do Google, quantidade: 87, data: 2026-09-25 }
 
+nao_atender:                     # persona negativa: quem não deve virar lead
+  - { perfil: "Crianças e adolescentes", motivo: "a escola só tem turmas de adultos", como_filtrar: "idade mínima 22 no Meta; negativar 'infantil', 'kids'" }
+  - { perfil: "Quem quer certificado (TOEFL, IELTS) em poucas semanas", motivo: "não há preparatório; vira matrícula que cancela", como_filtrar: "negativar 'toefl', 'ielts', 'intensivo'" }
+  - { perfil: "Quem procura o mais barato", motivo: "aplicativo resolve melhor; desiste no 2º mês", como_filtrar: "pergunta de qualificação 'Para que você precisa do inglês?'" }
+
 concorrentes:
   - { nome: Rede Nacional A, promessa: "fluência garantida", posicionamento_preco: media, fortes: [marca conhecida, muitas unidades], fracos: [turmas de 15, rotatividade de professor], canais: [Google, Meta, TV], aprender: "promessa genérica abre espaço para prova específica" }
   - { nome: Escola Local B, promessa: "inglês com nativos", posicionamento_preco: acima, fortes: [professores nativos], fracos: [horário só à noite], canais: [Instagram], aprender: "nativo é desejo, mas não resolve horário" }
@@ -48,7 +53,7 @@ unicidade: "turmas de até 6 com reposição de aula em qualquer horário da gra
 
 swot:
   forcas: [{ texto: "Nota 4,9 com 87 avaliações no Google", fonte: dados, status: validada, evidencia: "perfil do Google, 25/09/2026" }, "Turmas pequenas"]
-  fraquezas: ["Marca pouco conhecida fora do bairro", { texto: "Só uma consultora para atender", fonte: cliente }]
+  fraquezas: ["Marca pouco conhecida fora do bairro", { texto: "Só uma consultora para atender", fonte: empresa }]
   oportunidades: ["Empresas exigindo inglês em vagas de nível médio", "Aulas online ampliam a área atendida"]
   ameacas: ["Aplicativos baratos", "Desistência alta no 2º mês no setor"]
 

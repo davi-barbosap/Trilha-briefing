@@ -1,20 +1,26 @@
-# O que está sendo testado. Uma variável por teste, critério definido antes, volume mínimo para concluir.
+# O que está sendo testado. Uma variável por teste, critério definido antes, volume mínimo por variação.
 hipoteses:
   - id: h01-gancho-travar
-    hipotese: "O gancho 'você entende, mas a frase não sai' (PT01) agenda mais barato que 'turma de até 6' (PT02)"
+    hipotese: "O gancho 'você entende, mas a frase não sai' (PT01) gera lead mais barato que 'turma de até 6' (PT02)"
     variavel: criativo
-    metrica: custo por agendamento
-    criterio_sucesso: "PT01 ao menos 20% mais barato, com 30 agendamentos ou mais em cada"
-    minimo_conversoes: 30
+    codigos: [PT01, PT02]
+    metrica: custo por lead
+    evento: lead
+    criterio_sucesso: "PT01 ao menos 20% mais barato, com 50 leads ou mais em cada"
+    minimo_conversoes: 50
+    variacoes: 2
     horizonte: nucleo
     inicio: 2026-10-20
     resultado: planejada
   - id: h02-pagina-vs-whatsapp
-    hipotese: "Landing page com formulário traz lead que comparece mais do que o clique direto para WhatsApp"
+    hipotese: "Landing page com formulário traz mais lead qualificado por real investido do que o clique direto para WhatsApp"
     variavel: pagina
-    metrica: comparecimento à aula experimental
-    criterio_sucesso: "comparecimento 10 pontos maior pela página, com 30 agendamentos em cada"
+    codigos: [PT02]
+    metrica: custo por lead qualificado
+    evento: lead_qualificado
+    criterio_sucesso: "custo por qualificado 15% menor pela página, com 30 qualificados em cada"
     minimo_conversoes: 30
+    variacoes: 2
     horizonte: nucleo
     resultado: planejada
   - id: h03-empresas
@@ -23,5 +29,6 @@ hipoteses:
     metrica: reuniões com RH
     criterio_sucesso: "3 reuniões com RH em 2 meses"
     minimo_conversoes: 3
+    variacoes: 1
     horizonte: adjacente
     resultado: planejada

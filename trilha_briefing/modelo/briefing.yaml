@@ -5,11 +5,16 @@ cliente:
   nome: PREENCHER
   segmento: PREENCHER             # texto livre: odontologia, escola de idiomas, software B2B…
   playbook: padrao                # playbooks/<playbook>/ no Trilha
-  cidade_atuacao: ""
   site: ""
   redes: []
   whatsapp: ""                    # 55 + DDD + número, só dígitos
   tempo_mercado: ""
+
+area:
+  alcance: local                  # local | regional | nacional | online
+  cidades: []
+  raio_km: null
+  observacoes: ""
 
 negocio:
   o_que_vende: PREENCHER
@@ -19,6 +24,12 @@ negocio:
   ciclo_venda_dias: null
   time_comercial: ""
   crm: ""
+  marketplaces: []                # onde a categoria já é comprada (iFood, Mercado Livre, Doctoralia…)
+
+capacidade:                       # verba que gera mais do que isso queima lead
+  leads_dia: null                 # contatos novos por dia que o time atende bem
+  clientes_novos_mes: null        # clientes novos por mês que a operação entrega
+  observacoes: ""
 
 resultado_desejado:
   em_12_meses: PREENCHER          # o que precisa ser verdade daqui a 12 meses
@@ -37,5 +48,29 @@ restricoes:
   nao_pode: []
 
 stakeholders: []                  # { nome, papel, influencia: alta|media|baixa, interesse: alta|media|baixa, espera }
+aprovacao:                        # quem aprova anúncio e texto do lado do cliente
+  responsavel: ""
+  prazo_horas: null
+  substituto: ""
+
+acessos:                          # ok | pendente | nao_tem (precisa criar) | nao_sei
+  meta_business: nao_sei
+  conta_anuncios_meta: nao_sei
+  pixel_meta: nao_sei
+  google_ads: nao_sei
+  tag_google: nao_sei
+  gtm: nao_sei
+  ga4: nao_sei
+  crm: nao_sei
+  dominio: nao_sei
+
+ativos:
+  logo_editavel: nao_sei
+  manual_marca: nao_sei
+  fotos_reais: nao_sei
+  videos_reais: nao_sei
+  politica_privacidade: nao_sei
+  lista_clientes_autorizada: nao_sei
+
 preenchido_por: [assessor]        # acrescente cliente quando ele responder o questionário
 data: null
