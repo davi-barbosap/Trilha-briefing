@@ -10,6 +10,7 @@
     python -m trilha_briefing grade <pasta>                   grade públicos × argumentos com códigos
     python -m trilha_briefing exportar <pasta> --para trilha|lp [--saida dist]
     python -m trilha_briefing apresentar <pasta> [--saida dist]
+    python -m trilha_briefing fechar-ciclo <pasta> --nome 2026-T4   guarda o estado antes da revisão trimestral
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from pathlib import Path
 
 from trilha_briefing import questionario
 from trilha_briefing.apresentar import apresentar
+from trilha_briefing.ciclo import fechar_ciclo
 from trilha_briefing.canais import recomendacoes_gerais, sugerir
 from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ErroCliente, carregar_cliente
@@ -187,6 +189,19 @@ def cmd_apresentar(a) -> int:
     return 0
 
 
+def cmd_fechar_ciclo(a) -> int:
+    try:
+        destino = fechar_ciclo(a.pasta, a.nome)
+    except ErroCliente as e:
+        print(f"✗ {a.pasta}: arquivos com erro; corrija antes de fechar o ciclo\n{e}")
+        return 1
+    except (ValueError, FileExistsError) as e:
+        print(f"✗ {e}")
+        return 1
+    print(f"✓ {destino} (cópia dos arquivos + resumo.md). Agora revise o plano com os dados do ciclo.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="trilha_briefing", description="Briefing, marca e estratégia por cliente")
     sub = ap.add_subparsers(dest="comando", required=True)
@@ -201,6 +216,8 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--para", choices=["trilha", "lp"], required=True)
     s.add_argument("--saida", default="dist"); s.add_argument("--oferta"); s.add_argument("--origem", choices=["meta", "google"])
     s.set_defaults(f=cmd_exportar)
+    s = sub.add_parser("fechar-ciclo"); s.add_argument("pasta"); s.add_argument("--nome", required=True)
+    s.set_defaults(f=cmd_fechar_ciclo)
     s = sub.add_parser("apresentar"); s.add_argument("pasta"); s.add_argument("--saida", default="dist"); s.set_defaults(f=cmd_apresentar)
     a = ap.parse_args(argv)
     return a.f(a)

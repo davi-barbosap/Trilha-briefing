@@ -329,6 +329,16 @@ class TestCli(Base):
                         break
                     modelo = filhos[0]
 
+    def test_fechar_ciclo(self):
+        self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "2026-T4"]), 0)
+        destino = self.pasta / "historico" / "2026-T4"
+        self.assertTrue((destino / "estrategia.yaml").exists())
+        self.assertTrue((destino / "ofertas" / "conversacao-adultos.yaml").exists())
+        self.assertIn("h01-gancho-travar", (destino / "resumo.md").read_text(encoding="utf-8"))
+        carregar_cliente(self.pasta)  # o histórico não atrapalha a leitura
+        self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "2026-T4"]), 1)
+        self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "../fora"]), 1)
+
     def test_novo(self):
         self.assertEqual(main(["novo", "cliente-novo", "--pasta", str(self.tmp)]), 0)
         c = carregar_cliente(self.tmp / "cliente-novo")
