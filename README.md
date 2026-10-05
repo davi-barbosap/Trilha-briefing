@@ -50,7 +50,7 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, 
 |---|---|---|
 | `exportar --para trilha` | `marca.yaml`, `ofertas/`, `perfil.parcial.yaml` | Trilha-ads (cadastro, economia e verba) |
 | `exportar --para lp --oferta <id> [--origem meta\|google]` | rascunho de `pagina.yaml` por oferta e origem | Trilha-LP |
-| `exportar --para copy` | `copy.yaml`: personas, voz, ofertas, provas utilizáveis, compliance, grade e hipóteses | Trilha-copy |
+| `exportar --para copy` | `copy.yaml`: personas, voz, ofertas, provas utilizáveis, compliance, grade, hipóteses e onde cada célula vira anúncio (nomes e parâmetros de URL do plano) | Trilha-copy |
 
 Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima exportação sobrescreve o que for mudado à mão. Detalhes em [contrato](docs/contrato.md).
 
@@ -128,7 +128,7 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
 
 ## Situação atual
 
-Versão 0.4.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
+Versão 0.4.1, em uso no exemplo e sem cliente real ainda. Próximos passos:
 - o caminho de volta dos resultados do Trilha-ads para as hipóteses e as personas;
 - o Trilha-ads comparar o plano com o que está rodando, quando houver coleta.
 

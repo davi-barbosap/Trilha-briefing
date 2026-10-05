@@ -1,5 +1,10 @@
 # Mudanças
 
+## 0.4.1 — plano de campanhas chega à copy (out/2026)
+
+- **`exportar --para copy`** leva o bloco `veiculacao`: onde cada célula vira anúncio (plataforma, campanha, conjunto), com o nome do anúncio e os parâmetros de URL já resolvidos pelas regras de nomes do plano. O Trilha-copy só preenche o código e a versão da peça e gera a lista de subida. Antes, o nome e a UTM de cada anúncio eram montados à mão na hora de subir, longe do plano.
+- Sem `campanhas.yaml`, o bloco não sai. É opcional e o contrato continua na versão 1.
+
 ## 0.4.0 — plano de campanhas (out/2026)
 
 ### Novo

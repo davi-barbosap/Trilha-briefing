@@ -59,10 +59,11 @@ Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferra
 | `ofertas` | `ofertas/` | com bastidores, alternativas, urgência, custo de não agir, escada do "e daí?" |
 | `provas`, `historias` | `provas.yaml` | **só as utilizáveis**: número e autoridade com fonte, depoimento e história autorizados |
 | `grade`, `hipoteses` | `estrategia.yaml`, `hipoteses.yaml` | a peça de copy nasce de uma célula da grade e se liga a uma hipótese |
+| `veiculacao` | `campanhas.yaml` + regras de nomes | onde cada célula vira anúncio: plataforma, nome da campanha e do conjunto, molde do nome do anúncio e dos parâmetros de URL, já resolvidos; ficam só `{codigo}` e `{versao}` para a copy preencher com a peça. Sai só quando há plano de campanhas |
 
 O que não é utilizável nem chega à ferramenta de copy: um depoimento sem autorização não pode ir parar num anúncio por engano.
 
-Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto.
+Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto. Bloco novo e opcional não sobe a versão: a copy ignora o que ainda não conhece.
 
 ## Teste de contrato
 
