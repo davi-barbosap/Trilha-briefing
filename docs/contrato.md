@@ -33,17 +33,31 @@ Gera um rascunho de `pagina.yaml` por oferta e origem (`meta` abre com a dor, `g
 | Bloco da página | Vem de |
 |---|---|
 | `marca` | `plataforma.yaml` (cores, tipografia, registro, avisos, termos e promessas proibidas, política de privacidade) |
-| `contato.whatsapp` | `briefing.cliente.whatsapp` |
-| `topo.titulo` / `subtitulo` | `promessa.texto` / `big_idea.mecanismo_unico` |
+| `contato.whatsapp` | `briefing.cliente.whatsapp`; sem ele, sai `PREENCHER`, que não passa no `trilha_lp validar` |
+| `topo.titulo` / `subtitulo` | `promessa.texto` / `oferta.subtitulo` (ou os três primeiros diferenciais) |
 | `topo.provas` | até 2 números com fonte |
 | `topo.reducao_medo` | inversão de risco, condição excepcional, pagamento |
 | `dor` | 1ª dor da persona → título; antes/depois (`dia_a_dia`, `sentir`) → problema e agravamento; mecanismo único → solução |
 | `prova_social` | história de cliente (título), números com fonte, depoimentos autorizados |
-| `beneficios` | `antes_depois` (o "depois" é o título) + diferenciais, de 4 a 8 |
+| `beneficios` | `oferta.beneficios` (4 a 8, escritos para a página); sem eles, o "depois" do antes/depois e os diferenciais, com o texto de apoio marcado como pendente |
 | `como_funciona`, `objecoes` | os mesmos campos da oferta |
 | `formulario.qualificacao` | `oferta.qualificacao` |
 
 O que faltar sai como `# PENDENTE:` no topo do arquivo. O texto sai cru: reescreva com a voz da marca e valide com `python -m trilha_lp validar`.
+
+## Teste de contrato
+
+`tests/test_contrato.py` exporta o exemplo e valida o resultado com o código real dos outros repositórios:
+- as ofertas passam no esquema do Trilha;
+- a economia dá os mesmos números na calculadora do Trilha;
+- a página da oferta principal passa no esquema da Trilha-LP;
+- a página sem WhatsApp não passa.
+
+Os repositórios não dependem um do outro, então o teste só roda com os dois clonados ao lado:
+
+```bash
+PYTHONPATH=../Trilha:../Trilha-LP python -m unittest tests.test_contrato -v
+```
 
 ## Grade de criativos
 

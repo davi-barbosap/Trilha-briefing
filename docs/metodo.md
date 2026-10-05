@@ -35,10 +35,21 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 
 ## Ferramentas por etapa
 
-**Kickoff.** Questionário em linguagem do cliente (`questionario`); a versão do assessor mostra o campo que cada pergunta preenche (`questionario --assessor`). Mapa de stakeholders por influência × interesse: quem decide e quem precisa ser ouvido.
+**Kickoff.** 77 perguntas em três momentos:
+- ★ **cliente:** o cliente responde sozinho antes da reunião (`questionario`, cerca de 30 minutos);
+- ● **reunião:** aprofundar com o dono e com quem atende (`questionario --para reuniao`, cerca de 90 minutos);
+- ◆ **assessor:** o que você levanta com acessos, dados e escuta (`questionario --para assessor` mostra tudo, com o campo de cada pergunta).
+
+Também entram:
+- o mapa de stakeholders por influência × interesse;
+- quem aprova anúncio, em quanto tempo e quem substitui;
+- a capacidade de atendimento e de entrega;
+- a área de atuação;
+- os acessos e ativos que a fundação precisa.
 
 **Pesquisa.**
 - Personas com dores, desejos, objeções, ganchos, nível de consciência e gatilho de compra.
+- Quem **não** atender (persona negativa) e como filtrar: exclusão de público, palavra-chave negativa, pergunta de qualificação.
 - Benchmark de 3 a 5 concorrentes, terminando em **unicidade** (o que só este cliente tem).
 - SWOT, calendário de sazonalidade e a nota de maturidade do Trilha (0–3 em rastreamento, CRM, capacidade criativa, histórico de conta e verba).
 
@@ -65,13 +76,15 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 
 **Testes.**
 - A ordem para mexer quando algo não vai bem: criativo → público → objetivo → página → oferta. É a mesma ordem de diagnóstico do dossiê do Trilha.
+- Cada hipótese aponta os códigos da grade que testa, a etapa do funil em que o volume é contado, o mínimo **por variação** e quantas variações disputam. A verba de validação precisa pagar mínimo × variações; a conta usa o custo no teto, que é o ponto de equilíbrio. Acima do teto, a verba compra menos.
+- O evento de otimização (`evento_otimizacao`) é o que a verba sustenta com cerca de 50 eventos por semana. A métrica principal pode ficar mais abaixo no funil e ser acompanhada no CRM.
 - Horizonte de cada teste: núcleo (o que já funciona), adjacente (novo público ou oferta próxima) ou ruptura.
 
 ## Ciclo
 
 - **Semanal:** fica no Trilha (dossiê, raio-x do funil, relatório). Esta ferramenta não repete esses números.
 - **Trimestral:**
-  - volte aqui;
+  - `fechar-ciclo --nome 2026-T4` guarda uma cópia do estado e um resumo em `historico/`;
   - atualize as hipóteses com os resultados;
   - troque `estimados` da economia por taxas reais do CRM;
   - promova a `validada` o que a escuta e os dados confirmaram;
