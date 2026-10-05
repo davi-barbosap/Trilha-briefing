@@ -298,6 +298,7 @@ def pacote_copy(c: ClienteCompleto) -> dict:
         },
         "voz": pl.voz.model_dump(mode="json"),
         "posicionamento": pl.posicionamento.model_dump(mode="json"),
+        "identidade_visual": pl.identidade_visual.model_dump(mode="json"),  # vai no briefing do criativo
         "compliance": {
             "termos_proibidos": pl.voz.termos_proibidos,
             "promessas_proibidas": pl.compliance.promessas_proibidas,
@@ -317,7 +318,35 @@ def pacote_copy(c: ClienteCompleto) -> dict:
         "hipoteses": [h.model_dump(mode="json") for h in c.hipoteses.hipoteses],
         "metrica_principal": est.metrica_principal,
         "evento_otimizacao": est.evento_otimizacao or est.metrica_principal,
+        **({"veiculacao": v} if (v := veiculacao(c)) else {}),
     }
+
+
+def veiculacao(c: ClienteCompleto) -> list[dict]:
+    """Onde cada célula vira anúncio, com os nomes e os parâmetros de URL já resolvidos pelo plano de campanhas.
+
+    Ficam só `{codigo}` e `{versao}`, que o Trilha-copy preenche com a peça. Sem campanhas.yaml, sai vazio.
+    """
+    from trilha_briefing.campanhas import evento_da, nome, regras_do_plano  # campanhas importa este módulo
+
+    if not c.campanhas.campanhas:
+        return []
+    regras = regras_do_plano(c.campanhas)
+    locais = []
+    for cp in c.campanhas.campanhas:
+        base = {"cliente": c.briefing.cliente.id, "campanha": cp.id, "plataforma": cp.plataforma, "canal": cp.canal,
+                "evento": evento_da(c, cp), "fase": cp.fase}
+        for cj in cp.conjuntos:
+            for codigo in cj.celulas:
+                campos = {**base, "conjunto": cj.id}
+                locais.append({
+                    "codigo": codigo, "plataforma": cp.plataforma,
+                    "campanha": nome(regras.nomes.campanha, **campos),
+                    "conjunto": nome(regras.nomes.conjunto, **campos),
+                    "anuncio": nome(regras.nomes.anuncio, **campos),
+                    "parametros_url": nome(regras.nomes.utm, **campos),
+                })
+    return locais
 
 
 def exportar_copy(c: ClienteCompleto, saida: str | Path) -> Path:

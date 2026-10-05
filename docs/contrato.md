@@ -53,16 +53,18 @@ Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferra
 |---|---|---|
 | `cliente` | `briefing.yaml` | id, nome, segmento, playbook, WhatsApp, área |
 | `voz`, `posicionamento` | `plataforma.yaml` | inclui `voz.intensidade`, o termostato de 1 a 5 |
+| `identidade_visual` | `plataforma.yaml` | cores, tipografia, logo e estilo de imagem: vão no briefing do criativo de cada peça, para a equipe de criação |
 | `compliance` | `plataforma.yaml` + `briefing.restricoes` | termos e promessas proibidas, registros, avisos, regras legais, o que não pode |
 | `personas`, `nao_atender` | `pesquisa.yaml` | com medos, crenças (método, interna, externa), micro-problemas, frases literais, sofisticação |
 | `concorrentes` | `pesquisa.yaml` | **só os nomes**, para a revisão avisar quando uma peça cita um concorrente |
 | `ofertas` | `ofertas/` | com bastidores, alternativas, urgência, custo de não agir, escada do "e daí?" |
 | `provas`, `historias` | `provas.yaml` | **só as utilizáveis**: número e autoridade com fonte, depoimento e história autorizados |
 | `grade`, `hipoteses` | `estrategia.yaml`, `hipoteses.yaml` | a peça de copy nasce de uma célula da grade e se liga a uma hipótese |
+| `veiculacao` | `campanhas.yaml` + regras de nomes | onde cada célula vira anúncio: plataforma, nome da campanha e do conjunto, molde do nome do anúncio e dos parâmetros de URL, já resolvidos; ficam só `{codigo}` e `{versao}` para a copy preencher com a peça. Sai só quando há plano de campanhas |
 
 O que não é utilizável nem chega à ferramenta de copy: um depoimento sem autorização não pode ir parar num anúncio por engano.
 
-Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto.
+Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto. Bloco novo e opcional não sobe a versão: a copy ignora o que ainda não conhece.
 
 ## Teste de contrato
 
