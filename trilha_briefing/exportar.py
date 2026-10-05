@@ -1,9 +1,9 @@
 """Gera os arquivos que as outras ferramentas leem, a partir da mesma fonte.
 
-- Trilha: `marca.yaml`, `ofertas/<id>.yaml` (passam no esquema do Trilha) e `perfil.parcial.yaml`
-  (economia, métrica e verba; contas, CRM e conversões o assessor completa no Trilha).
+- Trilha-ads: `marca.yaml`, `ofertas/<id>.yaml` (passam no esquema do Trilha-ads) e `perfil.parcial.yaml`
+  (economia, métrica e verba; contas, CRM e conversões o assessor completa no Trilha-ads).
 - Trilha-LP: rascunho de `pagina.yaml` por oferta e origem. O texto sai cru: reescrever com a voz da marca.
-- Trilha-copywritter: `copy.yaml`, o contrato com tudo o que a copy pode usar (e nada que ela não possa).
+- Trilha-copy: `copy.yaml`, o contrato com tudo o que a copy pode usar (e nada que ela não possa).
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ def _sem_vazios(d: dict) -> dict:
     return {k: v for k, v in d.items() if v not in ("", None, [], {})}
 
 
-# ---------- Trilha ----------
+# ---------- Trilha-ads ----------
 
 
 def marca_trilha(c: ClienteCompleto) -> dict:
@@ -125,7 +125,7 @@ def exportar_trilha(c: ClienteCompleto, saida: str | Path) -> list[Path]:
         (saida / "perfil.parcial.yaml", perfil_parcial(c), [
             origem,
             "Parcial: falta o que só existe depois do acesso às contas — plataformas, crm (funis, mapa_eventos,",
-            "campos), conversao, freio e operacao. Complete no Trilha e valide com: python -m trilha validar",
+            "campos), conversao, freio e operacao. Complete no Trilha-ads e valide com: python -m trilha validar",
         ]),
     ]
     arquivos += [(saida / "ofertas" / f"{o.id}.yaml", oferta_trilha(c, o), [origem]) for o in c.ofertas]
@@ -277,7 +277,7 @@ def exportar_lp(c: ClienteCompleto, saida: str | Path, oferta: str | None = None
     return escritos
 
 
-# ---------- Trilha-copywritter ----------
+# ---------- Trilha-copy ----------
 
 VERSAO_CONTRATO_COPY = 1
 
@@ -324,7 +324,7 @@ def exportar_copy(c: ClienteCompleto, saida: str | Path) -> Path:
     caminho = Path(saida) / c.briefing.cliente.id / "copy.yaml"
     caminho.parent.mkdir(parents=True, exist_ok=True)
     cab = [
-        f"Contrato com o Trilha-copywritter, gerado pelo trilha-briefing a partir de clientes/{c.briefing.cliente.id}/.",
+        f"Contrato com o Trilha-copy, gerado pelo Trilha-briefing a partir do cliente {c.briefing.cliente.id}.",
         "Edite lá, não aqui. Importe com: python -m trilha_copy importar <este arquivo>",
     ]
     caminho.write_text(_yaml(pacote_copy(c), cab), encoding="utf-8")

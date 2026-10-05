@@ -1,59 +1,73 @@
 # Trilha-briefing
 
-Briefing, marca e estratégia por cliente. É a ferramenta que guia o assessor a entender o cliente antes de anunciar: o mercado, quem compra, a marca, as provas e as ofertas. Termina num plano com objetivo, economia, verba, canais, riscos e medição.
+Diagnóstico e planejamento de cada cliente da Trilha. É a primeira etapa e a fonte de tudo:
+- o que o cliente vende e para quem;
+- a marca, as provas e as ofertas;
+- a estratégia: objetivo, economia, verba, canais, grade de criativos, hipóteses e medição.
+
+As outras ferramentas só usam o que está aqui.
 
 Serve para qualquer segmento. O exemplo (`clientes/_exemplo/`) é uma escola de inglês fictícia.
 
-O que sai daqui alimenta as outras ferramentas:
-- [Trilha](https://github.com/davi-barbosap/Trilha) recebe `marca.yaml`, `ofertas/` e a economia do `perfil.yaml`;
-- [Trilha-LP](https://github.com/davi-barbosap/Trilha-LP) recebe o rascunho do `pagina.yaml`;
-- [Trilha-copywritter](https://github.com/davi-barbosap/Trilha-copywritter) recebe o `copy.yaml`, com tudo o que a copy pode usar;
-- o cliente recebe a apresentação do plano em HTML.
+## Ecossistema Trilha
 
-## Como usar
+| Etapa | Repositório | Papel |
+|---|---|---|
+| 1. Diagnóstico e planejamento | **Trilha-briefing (este)** | entende o cliente e decide a estratégia; é a fonte de tudo o que as outras ferramentas usam |
+| 2. Copy | [Trilha-copy](https://github.com/davi-barbosap/Trilha-copy) | estrutura e revisa os textos dos anúncios, fiel ao briefing |
+| 3. Página | [Trilha-LP](https://github.com/davi-barbosap/Trilha-LP) | landing page com o rastreamento que leva a origem do lead até o Kommo |
+| 4. Execução e medição | [Trilha-ads](https://github.com/davi-barbosap/Trilha-ads) | coleta, confere e calcula: raio-x do funil, conversão real, freio, material das reuniões |
+| Dados dos clientes | Trilha-clientes (privado) | os arquivos reais de cada cliente; esta ferramenta usa a pasta `briefing/` e exporta para as outras |
 
-```bash
-pip install -e .
+O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, vai no anúncio como `utm_content` e na mensagem do WhatsApp da página, e chega ao lead no Kommo.
 
-python -m trilha_briefing novo minha-cliente                    # cria clientes/minha-cliente/
-python -m trilha_briefing questionario --cliente "Minha Cliente" > questionario.md   # ★ envie ao cliente
-python -m trilha_briefing questionario --para reuniao           # ● roteiro do kickoff + roteiro de escuta
-python -m trilha_briefing questionario --para assessor          # tudo, com o momento e o campo de cada pergunta
+## O que faz
 
-python -m trilha_briefing validar   clientes/minha-cliente      # esquema de todos os arquivos
-python -m trilha_briefing lacunas   clientes/minha-cliente      # o que falta e o que bloqueia a aprovação
-python -m trilha_briefing revisar   clientes/minha-cliente      # avisos por gravidade; sai com erro se algo bloqueia
-python -m trilha_briefing economia  clientes/minha-cliente      # tetos de custo, verba para otimizar por etapa, validação
-python -m trilha_briefing canais    clientes/minha-cliente      # ordem sugerida de canais × o que está no plano
-python -m trilha_briefing grade     clientes/minha-cliente      # públicos × argumentos com códigos
+### 1. Diagnóstico: entender o cliente
 
-python -m trilha_briefing exportar  clientes/minha-cliente --para trilha   # dist/<id>/marca.yaml, ofertas/, perfil.parcial.yaml
-python -m trilha_briefing exportar  clientes/minha-cliente --para lp       # dist/<oferta>-<origem>/pagina.yaml
-python -m trilha_briefing exportar  clientes/minha-cliente --para copy     # dist/<id>/copy.yaml (contrato com o Trilha-copywritter)
-python -m trilha_briefing apresentar clientes/minha-cliente                # dist/<id>/plano.html
+| Comando | O que faz |
+|---|---|
+| `novo <id>` | Cria a pasta do cliente a partir do modelo comentado. |
+| `questionario` | Gera as perguntas do briefing em três momentos. ★ É o questionário que o cliente responde sozinho, em uns 30 minutos (`--para cliente`). ● É o roteiro da reunião de kickoff e da escuta (`--para reuniao`). ◆ É o que o assessor levanta com dados. A versão `--para assessor` mostra o momento e o campo que cada pergunta preenche. |
+| `validar` | Confere o esquema de todos os arquivos e as referências entre eles: personas e ofertas citadas existem, ids não se repetem e a pasta tem o nome do cliente. |
+| `lacunas` | Mostra o que falta em cada etapa e o que bloqueia a aprovação da estratégia. |
+| `revisar` | Dá avisos em três gravidades e sai com erro se algo bloqueia (lista abaixo). |
 
-python -m trilha_briefing fechar-ciclo clientes/minha-cliente --nome 2026-T4  # guarda o estado antes da revisão trimestral
-```
+### 2. Planejamento: decidir a estratégia
 
-## Arquivos de um cliente
+| Comando | O que faz |
+|---|---|
+| `economia` | Calcula os tetos de custo (CAC, custo por lead, por qualificado e por agendamento) e a verba mínima viável. Compara as conversões que a verba de validação compra com o mínimo de cada hipótese. |
+| `canais` | Sugere a ordem dos canais por intenção e atenção e compara com o que está no plano. A busca vem antes quando há demanda; a descoberta sobe quando a compra é por desejo ou o público ainda não conhece o problema. |
+| `grade` | Monta a grade públicos × argumentos, com o código de cada célula. Cada célula vira peças de copy com aquele código. |
+| `apresentar` | Gera o plano em HTML para o cliente. O que ainda não foi validado aparece marcado como hipótese; afirmações refutadas e riscos marcados como internos ficam de fora. |
+| `fechar-ciclo --nome 2026-T4` | Guarda uma cópia do estado e um resumo antes da revisão trimestral. |
 
-```
-clientes/<id>/
-  briefing.yaml      o que a empresa diz: negócio, área, capacidade, aprovação, acessos, ativos
-  pesquisa.yaml      personas, escuta, quem não atender, concorrentes, SWOT, sazonalidade, maturidade
-  plataforma.yaml    jornada, associações, posicionamento, história, voz, identidade, temas
-  provas.yaml        números com fonte, depoimentos autorizados, histórias de clientes
-  ofertas/<id>.yaml  degrau, big idea, promessa, antes/depois, benefícios, objeções, inversão de risco
-  estrategia.yaml    objetivo, economia, evento de otimização, verba, canais, grade, riscos, marcos, medição
-  hipoteses.yaml     testes com códigos da grade, critério de sucesso e volume mínimo por variação
-  historico/<ciclo>/ cópia do estado em cada fechamento de ciclo, com resumo.md
-```
+### 3. Exportação: o contrato com as outras ferramentas
 
-Toda afirmação importante diz de onde veio (`fonte`: empresa, consumidor, mercado, dados, assessor) e se já foi confirmada (`status`: hipótese, validada, refutada).
+| Comando | Gera | Para |
+|---|---|---|
+| `exportar --para trilha` | `marca.yaml`, `ofertas/`, `perfil.parcial.yaml` | Trilha-ads (cadastro, economia e verba) |
+| `exportar --para lp --oferta <id> [--origem meta\|google]` | rascunho de `pagina.yaml` por oferta e origem | Trilha-LP |
+| `exportar --para copy` | `copy.yaml`: personas, voz, ofertas, provas utilizáveis, compliance, grade e hipóteses | Trilha-copy |
 
-## O que bloqueia a aprovação
+Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima exportação sobrescreve o que for mudado à mão. Detalhes em [contrato](docs/contrato.md).
 
-`lacunas` só libera a estratégia para o cliente quando houver:
+## Como faz
+
+- **Origem de cada afirmação.** Toda afirmação importante diz de onde veio (`fonte`: empresa, consumidor, mercado, dados, assessor) e se já foi confirmada (`status`: hipótese, validada, refutada). A opinião do dono não passa como voz do consumidor.
+- **Escuta antes da estratégia.** A aprovação exige registro de escuta e uma objeção vinda dela para cada persona da oferta principal.
+- **Economia antes da verba.** As metas saem da economia unitária, com as mesmas fórmulas do Trilha-ads; um teste de contrato confere que os números batem.
+- **Medição antes de lançar.** Seis itens precisam estar prontos:
+  - UTMs no padrão;
+  - campos no CRM;
+  - evento de conversão;
+  - etapas e motivos de perda;
+  - código do criativo chegando no lead;
+  - relatório definido.
+- **Hipóteses que dá para concluir.** Cada uma tem célula da grade, critério de sucesso e volume mínimo por variação. A revisão avisa quando a verba não compra conversões suficientes para concluir o teste.
+
+**O que bloqueia a aprovação.** `lacunas` só libera a estratégia para o cliente quando houver:
 - objetivo com meta, prazo e resultados-chave;
 - os seis itens de medição prontos;
 - economia unitária e verba de validação combinadas;
@@ -63,29 +77,104 @@ Toda afirmação importante diz de onde veio (`fonte`: empresa, consumidor, merc
 - um canal ativo;
 - nenhum aviso de gravidade **bloqueia** na revisão.
 
-A revisão separa os avisos em três níveis:
-- **Bloqueia:** promessa ou termo proibido, escassez sem evidência, palavra-chave de concorrente sem aprovação, dados que se contradizem entre arquivos, verba acima do teto, evento de otimização que a verba não sustenta.
-- **Atenção:** volume insuficiente para concluir um teste, verba abaixo da mínima viável, verba que traz mais leads do que o time atende, promessa sem prazo ou sem número.
-- **Sugestão:** afirmações sem fonte, taxas ainda estimadas, pesos dos temas.
+**A revisão** separa os avisos em três níveis:
+- **Bloqueia:**
+  - promessa ou termo proibido;
+  - escassez sem evidência e urgência sem motivo;
+  - palavra-chave de concorrente sem aprovação;
+  - dados que se contradizem entre arquivos;
+  - verba acima do teto;
+  - evento de otimização que a verba não sustenta.
+- **Atenção:**
+  - volume insuficiente para concluir um teste;
+  - verba abaixo da mínima viável;
+  - verba que traz mais leads do que o time atende;
+  - promessa sem prazo ou sem número;
+  - urgência vencida.
+- **Sugestão:**
+  - afirmações sem fonte;
+  - taxas ainda estimadas;
+  - diferencial sem a escada do "e daí?";
+  - crença sem a forma de derrubar;
+  - depoimento sem persona.
+
+## Arquivos de um cliente
+
+```
+<id>/
+  briefing.yaml      o que a empresa diz: negócio, área, capacidade, aprovação, acessos, ativos
+  pesquisa.yaml      personas (dores, desejos, medos, crenças, frases literais, sofisticação), escuta,
+                     quem não atender, concorrentes, SWOT, sazonalidade, maturidade
+  plataforma.yaml    jornada, associações, posicionamento, história, voz (com intensidade), identidade, temas
+  provas.yaml        números com fonte, depoimentos autorizados, histórias de clientes, cada um com o perfil
+  ofertas/<id>.yaml  degrau, big idea, promessa, antes/depois, diferenciais, bastidores, alternativas,
+                     objeções, inversão de risco, urgência e escassez reais
+  estrategia.yaml    objetivo, economia, evento de otimização, verba, canais, grade, riscos, marcos, medição
+  hipoteses.yaml     testes com códigos da grade, critério de sucesso e volume mínimo por variação
+  historico/<ciclo>/ cópia do estado em cada fechamento de ciclo, com resumo.md
+```
+
+## O que não faz
+
+- **Não escreve copy nem página.** O rascunho de página sai cru, para reescrever na Trilha-LP; a copy é estruturada e revisada no Trilha-copy.
+- **Não lê as contas de anúncio nem o Kommo.** Isso é do Trilha-ads.
+- **Não decide.** Sugere a ordem dos canais e confere a consistência; quem decide é o assessor, com o cliente.
+- **Ainda não monta o plano de campanhas:** campanhas e conjuntos por canal, públicos, palavras-chave, nomes, fases e critérios para escalar. É o próximo passo.
+- **Ainda não recebe os resultados de volta.** O resultado de cada hipótese é registrado à mão em `hipoteses.yaml`.
+- **O questionário é Markdown:** as respostas do cliente são transcritas à mão para os arquivos.
+
+## Situação atual
+
+Versão 0.3.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
+- o plano de campanhas;
+- o caminho de volta dos resultados do Trilha-ads para as hipóteses e as personas.
+
+## Como usar
+
+```bash
+pip install -e .
+
+# Clientes reais ficam no Trilha-clientes (privado), pasta briefing/
+cd ../Trilha-clientes
+python -m trilha_briefing novo minha-cliente --pasta briefing
+python -m trilha_briefing questionario --cliente "Minha Cliente" > questionario.md   # ★ envie ao cliente
+python -m trilha_briefing questionario --para reuniao           # ● roteiro do kickoff e da escuta
+python -m trilha_briefing questionario --para assessor          # tudo, com o momento e o campo de cada pergunta
+
+python -m trilha_briefing validar   briefing/minha-cliente
+python -m trilha_briefing lacunas   briefing/minha-cliente
+python -m trilha_briefing revisar   briefing/minha-cliente
+python -m trilha_briefing economia  briefing/minha-cliente
+python -m trilha_briefing canais    briefing/minha-cliente
+python -m trilha_briefing grade     briefing/minha-cliente
+
+python -m trilha_briefing exportar  briefing/minha-cliente --para copy   --saida copy                   # copy/minha-cliente/copy.yaml
+python -m trilha_briefing exportar  briefing/minha-cliente --para trilha --saida ads                    # ads/minha-cliente/...
+python -m trilha_briefing exportar  briefing/minha-cliente --para lp --oferta X --saida lp/minha-cliente # lp/minha-cliente/X-meta/...
+python -m trilha_briefing apresentar briefing/minha-cliente     # dist/minha-cliente/plano.html (não versionar)
+
+python -m trilha_briefing fechar-ciclo briefing/minha-cliente --nome 2026-T4
+```
+
+Neste repositório, os comandos rodam também sobre o exemplo: `python -m trilha_briefing lacunas clientes/_exemplo`.
 
 ## Documentação
 
 - [Método](docs/metodo.md): princípios, etapas, ciclo trimestral e onde fomos críticos com as fontes.
-- [Contrato com o Trilha e a Trilha-LP](docs/contrato.md): o que vai para onde.
+- [Contrato](docs/contrato.md): o que vai para o Trilha-ads, a Trilha-LP e o Trilha-copy.
 - [Decisões](docs/decisoes/): por que as coisas são como são.
 - [Mudanças](CHANGELOG.md).
-
-## Dados de clientes
-
-Clientes reais têm estratégia, números e dados pessoais (LGPD). Por padrão, o `.gitignore` deixa `clientes/*` fora do Git e versiona só o exemplo. Se o repositório for privado e você quiser versionar os clientes aqui, apague as duas linhas no fim do `.gitignore`.
 
 ## Testes
 
 ```bash
 python -m unittest discover -s tests -v
-
-# contrato com os outros repositórios (clonados ao lado deste):
-PYTHONPATH=../Trilha:../Trilha-LP python -m unittest tests.test_contrato -v
 ```
 
-Sem o Trilha e a Trilha-LP no `PYTHONPATH`, o teste de contrato é pulado. Rode-o sempre que mudar a exportação ou quando um dos outros repositórios mudar de formato.
+O teste de contrato (`tests/test_contrato.py`) confere que o que exportamos passa nos esquemas reais do Trilha-ads e da Trilha-LP. Ele roda quando os dois estão instalados; sem eles, é pulado. A CI clona os dois repositórios e roda o teste a cada push.
+
+Mudança que atravessa repositórios: abra os PRs juntos e faça o merge primeiro do lado que exporta.
+
+## Dados de clientes
+
+Clientes reais têm estratégia, números e dados pessoais (LGPD). Eles ficam no repositório privado Trilha-clientes. Aqui, o `.gitignore` deixa `clientes/*` fora do Git e versiona só o exemplo fictício.

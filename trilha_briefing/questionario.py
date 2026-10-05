@@ -21,7 +21,7 @@ SIMBOLO = {"cliente": "★", "reuniao": "●", "assessor": "◆"}
 BLOCOS: list[tuple[str, list[tuple[Momento, str, str]]]] = [
     ("Envie junto com as respostas", [
         ("cliente", "Acesso ao Gerenciador de Negócios do Meta, ao Google Ads, ao Gerenciador de Tags/GA4, ao CRM e ao domínio do site (ou diga quem tem).",
-         "briefing.acessos; perfil.yaml do Trilha (plataformas, crm)"),
+         "briefing.acessos; perfil.yaml do Trilha-ads (plataformas, crm)"),
         ("cliente", "Logo em arquivo editável, manual de marca (se houver), cores e fontes.", "briefing.ativos; plataforma.identidade_visual"),
         ("cliente", "Uma pasta com fotos e vídeos reais: equipe, produto, clientes, local.", "briefing.ativos; criativos; imagem da página"),
         ("cliente", "O link da política de privacidade do site (ou avise que não existe).", "briefing.ativos.politica_privacidade; plataforma.compliance"),
@@ -70,9 +70,9 @@ BLOCOS: list[tuple[str, list[tuple[Momento, str, str]]]] = [
         ("cliente", "Em quanto tempo vocês respondem um contato novo, de verdade?", "plataforma.atendimento.sla_resposta"),
         ("cliente", "Quantos contatos novos por dia o time consegue atender bem?", "briefing.capacidade.leads_dia"),
         ("cliente", "Quantos clientes novos por mês conseguem entregar (vagas, agenda, estoque)?", "briefing.capacidade.clientes_novos_mes"),
-        ("reuniao", "Quais são as etapas do primeiro contato à venda? Usam CRM? Qual?", "briefing.negocio.crm; funil do Kommo no Trilha"),
-        ("reuniao", "Por que se perde uma venda? Quais são os 5 motivos mais comuns?", "motivos de perda do Kommo (Trilha)"),
-        ("reuniao", "Quantas vezes tentam falar com quem não responde, e por qual canal?", "diagnóstico de atendimento (raio-x do Trilha)"),
+        ("reuniao", "Quais são as etapas do primeiro contato à venda? Usam CRM? Qual?", "briefing.negocio.crm; funil do Kommo no Trilha-ads"),
+        ("reuniao", "Por que se perde uma venda? Quais são os 5 motivos mais comuns?", "motivos de perda do Kommo (Trilha-ads)"),
+        ("reuniao", "Quantas vezes tentam falar com quem não responde, e por qual canal?", "diagnóstico de atendimento (raio-x do Trilha-ads)"),
         ("reuniao", "Fora do horário, quem responde? Há robô?", "plataforma.atendimento.handoff"),
     ]),
     ("Quem compra e quem não compra", [

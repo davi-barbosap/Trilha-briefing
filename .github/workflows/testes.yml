@@ -8,10 +8,18 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -e .
+      - name: Trilha-ads e Trilha-LP, para o teste de contrato
+        run: |
+          git clone --depth 1 https://github.com/davi-barbosap/Trilha-ads ../Trilha-ads
+          git clone --depth 1 https://github.com/davi-barbosap/Trilha-LP ../Trilha-LP
+          pip install -e ../Trilha-ads -e ../Trilha-LP
       - run: python -m unittest discover -s tests -v
+      - name: O teste de contrato não pode ter sido pulado
+        run: python -c "import trilha.core.oferta, trilha_lp.esquema"
       - run: python -m trilha_briefing validar clientes/_exemplo
       - run: python -m trilha_briefing lacunas clientes/_exemplo
       - run: python -m trilha_briefing revisar clientes/_exemplo
       - run: python -m trilha_briefing exportar clientes/_exemplo --para trilha
       - run: python -m trilha_briefing exportar clientes/_exemplo --para lp --oferta conversacao-adultos
+      - run: python -m trilha_briefing exportar clientes/_exemplo --para copy
       - run: python -m trilha_briefing apresentar clientes/_exemplo

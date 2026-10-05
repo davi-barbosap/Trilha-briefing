@@ -174,7 +174,7 @@ def _estrategia(c: ClienteCompleto) -> list[str]:
     if not e.krs:
         f.append("resultados-chave (krs)")
     if e.economia is None:
-        f.append("economia unitária (mesmos campos do perfil.yaml do Trilha)")
+        f.append("economia unitária (mesmos campos do perfil.yaml do Trilha-ads)")
     o = e.orcamento
     if o.verba_validacao is None or o.semanas_validacao is None:
         f.append("verba e prazo de validação: o máximo que o cliente aceita perder até saber se funciona")
