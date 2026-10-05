@@ -281,6 +281,44 @@ class TestExportar(Base):
         self.assertIn("# PENDENTE:", caminho.read_text(encoding="utf-8"))
 
 
+class TestCamposParaCopy(Base):
+    def test_pacote_copy(self):
+        from trilha_briefing.exportar import VERSAO_CONTRATO_COPY, pacote_copy
+        d = pacote_copy(carregar_cliente(EXEMPLO))
+        self.assertEqual(d["contrato"], VERSAO_CONTRATO_COPY)
+        self.assertNotIn("Professora maravilhosa!", [p["texto"] for p in d["provas"]])  # não autorizado fica fora
+        self.assertIn("Aplicativos", d["concorrentes"])
+        travado = next(p for p in d["personas"] if p["id"] == "profissional-travado")
+        self.assertTrue(travado["frases"] and travado["crencas"])
+        principal = next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos")
+        self.assertEqual(principal["urgencia"]["data"], "2026-11-03")
+        self.assertTrue(principal["diferenciais"][0]["e_dai"])
+
+    def test_cli_exporta_copy(self):
+        self.assertEqual(main(["exportar", str(EXEMPLO), "--para", "copy", "--saida", str(self.tmp / "dist")]), 0)
+        texto = (self.tmp / "dist" / "_exemplo" / "copy.yaml").read_text(encoding="utf-8")
+        self.assertIn("contrato: 1", texto)
+
+    def test_urgencia_sem_motivo_bloqueia(self):
+        def urg(d):
+            d["urgencia"] = {"tipo": "prazo", "texto": "Só até sexta!"}
+        self.editar("ofertas/conversacao-adultos.yaml", urg)
+        avisos = [a for a in _revisar(carregar_cliente(self.pasta)) if a.nivel == "bloqueia"]
+        self.assertTrue(any("urgencia sem motivo" in a.texto for a in avisos))
+
+    def test_prova_com_persona_inexistente(self):
+        self.editar("provas.yaml", lambda d: d["provas"][3].update(personas=["fantasma"]))
+        with self.assertRaises(ErroCliente) as e:
+            carregar_cliente(self.pasta)
+        self.assertIn("renata", e.exception.erros["provas.yaml"])
+
+    def test_lacunas_de_copy_na_persona(self):
+        faltas = " | ".join(lacunas(carregar_cliente(EXEMPLO))["pesquisa"])
+        self.assertIn("viajante", faltas)
+        self.assertIn("frases literais", faltas)
+        self.assertNotIn("profissional-travado", faltas)
+
+
 class TestApresentar(Base):
     def test_html(self):
         self.editar("briefing.yaml", lambda d: d["cliente"].update(nome="Escola <Exemplo> & Cia"))

@@ -9,7 +9,12 @@ personas: []
 #    desejos: []
 #    objecoes: []
 #    ganchos: []
+#    medos: []                  # o que teme que aconteça se não resolver
+#    crencas: []                # { texto, tipo: metodo|interna|externa, quebra, fonte, mencoes }
+#    micro_problemas: []        # os problemas que a pessoa acha que tem
+#    frases: []                 # { texto, origem, sobre: dor|desejo|medo|objecao|crenca|outro } — sem nome (LGPD)
 #    nivel_consciencia: consciente_do_problema   # inconsciente | consciente_do_problema | consciente_da_solucao | consciente_do_produto | pronto_para_comprar
+#    sofisticacao: media        # baixa | media | alta: quantas promessas parecidas já ouviu
 #    onde_esta: []
 #    gatilho_compra: ""
 escuta: []                        # { fonte, quantidade, data, resumo } — sem escuta, persona é opinião

@@ -1,3 +1,3 @@
 # O que sustenta cada promessa. Número precisa de fonte; depoimento, de autorização por escrito.
-provas: []                        # { tipo: numero|depoimento|case|autoridade|midia|certificacao, texto, numero, autor, fonte, autorizado, formato, link }
+provas: []                        # { id, tipo: numero|depoimento|case|autoridade|midia|certificacao, texto, numero, autor, fonte, autorizado, formato, link, personas, perfil }
 historias: []                     # { titulo, antes, virada, resultado, autorizado }

@@ -1,5 +1,42 @@
 # Mudanças
 
+## 0.3.0 — campos para a copy (out/2026)
+
+O que as aulas de copy mostraram que faltava na fonte, e o contrato com o Trilha-copywritter.
+
+### Novo
+- **Persona:**
+  - `medos` (o que teme se não resolver);
+  - `crencas` em três tipos (método, interna, externa), cada uma com a forma de derrubar;
+  - `micro_problemas`;
+  - `frases` literais de quem compra, sem nome;
+  - `sofisticacao` (quantas promessas parecidas já ouviu).
+- **Afirmações** (`Item`) ganham `mencoes`: quantas pessoas disseram isso na escuta.
+- **Oferta:**
+  - `bastidores` (o cuidado que ninguém conta);
+  - `alternativas` e por que não resolvem;
+  - `urgencia` real, com motivo e data;
+  - `custo_inacao`;
+  - `big_idea.crenca_comum` e `por_que_falha`;
+  - escada do "e daí?" (`e_dai`) em cada diferencial.
+- **Provas:** `id`, `personas` e `perfil` do protagonista, para usar a prova parecida com quem lê.
+- **Voz:** `intensidade` de 1 a 5.
+- **Grade:** `promessa` por célula, ajustada ao medo daquela persona.
+- **`exportar --para copy`:** gera `copy.yaml`, o contrato versionado com o Trilha-copywritter.
+- **Questionário:** 10 perguntas novas (medos, palavras exatas, sofisticação, crenças, bastidores, crença do mercado, alternativas, prazo real, intensidade, perfil dos depoimentos).
+
+### Revisão e lacunas
+- **Bloqueia:** urgência sem motivo ou evidência.
+- **Atenção:** urgência vencida.
+- **Sugestão:**
+  - diferencial da oferta principal sem a escada do "e daí?";
+  - crença sem a forma de derrubar;
+  - depoimento sem persona.
+- **Lacunas:**
+  - persona sem frases, crenças ou sofisticação;
+  - oferta principal sem bastidores, sem processo (crença comum e por que falha) ou sem alternativas;
+  - voz sem intensidade.
+
 ## 0.2.0 — revisão crítica (out/2026)
 
 ### Corrige

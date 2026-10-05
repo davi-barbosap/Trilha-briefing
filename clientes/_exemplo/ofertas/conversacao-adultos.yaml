@@ -10,6 +10,8 @@ big_idea:
   oportunidade: "Vagas de nível médio pedindo inglês para reuniões, não só leitura"
   inimigo: "Aula em que o professor fala e o aluno só escuta"
   mecanismo_unico: "Turma de até 6 em que você fala a maior parte da aula, treinando as situações do seu trabalho"
+  crenca_comum: "Para falar inglês é preciso estudar mais gramática e vocabulário"
+  por_que_falha: "Quem já entende inglês não trava por falta de palavra: trava porque nunca treinou falar sob pressão"
 
 promessa:
   texto: "Fale nas reuniões em inglês em 4 meses, treinando com as situações do seu trabalho"
@@ -23,12 +25,23 @@ antes_depois:
   - { dimensao: status, antes: "Fica de fora das reuniões com a matriz", depois: "É chamado para as reuniões que importam" }
 
 diferenciais:
-  - { texto: "Turmas de até 6 alunos", fonte: empresa, status: validada, evidencia: "grade de turmas" }
-  - { texto: "Reposição em qualquer horário da grade", fonte: empresa, status: validada, evidencia: "regulamento" }
+  - { texto: "Turmas de até 6 alunos", fonte: empresa, status: validada, evidencia: "grade de turmas",
+      e_dai: ["você fala na maior parte da aula", "a frase sai sem ensaio", "você pede a palavra na reunião", "é chamado para as reuniões que importam"] }
+  - { texto: "Reposição em qualquer horário da grade", fonte: empresa, status: validada, evidencia: "regulamento",
+      e_dai: ["viagem ou plantão não fazem perder aula", "você não larga no segundo mês", "chega ao fim do curso"] }
   - { texto: "Aulas com situações do seu trabalho: reunião, apresentação, entrevista", fonte: empresa }
   - "Presencial ou online, na mesma turma"
 
 raridade: "única escola da região com turma de até 6 e reposição livre"
+
+bastidores:                      # o que a escola faz e ninguém conta
+  - { texto: "Antes de cada mês, o professor monta a aula com as reuniões e apresentações reais dos alunos da turma", fonte: empresa }
+  - { texto: "A coordenação grava 1 aula por mês e mede quanto tempo cada aluno falou", fonte: empresa, status: validada, evidencia: "planilha da coordenação" }
+
+alternativas:                    # o que mais a pessoa pode fazer com o mesmo dinheiro
+  - { alternativa: "Aplicativo", por_que_nao: "treina vocabulário, não conversa ao vivo sob pressão" }
+  - { alternativa: "Aula particular", por_que_nao: "custa 2 a 3 vezes mais e não treina conversa em grupo, como numa reunião" }
+  - { alternativa: "Escola de rede", por_que_nao: "turmas de 15: você fala poucos minutos por aula" }
 
 como_funciona:
   - { titulo: "Aula experimental", texto: "Uma aula de verdade, com turma, para você ver se o ritmo serve." }
@@ -52,6 +65,8 @@ objecoes:
 
 inversao_risco: "Se depois do primeiro mês não fizer sentido, você cancela sem multa"
 escassez: { texto: "Turmas com 6 alunos fecham quando lotam", real: true, evidencia: "limite pedagógico da escola" }
+urgencia: { tipo: prazo, texto: "A próxima turma noturna começa em 3 de novembro", motivo: "turma nova só abre a cada 2 meses", data: 2026-11-03, real: true, evidencia: "calendário de turmas" }
+custo_inacao: "Cada reunião em que você fica calado é uma chance de mostrar trabalho que vai para outra pessoa"
 
 condicoes:
   faixa_preco: "R$ 420 a R$ 520 por mês"

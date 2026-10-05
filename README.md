@@ -7,6 +7,7 @@ Serve para qualquer segmento. O exemplo (`clientes/_exemplo/`) é uma escola de 
 O que sai daqui alimenta as outras ferramentas:
 - [Trilha](https://github.com/davi-barbosap/Trilha) recebe `marca.yaml`, `ofertas/` e a economia do `perfil.yaml`;
 - [Trilha-LP](https://github.com/davi-barbosap/Trilha-LP) recebe o rascunho do `pagina.yaml`;
+- [Trilha-copywritter](https://github.com/davi-barbosap/Trilha-copywritter) recebe o `copy.yaml`, com tudo o que a copy pode usar;
 - o cliente recebe a apresentação do plano em HTML.
 
 ## Como usar
@@ -28,6 +29,7 @@ python -m trilha_briefing grade     clientes/minha-cliente      # públicos × a
 
 python -m trilha_briefing exportar  clientes/minha-cliente --para trilha   # dist/<id>/marca.yaml, ofertas/, perfil.parcial.yaml
 python -m trilha_briefing exportar  clientes/minha-cliente --para lp       # dist/<oferta>-<origem>/pagina.yaml
+python -m trilha_briefing exportar  clientes/minha-cliente --para copy     # dist/<id>/copy.yaml (contrato com o Trilha-copywritter)
 python -m trilha_briefing apresentar clientes/minha-cliente                # dist/<id>/plano.html
 
 python -m trilha_briefing fechar-ciclo clientes/minha-cliente --nome 2026-T4  # guarda o estado antes da revisão trimestral

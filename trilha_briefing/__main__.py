@@ -8,7 +8,7 @@
     python -m trilha_briefing economia <pasta>                tetos de custo e verba de validação
     python -m trilha_briefing canais <pasta>                  ordem sugerida de canais × o que está no plano
     python -m trilha_briefing grade <pasta>                   grade públicos × argumentos com códigos
-    python -m trilha_briefing exportar <pasta> --para trilha|lp [--saida dist]
+    python -m trilha_briefing exportar <pasta> --para trilha|lp|copy [--saida dist]
     python -m trilha_briefing apresentar <pasta> [--saida dist]
     python -m trilha_briefing fechar-ciclo <pasta> --nome 2026-T4   guarda o estado antes da revisão trimestral
 """
@@ -26,7 +26,7 @@ from trilha_briefing.ciclo import fechar_ciclo
 from trilha_briefing.canais import recomendacoes_gerais, sugerir
 from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ErroCliente, carregar_cliente
-from trilha_briefing.exportar import exportar_lp, exportar_trilha
+from trilha_briefing.exportar import exportar_copy, exportar_lp, exportar_trilha
 from trilha_briefing.lacunas import bloqueios_aprovacao, lacunas
 from trilha_briefing.revisao import revisar
 
@@ -175,6 +175,9 @@ def cmd_exportar(a) -> int:
         for caminho in exportar_trilha(c, a.saida):
             print(f"✓ {caminho}")
         return 0
+    if a.para == "copy":
+        print(f"✓ {exportar_copy(c, a.saida)}")
+        return 0
     origens = (a.origem,) if a.origem else ("meta", "google")
     for caminho, pend in exportar_lp(c, a.saida, a.oferta, origens):
         print(f"{'✓' if not pend else '…'} {caminho}")
@@ -213,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
     for nome, f in (("validar", cmd_validar), ("lacunas", cmd_lacunas), ("revisar", cmd_revisar),
                     ("economia", cmd_economia), ("canais", cmd_canais), ("grade", cmd_grade)):
         s = sub.add_parser(nome); s.add_argument("pasta"); s.set_defaults(f=f)
-    s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--para", choices=["trilha", "lp"], required=True)
+    s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--para", choices=["trilha", "lp", "copy"], required=True)
     s.add_argument("--saida", default="dist"); s.add_argument("--oferta"); s.add_argument("--origem", choices=["meta", "google"])
     s.set_defaults(f=cmd_exportar)
     s = sub.add_parser("fechar-ciclo"); s.add_argument("pasta"); s.add_argument("--nome", required=True)
