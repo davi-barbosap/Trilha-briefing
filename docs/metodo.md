@@ -12,9 +12,9 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 
 ## Princípios
 
-1. **Três vozes separadas.** O que o cliente diz (`fonte: cliente`), o que o mercado e os dados mostram (`mercado`, `dados`) e o que o assessor conclui (`assessor`). A opinião do cliente sobre o próprio cliente é ponto de partida, não conclusão.
+1. **Vozes separadas.** O que a empresa diz (`fonte: empresa`), o que quem compra disse na escuta (`consumidor`), o que o mercado e os dados mostram (`mercado`, `dados`) e o que o assessor conclui (`assessor`). A opinião da empresa sobre o próprio cliente é ponto de partida, não conclusão. "Cliente" não é fonte: é ambíguo e a ferramenta recusa.
 2. **Hipótese até prova.** Toda afirmação nasce `hipotese` e só vira `validada` com evidência (entrevista, conversa do CRM, relatório). A revisão acusa "validada sem evidência".
-3. **Escuta antes de persona.** Dores e objeções vêm de conversas reais (`pesquisa.escuta`). Sem escuta, a estratégia não é aprovada.
+3. **Escuta antes de persona.** Dores e objeções vêm de conversas reais (`pesquisa.escuta`). Cada persona da oferta principal precisa de ao menos uma objeção vinda da escuta (`consumidor` ou `dados`); sem isso, a estratégia não é aprovada.
 4. **Fato no lugar de adjetivo.** "Turmas de até 6" e não "atendimento de qualidade". A revisão acusa diferencial e promessa sem número.
 5. **Promessa que dá para cobrar.** Resultado observável, prazo e condição (para quem vale). Sem isso, a promessa não diferencia e ainda gera cliente frustrado.
 6. **Saber medir antes de lançar.** UTMs, origem gravada no CRM, conversão confirmada, motivos de perda, código do criativo e relatório combinado. Sem os seis, a estratégia não é aprovada.

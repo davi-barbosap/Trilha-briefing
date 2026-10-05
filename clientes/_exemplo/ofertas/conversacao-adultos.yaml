@@ -23,9 +23,9 @@ antes_depois:
   - { dimensao: status, antes: "Fica de fora das reuniões com a matriz", depois: "É chamado para as reuniões que importam" }
 
 diferenciais:
-  - { texto: "Turmas de até 6 alunos", fonte: cliente, status: validada, evidencia: "grade de turmas" }
-  - { texto: "Reposição em qualquer horário da grade", fonte: cliente, status: validada, evidencia: "regulamento" }
-  - { texto: "Aulas com situações do seu trabalho: reunião, apresentação, entrevista", fonte: cliente }
+  - { texto: "Turmas de até 6 alunos", fonte: empresa, status: validada, evidencia: "grade de turmas" }
+  - { texto: "Reposição em qualquer horário da grade", fonte: empresa, status: validada, evidencia: "regulamento" }
+  - { texto: "Aulas com situações do seu trabalho: reunião, apresentação, entrevista", fonte: empresa }
   - "Presencial ou online, na mesma turma"
 
 raridade: "única escola da região com turma de até 6 e reposição livre"
@@ -38,7 +38,7 @@ como_funciona:
 
 objecoes:
   - { eixo: tempo, objecao: "Não tenho horário fixo", resposta: "Você repõe em qualquer horário da grade, presencial ou online.", fonte: dados, status: validada }
-  - { eixo: confianca, objecao: "Já tentei e larguei", resposta: "Turma de até 6: você fala em todas as aulas e o professor acompanha a sua evolução todo mês.", fonte: cliente }
+  - { eixo: confianca, objecao: "Já tentei e larguei", resposta: "Turma de até 6: você fala em todas as aulas e o professor acompanha a sua evolução todo mês.", fonte: consumidor }
   - { eixo: preco, objecao: "Aplicativo é mais barato", resposta: "Aplicativo treina vocabulário; a reunião pede conversa ao vivo. Aqui é isso que você treina.", fonte: mercado }
 
 inversao_risco: "Se depois do primeiro mês não fizer sentido, você cancela sem multa"

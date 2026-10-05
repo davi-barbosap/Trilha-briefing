@@ -1,5 +1,6 @@
 # O que o mercado e os clientes reais mostram.
-# fonte: cliente | mercado | dados | assessor   status: hipotese | validada | refutada
+# fonte: empresa (o que a empresa diz) | consumidor (escuta de quem compra) | mercado | dados | assessor
+# status: hipotese | validada | refutada
 personas: []
 #  - id: nome-curto
 #    nome: ""

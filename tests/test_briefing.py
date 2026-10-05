@@ -51,6 +51,12 @@ class TestEsquema(Base):
         it = Item.model_validate("Turmas pequenas")
         self.assertEqual((it.fonte, it.status), ("nao_informada", "hipotese"))
 
+    def test_fonte_cliente_e_recusada(self):
+        self.editar("briefing.yaml", lambda d: d["historico"]["funcionou"].append({"texto": "x", "fonte": "cliente"}))
+        with self.assertRaises(ErroCliente) as e:
+            carregar_cliente(self.pasta)
+        self.assertIn("ambígua", e.exception.erros["briefing.yaml"])
+
     def test_persona_inexistente_na_oferta(self):
         self.editar("ofertas/aula-experimental.yaml", lambda d: d["personas"].append("fantasma"))
         with self.assertRaises(ErroCliente) as e:
@@ -117,6 +123,14 @@ class TestRevisao(Base):
             d["hipoteses"][0].update(resultado="validada", conversoes_obtidas=8)
         self.editar("hipoteses.yaml", hip)
         self.assertTrue(any("trate como inconclusiva" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_objecao_so_da_empresa_bloqueia_aprovacao(self):
+        def so_empresa(d):
+            for o in d["personas"][0]["objecoes"]:
+                o["fonte"] = "empresa"
+        self.editar("pesquisa.yaml", so_empresa)
+        bloqueios = bloqueios_aprovacao(carregar_cliente(self.pasta))
+        self.assertTrue(any("profissional-travado" in b for b in bloqueios))
 
     def test_sem_escuta_bloqueia_aprovacao(self):
         self.editar("pesquisa.yaml", lambda d: d.update(escuta=[]))

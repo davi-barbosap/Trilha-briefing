@@ -46,7 +46,7 @@ def revisar(c: ClienteCompleto) -> list[str]:
     itens = _itens(c)
     sem_fonte = [onde for onde, it in itens if it.fonte == "nao_informada"]
     if sem_fonte:
-        avisos.append(f"{len(sem_fonte)} afirmação(ões) sem fonte (ex.: {sem_fonte[0]}): diga se veio do cliente, do mercado, dos dados ou de você")
+        avisos.append(f"{len(sem_fonte)} afirmação(ões) sem fonte (ex.: {sem_fonte[0]}): diga se veio da empresa, do consumidor, do mercado, dos dados ou de você")
     for onde, it in itens:
         if it.status == "validada" and not it.evidencia:
             avisos.append(f"{onde}: marcada como validada sem evidência")

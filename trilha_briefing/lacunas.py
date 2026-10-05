@@ -5,9 +5,14 @@ Lacuna é informação que ainda não existe. Não é julgamento de qualidade: i
 
 from __future__ import annotations
 
-from trilha_briefing.esquema import ClienteCompleto
+from trilha_briefing.esquema import FONTES_DE_ESCUTA, ClienteCompleto, Persona
 
 ETAPAS = ("briefing", "pesquisa", "plataforma", "provas", "ofertas", "estrategia")
+
+
+def escutada(p: Persona) -> bool:
+    """A persona tem ao menos uma objeção vinda de quem compra (escuta ou dados), não da empresa."""
+    return any(o.fonte in FONTES_DE_ESCUTA for o in p.objecoes)
 
 
 def _briefing(c: ClienteCompleto) -> list[str]:
@@ -40,6 +45,8 @@ def _pesquisa(c: ClienteCompleto) -> list[str]:
                                 ("ganchos", pe.ganchos)) if not v]
         if pe.nivel_consciencia is None:
             falta.append("nível de consciência")
+        if pe.objecoes and not escutada(pe):
+            falta.append("objeção vinda da escuta (consumidor ou dados)")
         if falta:
             f.append(f"persona {pe.id}: {', '.join(falta)}")
     if not p.escuta:
@@ -180,12 +187,13 @@ def bloqueios_aprovacao(c: ClienteCompleto) -> list[str]:
         b.append(f"medição não pronta ({', '.join(e.medicao.pendentes())}): sem isso não há como saber se funcionou")
     if e.economia is None or e.orcamento.verba_validacao is None:
         b.append("sem economia unitária ou sem verba de validação: não há teto de custo nem limite de perda combinado")
-    escutadas = any(
-        it.fonte in ("cliente", "dados", "mercado") for p in c.pesquisa.personas for it in p.objecoes
-    )
-    if not c.pesquisa.escuta or not escutadas:
-        b.append("objeções sem escuta real: as personas ainda são opinião")
     principal = c.oferta_principal()
+    personas = [c.persona(pid) for pid in (principal.personas if principal else [])]
+    sem_escuta = [p.id for p in personas if p and not escutada(p)]
+    if not c.pesquisa.escuta:
+        b.append("nenhum registro de escuta: as personas ainda são opinião da empresa")
+    elif sem_escuta or not personas:
+        b.append(f"persona(s) da oferta principal sem objeção vinda da escuta: {', '.join(sem_escuta) or 'nenhuma persona ligada'}")
     if principal is None or principal.promessa is None:
         b.append("oferta principal sem promessa")
     if not (c.provas.utilizaveis("numero") or c.provas.utilizaveis("depoimento")):

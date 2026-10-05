@@ -12,6 +12,13 @@ Cada arquivo responde a uma pergunta:
 
 Afirmações importantes (dores, objeções, diferenciais…) são `Item`: dizem de onde vieram
 (`fonte`) e se já foram confirmadas (`status`). Um texto solto vira hipótese de fonte não informada.
+
+Fontes:
+    empresa     o que o dono e o time da empresa dizem (opinião de quem vende)
+    consumidor  o que quem compra disse: entrevistas, conversas, avaliações (escuta)
+    mercado     concorrentes, buscas, anúncios ativos, notícias do setor
+    dados       números do CRM, das plataformas, do sistema da empresa
+    assessor    conclusão do assessor a partir das demais
 """
 
 from __future__ import annotations
@@ -24,7 +31,8 @@ from typing import Annotated, Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-Fonte = Literal["cliente", "mercado", "dados", "assessor", "nao_informada"]
+Fonte = Literal["empresa", "consumidor", "mercado", "dados", "assessor", "nao_informada"]
+FONTES_DE_ESCUTA = ("consumidor", "dados")
 Status = Literal["hipotese", "validada", "refutada"]
 Nivel = Literal["alta", "media", "baixa"]
 NivelConsciencia = Literal[
@@ -38,6 +46,16 @@ class _Base(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+def _fonte_sem_ambiguidade(v: Any) -> Any:
+    """'cliente' não é fonte: ninguém sabe se é a empresa ou quem compra dela."""
+    if isinstance(v, dict) and v.get("fonte") == "cliente":
+        raise ValueError(
+            "fonte 'cliente' é ambígua: use 'empresa' (o que a empresa diz) "
+            "ou 'consumidor' (o que quem compra disse, na escuta)"
+        )
+    return v
+
+
 class Item(_Base):
     """Uma afirmação com origem: o que o cliente diz, o que o mercado e os dados mostram, o que o assessor conclui."""
 
@@ -49,7 +67,7 @@ class Item(_Base):
     @model_validator(mode="before")
     @classmethod
     def _de_texto(cls, v: Any) -> Any:
-        return {"texto": v} if isinstance(v, str) else v
+        return _fonte_sem_ambiguidade({"texto": v} if isinstance(v, str) else v)
 
 
 # ---------- briefing.yaml: o que o cliente diz ----------
@@ -346,6 +364,8 @@ class ObjecaoOferta(_Base):
     resposta: str = ""
     fonte: Fonte = "nao_informada"
     status: Status = "hipotese"
+
+    _fonte = model_validator(mode="before")(classmethod(lambda cls, v: _fonte_sem_ambiguidade(v)))
 
 
 class Escassez(_Base):

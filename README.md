@@ -43,7 +43,7 @@ clientes/<id>/
   hipoteses.yaml     testes com critério de sucesso e volume mínimo
 ```
 
-Toda afirmação importante diz de onde veio (`fonte`: cliente, mercado, dados, assessor) e se já foi confirmada (`status`: hipótese, validada, refutada).
+Toda afirmação importante diz de onde veio (`fonte`: empresa, consumidor, mercado, dados, assessor) e se já foi confirmada (`status`: hipótese, validada, refutada).
 
 ## O que bloqueia a aprovação
 

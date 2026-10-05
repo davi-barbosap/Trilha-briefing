@@ -29,9 +29,9 @@ resultado_desejado:
 historico:
   funcionou:
     - { texto: "Aula experimental gratuita converte 1 em cada 3 que comparecem", fonte: dados, status: validada, evidencia: "planilha de matrículas jan–set" }
-    - { texto: "Indicação com desconto de 10% para quem indica", fonte: cliente }
+    - { texto: "Indicação com desconto de 10% para quem indica", fonte: empresa }
   nao_funcionou:
-    - { texto: "Promoção de matrícula grátis atraiu muita gente que desistiu no 2º mês", fonte: cliente }
+    - { texto: "Promoção de matrícula grátis atraiu muita gente que desistiu no 2º mês", fonte: empresa }
   ja_investiu_em_midia: "Impulsionamento no Instagram, ~R$ 500/mês em 2025, sem medir matrículas"
 
 restricoes:
