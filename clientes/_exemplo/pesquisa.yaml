@@ -39,6 +39,11 @@ escuta:
   - { fonte: conversas do Kommo (leads perdidos), quantidade: 40, data: 2026-09-25, resumo: "horário e preço são as objeções mais comuns" }
   - { fonte: avaliações do Google, quantidade: 87, data: 2026-09-25 }
 
+nao_atender:                     # persona negativa: quem não deve virar lead
+  - { perfil: "Crianças e adolescentes", motivo: "a escola só tem turmas de adultos", como_filtrar: "idade mínima 22 no Meta; negativar 'infantil', 'kids'" }
+  - { perfil: "Quem quer certificado (TOEFL, IELTS) em poucas semanas", motivo: "não há preparatório; vira matrícula que cancela", como_filtrar: "negativar 'toefl', 'ielts', 'intensivo'" }
+  - { perfil: "Quem procura o mais barato", motivo: "aplicativo resolve melhor; desiste no 2º mês", como_filtrar: "pergunta de qualificação 'Para que você precisa do inglês?'" }
+
 concorrentes:
   - { nome: Rede Nacional A, promessa: "fluência garantida", posicionamento_preco: media, fortes: [marca conhecida, muitas unidades], fracos: [turmas de 15, rotatividade de professor], canais: [Google, Meta, TV], aprender: "promessa genérica abre espaço para prova específica" }
   - { nome: Escola Local B, promessa: "inglês com nativos", posicionamento_preco: acima, fortes: [professores nativos], fracos: [horário só à noite], canais: [Instagram], aprender: "nativo é desejo, mas não resolve horário" }

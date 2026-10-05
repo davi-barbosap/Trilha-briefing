@@ -35,6 +35,8 @@ Fonte = Literal["empresa", "consumidor", "mercado", "dados", "assessor", "nao_in
 FONTES_DE_ESCUTA = ("consumidor", "dados")
 Status = Literal["hipotese", "validada", "refutada"]
 Nivel = Literal["alta", "media", "baixa"]
+Situacao = Literal["ok", "pendente", "nao_tem", "nao_sei"]
+Cor = Annotated[str, Field(pattern=r"^#[0-9a-fA-F]{6}$")]
 NivelConsciencia = Literal[
     "inconsciente", "consciente_do_problema", "consciente_da_solucao", "consciente_do_produto", "pronto_para_comprar"
 ]
@@ -78,11 +80,27 @@ class Cliente(_Base):
     nome: str
     segmento: str  # texto livre: odontologia, escola de idiomas, software B2B, loja de móveis…
     playbook: str = "padrao"  # playbooks/<playbook>/ no Trilha
-    cidade_atuacao: str = ""
     site: str = ""
     redes: list[str] = Field(default_factory=list)
     whatsapp: Annotated[str, Field(pattern=r"^(55\d{10,11})?$")] = ""  # 55 + DDD + número, só dígitos
     tempo_mercado: str = ""
+
+
+class Area(_Base):
+    """Onde a empresa atende: define a geografia das campanhas."""
+
+    alcance: Literal["local", "regional", "nacional", "online"]
+    cidades: list[str] = Field(default_factory=list)
+    raio_km: float | None = Field(default=None, gt=0)
+    observacoes: str = ""
+
+    def descricao(self) -> str:
+        partes = [", ".join(self.cidades) or self.alcance]
+        if self.raio_km:
+            partes.append(f"raio de {self.raio_km:g} km")
+        if self.observacoes:
+            partes.append(self.observacoes)
+        return " · ".join(partes)
 
 
 class Negocio(_Base):
@@ -93,6 +111,7 @@ class Negocio(_Base):
     ciclo_venda_dias: int | None = None
     time_comercial: str = ""  # quem atende o lead, quantas pessoas, que papéis
     crm: str = ""
+    marketplaces: list[str] = Field(default_factory=list)  # onde a categoria já é comprada (iFood, Mercado Livre…)
 
 
 class Resultado(_Base):
@@ -116,6 +135,53 @@ class Restricoes(_Base):
     nao_pode: list[str] = Field(default_factory=list)
 
 
+class Capacidade(_Base):
+    """Quanto a operação aguenta. Verba que gera mais do que isso queima lead."""
+
+    leads_dia: int | None = Field(default=None, ge=0)  # contatos novos por dia que o time atende bem
+    clientes_novos_mes: int | None = Field(default=None, ge=0)  # clientes novos por mês que a operação entrega
+    observacoes: str = ""
+
+
+class Aprovacao(_Base):
+    """Quem aprova anúncio e texto do lado do cliente. É o gargalo mais comum do dia a dia."""
+
+    responsavel: str = ""
+    prazo_horas: int | None = Field(default=None, gt=0)
+    substituto: str = ""
+
+
+class Acessos(_Base):
+    """O que a fundação precisa para começar. ok | pendente | nao_tem (precisa criar) | nao_sei."""
+
+    meta_business: Situacao = "nao_sei"
+    conta_anuncios_meta: Situacao = "nao_sei"
+    pixel_meta: Situacao = "nao_sei"
+    google_ads: Situacao = "nao_sei"
+    tag_google: Situacao = "nao_sei"
+    gtm: Situacao = "nao_sei"
+    ga4: Situacao = "nao_sei"
+    crm: Situacao = "nao_sei"
+    dominio: Situacao = "nao_sei"
+
+    def pendentes(self) -> list[str]:
+        return [k for k in type(self).model_fields if getattr(self, k) != "ok"]
+
+
+class Ativos(_Base):
+    """Material que a empresa já tem para criativos e páginas."""
+
+    logo_editavel: Situacao = "nao_sei"
+    manual_marca: Situacao = "nao_sei"
+    fotos_reais: Situacao = "nao_sei"
+    videos_reais: Situacao = "nao_sei"
+    politica_privacidade: Situacao = "nao_sei"
+    lista_clientes_autorizada: Situacao = "nao_sei"  # para públicos semelhantes, com base legal
+
+    def pendentes(self) -> list[str]:
+        return [k for k in type(self).model_fields if getattr(self, k) != "ok"]
+
+
 class Pessoa(_Base):
     """Quem decide ou é afetado do lado do cliente: influência × interesse."""
 
@@ -128,11 +194,16 @@ class Pessoa(_Base):
 
 class Briefing(_Base):
     cliente: Cliente
+    area: Area | None = None
     negocio: Negocio
+    capacidade: Capacidade = Field(default_factory=Capacidade)
     resultado_desejado: Resultado
     historico: Historico = Field(default_factory=Historico)
     restricoes: Restricoes = Field(default_factory=Restricoes)
     stakeholders: list[Pessoa] = Field(default_factory=list)
+    aprovacao: Aprovacao = Field(default_factory=Aprovacao)
+    acessos: Acessos = Field(default_factory=Acessos)
+    ativos: Ativos = Field(default_factory=Ativos)
     preenchido_por: list[Literal["cliente", "assessor"]] = Field(default_factory=list)
     data: date | None = None
 
@@ -160,6 +231,14 @@ class Escuta(_Base):
     quantidade: int = Field(ge=0)
     data: date | None = None
     resumo: str = ""
+
+
+class NaoAtender(_Base):
+    """Persona negativa: quem não deve virar lead, e como filtrar antes de pagar por ele."""
+
+    perfil: str
+    motivo: str = ""
+    como_filtrar: str = ""  # exclusão de público, palavra-chave negativa, pergunta de qualificação
 
 
 class Concorrente(_Base):
@@ -202,6 +281,7 @@ class Maturidade(_Base):
 class Pesquisa(_Base):
     personas: list[Persona] = Field(default_factory=list)
     escuta: list[Escuta] = Field(default_factory=list)
+    nao_atender: list[NaoAtender] = Field(default_factory=list)
     concorrentes: list[Concorrente] = Field(default_factory=list)
     unicidade: str = ""  # o que só este cliente tem, depois de olhar os concorrentes
     swot: Swot = Field(default_factory=Swot)
@@ -252,11 +332,25 @@ class Voz(_Base):
     termos_proibidos: list[str] = Field(default_factory=list)
 
 
+CHAVES_COR = {"primaria", "secundaria", "fundo", "texto", "apoio"}
+PRECO_CANAIS = {"anuncio", "whatsapp", "landing"}
+PRECO_REGRAS = {"nunca", "a_partir_de", "parcela", "valor_cheio"}
+
+
 class IdentidadeVisual(_Base):
-    cores: dict[str, str | list[str]] = Field(default_factory=dict)  # primaria, secundaria, fundo, texto, apoio
+    cores: dict[str, Cor | list[Cor]] = Field(default_factory=dict)  # primaria, secundaria, fundo, texto (#RRGGBB), apoio
     tipografia: dict[str, str] = Field(default_factory=dict)  # titulos, texto
     logo: str = ""
     estilo_imagem: str = ""
+
+    @model_validator(mode="after")
+    def _chaves(self) -> IdentidadeVisual:
+        estranhas = set(self.cores) - CHAVES_COR
+        if estranhas:
+            raise ValueError(f"cores aceita {sorted(CHAVES_COR)}; recebeu {sorted(estranhas)}")
+        if isinstance(self.cores.get("apoio", []), str):
+            raise ValueError("cores.apoio é uma lista de cores")
+        return self
 
 
 class Tema(_Base):
@@ -295,6 +389,15 @@ class Plataforma(_Base):
     compliance: Compliance = Field(default_factory=Compliance)
     atendimento: Atendimento = Field(default_factory=Atendimento)
     preco: dict[str, str] = Field(default_factory=dict)  # anuncio | whatsapp | landing → nunca, a_partir_de, parcela, valor_cheio
+
+    @model_validator(mode="after")
+    def _preco(self) -> Plataforma:
+        canais = set(self.preco) - PRECO_CANAIS
+        regras = set(self.preco.values()) - PRECO_REGRAS
+        if canais or regras:
+            raise ValueError(f"preco: canais {sorted(PRECO_CANAIS)} com regras {sorted(PRECO_REGRAS)}; "
+                             f"recebeu {sorted(canais | regras)}")
+        return self
 
 
 # ---------- provas.yaml ----------

@@ -217,7 +217,7 @@ th{{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;opacity:.7}}
 @media(min-width:760px){{.grade{{grid-template-columns:repeat(2,1fr)}}.swot,.de-para{{grid-template-columns:1fr 1fr}}}}
 @media print{{header{{-webkit-print-color-adjust:exact;print-color-adjust:exact}}section{{padding:24px 0}}}}
 </style></head>
-<body><header><div><p>Plano de marketing</p><h1>{escape(b.cliente.nome)}</h1><p>{escape(b.cliente.segmento)}{' · ' + escape(b.cliente.cidade_atuacao) if b.cliente.cidade_atuacao else ''}</p></div></header>
+<body><header><div><p>Plano de marketing</p><h1>{escape(b.cliente.nome)}</h1><p>{escape(b.cliente.segmento)}{' · ' + escape(b.area.descricao()) if b.area else ''}</p></div></header>
 <main>{html_secoes}</main></body></html>
 """
 

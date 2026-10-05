@@ -13,6 +13,7 @@ personas: []
 #    onde_esta: []
 #    gatilho_compra: ""
 escuta: []                        # { fonte, quantidade, data, resumo } — sem escuta, persona é opinião
+nao_atender: []                   # persona negativa: { perfil, motivo, como_filtrar }
 concorrentes: []                  # 3 a 5: { nome, promessa, posicionamento_preco, fortes, fracos, canais, aprender }
 unicidade: ""
 swot: { forcas: [], fraquezas: [], oportunidades: [], ameacas: [] }

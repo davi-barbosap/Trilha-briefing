@@ -184,7 +184,42 @@ class TestGravidade(Base):
         self.assertIn("O melhor método", vagos[0])
 
 
+class TestBriefingCompleto(Base):
+    def test_cor_e_preco_validados_na_origem(self):
+        self.editar("plataforma.yaml", lambda d: d["identidade_visual"]["cores"].update(primaria="azul"))
+        with self.assertRaises(ErroCliente):
+            carregar_cliente(self.pasta)
+        shutil.rmtree(self.pasta)
+        shutil.copytree(EXEMPLO, self.pasta)
+        self.editar("plataforma.yaml", lambda d: d["preco"].update(anuncio="sob_consulta"))
+        with self.assertRaises(ErroCliente):
+            carregar_cliente(self.pasta)
+
+    def test_lacunas_do_briefing(self):
+        def tira(d):
+            d.pop("area")
+            d["capacidade"] = {}
+            d["aprovacao"] = {}
+        self.editar("briefing.yaml", tira)
+        faltas = " | ".join(lacunas(carregar_cliente(self.pasta))["briefing"])
+        for trecho in ("área de atuação", "capacidade", "quem aprova", "acessos pendentes"):
+            self.assertIn(trecho, faltas)
+
+    def test_verba_acima_da_capacidade(self):
+        self.editar("briefing.yaml", lambda d: d["capacidade"].update(leads_dia=2))
+        self.assertTrue(any("o time atende bem 2" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_persona_negativa_e_lacuna(self):
+        self.editar("pesquisa.yaml", lambda d: d.update(nao_atender=[]))
+        self.assertTrue(any("persona negativa" in f for f in lacunas(carregar_cliente(self.pasta))["pesquisa"]))
+
+
 class TestCanais(Base):
+    def test_marketplace_so_quando_existe(self):
+        self.assertNotIn("marketplace", [s.canal for s in sugerir(carregar_cliente(EXEMPLO))])
+        self.editar("briefing.yaml", lambda d: d["negocio"].update(marketplaces=["Mercado Livre"]))
+        self.assertIn("marketplace", [s.canal for s in sugerir(carregar_cliente(self.pasta))])
+
     def test_desejo_puxa_descoberta(self):
         antes = [s.canal for s in sugerir(carregar_cliente(EXEMPLO))]
         self.editar("briefing.yaml", lambda d: d["negocio"].update(tipo_compra="desejo"))

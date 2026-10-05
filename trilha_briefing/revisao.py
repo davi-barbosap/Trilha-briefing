@@ -151,6 +151,11 @@ def _economia(c: ClienteCompleto, avisos: list[Aviso]) -> None:
     if verba < n.verba_minima_viavel:
         avisos.append(Aviso("atencao", f"verba mensal {_brl(verba)} abaixo da mínima viável ({_brl(n.verba_minima_viavel)}, "
                                        "50 leads/semana no CPL máximo): concentre em uma plataforma e uma oferta"))
+    capacidade = c.briefing.capacidade.leads_dia
+    leads_dia = verba / n.custo_max["lead"] / (365.25 / 12)
+    if capacidade and leads_dia > capacidade:
+        avisos.append(Aviso("atencao", f"no CPL máximo a verba já traz {leads_dia:.0f} leads por dia (com custo menor, mais), "
+                                       f"e o time atende bem {capacidade}: lead sem resposta é verba perdida"))
     teto = est.orcamento.teto_mensal or c.briefing.restricoes.verba_mensal_max
     if teto and verba > teto:
         avisos.append(Aviso("bloqueia", f"verba mensal {_brl(verba)} acima do teto combinado ({_brl(teto)})"))

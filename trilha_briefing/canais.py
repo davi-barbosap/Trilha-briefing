@@ -58,6 +58,8 @@ def sugerir(c: ClienteCompleto) -> list[Sugestao]:
         return i
 
     ordem = sorted(BASE, key=peso)
+    if not c.briefing.negocio.marketplaces:
+        ordem = [x for x in ordem if x != "marketplace"]  # só entra quando o segmento tem onde a compra já acontece
     mat = c.pesquisa.maturidade
     plano = {cp.canal: cp.status for cp in c.estrategia.canais}
     saida = []
@@ -67,6 +69,8 @@ def sugerir(c: ClienteCompleto) -> list[Sugestao]:
             obs.append("depende de público acumulado: conta nova ainda não tem")
         if canal == "busca_marca":
             obs.append("confirme o volume de busca pelo nome antes de reservar verba")
+        if canal == "marketplace":
+            obs.append(f"onde: {', '.join(c.briefing.negocio.marketplaces)}")
         if canal == "busca_concorrente":
             obs.append("risco jurídico: só com aprovação por escrito do cliente")
         if canal in DESCOBERTA and frio:

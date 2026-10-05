@@ -30,6 +30,16 @@ def _briefing(c: ClienteCompleto) -> list[str]:
         f.append("verba mensal máxima (restricoes.verba_mensal_max)")
     if not b.stakeholders:
         f.append("quem decide do lado do cliente (stakeholders)")
+    if b.area is None:
+        f.append("área de atuação: cidades, raio ou online (area)")
+    if b.capacidade.leads_dia is None or b.capacidade.clientes_novos_mes is None:
+        f.append("capacidade: contatos por dia que o time atende e clientes novos por mês que a operação entrega")
+    if not b.aprovacao.responsavel or b.aprovacao.prazo_horas is None:
+        f.append("quem aprova anúncio e texto, e em quanto tempo (aprovacao)")
+    if b.acessos.pendentes():
+        f.append(f"acessos pendentes: {', '.join(b.acessos.pendentes())}")
+    if b.ativos.pendentes():
+        f.append(f"ativos a conferir: {', '.join(b.ativos.pendentes())}")
     if "cliente" not in b.preenchido_por:
         f.append("o cliente ainda não respondeu o questionário (preenchido_por)")
     return f
@@ -52,6 +62,8 @@ def _pesquisa(c: ClienteCompleto) -> list[str]:
             f.append(f"persona {pe.id}: {', '.join(falta)}")
     if not p.escuta:
         f.append("escuta: de onde vieram dores e objeções (entrevistas, CRM, avaliações)")
+    if not p.nao_atender:
+        f.append("quem não atender (persona negativa) e como filtrar")
     if len(p.concorrentes) < 3:
         f.append(f"benchmark com {len(p.concorrentes)} concorrente(s); o mínimo útil é 3, o ideal 5")
     if not p.unicidade:
