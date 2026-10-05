@@ -246,12 +246,32 @@ class TestExportar(Base):
         o = c.oferta("conversacao-adultos")
         meta, pend = pagina_lp(c, o, "meta")
         google, _ = pagina_lp(c, o, "google")
-        self.assertEqual(pend, [])
+        self.assertEqual(pend, [])  # a oferta principal do exemplo tem benefícios escritos
         self.assertIn("dor", meta)
         self.assertNotIn("dor", google)
         self.assertIn("prova_social", google)
         self.assertTrue(4 <= len(meta["beneficios"]["itens"]) <= 8)
         self.assertEqual(meta["contato"]["whatsapp"], "5541900000000")
+
+    def test_whatsapp_ausente_nao_passa_por_valido(self):
+        self.editar("briefing.yaml", lambda d: d["cliente"].update(whatsapp=""))
+        c = carregar_cliente(self.pasta)
+        pagina, pend = pagina_lp(c, c.oferta("conversacao-adultos"), "meta")
+        self.assertNotRegex(pagina["contato"]["whatsapp"], r"^55\d{10,11}$")
+        self.assertTrue(any("whatsapp" in p for p in pend))
+
+    def test_subtitulo_nao_repete_a_solucao(self):
+        c = carregar_cliente(EXEMPLO)
+        pagina, _ = pagina_lp(c, c.oferta("conversacao-adultos"), "meta")
+        self.assertNotEqual(pagina["topo"]["subtitulo"], pagina["dor"]["solucao"])
+
+    def test_beneficios_escritos_tem_prioridade(self):
+        itens = [{"titulo": f"Benefício {i}", "texto": f"Texto {i}"} for i in range(5)]
+        self.editar("ofertas/conversacao-adultos.yaml", lambda d: d.update(beneficios=itens))
+        c = carregar_cliente(self.pasta)
+        pagina, pend = pagina_lp(c, c.oferta("conversacao-adultos"), "meta")
+        self.assertEqual(pagina["beneficios"]["itens"], itens)
+        self.assertEqual(pend, [])
 
     def test_pendencias_ficam_no_arquivo(self):
         c = carregar_cliente(EXEMPLO)

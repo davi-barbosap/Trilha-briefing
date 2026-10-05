@@ -36,6 +36,15 @@ como_funciona:
   - { titulo: "Turma de até 6", texto: "Duas aulas por semana, presencial ou online." }
   - { titulo: "Revisão a cada mês", texto: "O professor mostra o que você já fala e o próximo passo." }
 
+subtitulo: "Você entende inglês, mas trava para falar. Em turmas de até 6, você fala a maior parte da aula e repõe em qualquer horário."
+
+beneficios:                      # escritos para a página; sem eles, o rascunho sai com o texto de apoio em branco
+  - { titulo: "Responda na hora, sem roteiro", texto: "A aula treina as frases das suas reuniões, até elas saírem sem ensaio." }
+  - { titulo: "Fale em todas as aulas, numa turma de até 6", texto: "Com poucos alunos, você fala a maior parte do tempo, não só escuta." }
+  - { titulo: "Reponha em qualquer horário da grade", texto: "Viagem, reunião ou plantão não fazem você perder conteúdo." }
+  - { titulo: "Treine com as situações do seu trabalho", texto: "Reunião, apresentação e entrevista: o conteúdo parte do que você vive." }
+  - { titulo: "Veja sua evolução todo mês", texto: "O professor mostra o que você já fala e qual é o próximo passo." }
+
 objecoes:
   - { eixo: tempo, objecao: "Não tenho horário fixo", resposta: "Você repõe em qualquer horário da grade, presencial ou online.", fonte: dados, status: validada }
   - { eixo: confianca, objecao: "Já tentei e larguei", resposta: "Turma de até 6: você fala em todas as aulas e o professor acompanha a sua evolução todo mês.", fonte: consumidor }

@@ -93,8 +93,9 @@ def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
     ja = {_norm(t) for t in pl.voz.termos_proibidos}
     proibidos += [(t, "promessa proibida") for t in pl.compliance.promessas_proibidas if _norm(t) not in ja]
     for o in c.ofertas:
-        textos = [("promessa", o.promessa.texto if o.promessa else ""), ("cta", o.cta)]
+        textos = [("promessa", o.promessa.texto if o.promessa else ""), ("cta", o.cta), ("subtitulo", o.subtitulo)]
         textos += [(f"diferenciais[{i}]", d.texto) for i, d in enumerate(o.diferenciais)]
+        textos += [(f"beneficios[{i}]", f"{x.titulo} {x.texto}") for i, x in enumerate(o.beneficios)]
         for onde, texto in textos:
             for termo, motivo in proibidos:
                 if termo and _norm(termo) in _norm(texto):

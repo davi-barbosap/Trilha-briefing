@@ -15,7 +15,8 @@ import yaml
 from trilha_briefing.esquema import ClienteCompleto, Oferta
 
 PESSOA_GRAMATICAL = {"pessoa": "eu", "marca_pessoa": "eu", "marca": "nós"}
-WHATSAPP_RESERVA = "5500000000000"
+# Inválido de propósito: a página não passa no `trilha_lp validar` até o número real entrar.
+WHATSAPP_PENDENTE = "PREENCHER"
 
 
 def _yaml(dados: dict, cabecalho: list[str]) -> str:
@@ -149,9 +150,9 @@ def pagina_lp(c: ClienteCompleto, o: Oferta, origem: str) -> tuple[dict, list[st
         pend.append("topo.provas: nenhum número com fonte em provas.yaml")
     reducao = [t for t in (o.inversao_risco, o.condicoes.condicao_excepcional, o.condicoes.pagamento) if t][:3]
 
-    whatsapp = b.cliente.whatsapp or WHATSAPP_RESERVA
+    whatsapp = b.cliente.whatsapp or WHATSAPP_PENDENTE
     if not b.cliente.whatsapp:
-        pend.append("contato.whatsapp: número de reserva; preencher briefing.cliente.whatsapp")
+        pend.append("contato.whatsapp: preencher briefing.cliente.whatsapp (a página não valida sem ele)")
     cores = pl.identidade_visual.cores
     if not {"primaria", "secundaria"} <= set(cores):
         pend.append("marca.cores: definir primária e secundária em plataforma.yaml")
@@ -171,9 +172,15 @@ def pagina_lp(c: ClienteCompleto, o: Oferta, origem: str) -> tuple[dict, list[st
     if "PREENCHER" in " ".join(dor.values()):
         pend.append("dor: completar dores da persona, quadro antes/depois e mecanismo único")
 
-    beneficios = [{"titulo": ad.depois, "texto": f"Em vez de: {ad.antes[:1].lower()}{ad.antes[1:]}"} for ad in o.antes_depois]
-    beneficios += [{"titulo": d.texto, "texto": d.evidencia} for d in o.diferenciais]
-    beneficios = beneficios[:8]
+    if o.beneficios:
+        beneficios = [x.model_dump() for x in o.beneficios][:8]
+    else:
+        # Sem benefícios escritos, o rascunho parte do "depois" e dos diferenciais; o texto de apoio fica para escrever.
+        beneficios = [{"titulo": ad.depois, "texto": ""} for ad in o.antes_depois]
+        beneficios += [{"titulo": d.texto, "texto": d.evidencia if d.fonte != "nao_informada" else ""} for d in o.diferenciais]
+        beneficios = beneficios[:8]
+        if any(not x["texto"] for x in beneficios):
+            pend.append("beneficios: escrever o texto de apoio de cada item (ou preencher oferta.beneficios)")
     if len(beneficios) < 4:
         pend.append(f"beneficios: {len(beneficios)} itens; a página pede de 4 a 8")
     if not 3 <= len(o.como_funciona) <= 5:
@@ -216,7 +223,8 @@ def pagina_lp(c: ClienteCompleto, o: Oferta, origem: str) -> tuple[dict, list[st
         "contato": {"whatsapp": whatsapp, "mensagem_whatsapp": f"Olá! Quero saber mais sobre {o.nome}"},
         "topo": {
             "titulo": promessa,
-            "subtitulo": o.big_idea.mecanismo_unico or o.problema or "PREENCHER",
+            # O mecanismo único vai para a solução do bloco de dor; aqui, o que a pessoa ganha.
+            "subtitulo": o.subtitulo or " · ".join(d.texto for d in o.diferenciais[:3]) or "PREENCHER",
             "provas": provas_curtas,
             "cta": {"texto": cta, "acao": "formulario"},
             "reducao_medo": reducao,

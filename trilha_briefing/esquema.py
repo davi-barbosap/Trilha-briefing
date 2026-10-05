@@ -525,6 +525,8 @@ class Oferta(_Base):
     diferenciais: list[Item] = Field(default_factory=list)
     raridade: str = ""
     como_funciona: list[Passo] = Field(default_factory=list)
+    subtitulo: str = ""  # topo da página: dor + como a oferta resolve; vazio = 3 primeiros diferenciais
+    beneficios: list[Passo] = Field(default_factory=list)  # 4 a 8 { titulo, texto } escritos para a página
     objecoes: list[ObjecaoOferta] = Field(default_factory=list)
     inversao_risco: str = ""  # o que o cliente deixa de arriscar: garantia, teste, devolução
     escassez: Escassez | None = None
