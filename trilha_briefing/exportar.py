@@ -298,6 +298,7 @@ def pacote_copy(c: ClienteCompleto) -> dict:
         },
         "voz": pl.voz.model_dump(mode="json"),
         "posicionamento": pl.posicionamento.model_dump(mode="json"),
+        "identidade_visual": pl.identidade_visual.model_dump(mode="json"),  # vai no briefing do criativo
         "compliance": {
             "termos_proibidos": pl.voz.termos_proibidos,
             "promessas_proibidas": pl.compliance.promessas_proibidas,

@@ -53,6 +53,7 @@ Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferra
 |---|---|---|
 | `cliente` | `briefing.yaml` | id, nome, segmento, playbook, WhatsApp, área |
 | `voz`, `posicionamento` | `plataforma.yaml` | inclui `voz.intensidade`, o termostato de 1 a 5 |
+| `identidade_visual` | `plataforma.yaml` | cores, tipografia, logo e estilo de imagem: vão no briefing do criativo de cada peça, para a equipe de criação |
 | `compliance` | `plataforma.yaml` + `briefing.restricoes` | termos e promessas proibidas, registros, avisos, regras legais, o que não pode |
 | `personas`, `nao_atender` | `pesquisa.yaml` | com medos, crenças (método, interna, externa), micro-problemas, frases literais, sofisticação |
 | `concorrentes` | `pesquisa.yaml` | **só os nomes**, para a revisão avisar quando uma peça cita um concorrente |

@@ -230,6 +230,12 @@ class TestVeiculacaoParaCopy(Base):
         self.assertEqual(pt01["anuncio"], "{codigo}-{versao} amplo")
         self.assertEqual(pt01["parametros_url"], "utm_content={codigo}&utm_term=amplo")
 
+    def test_identidade_visual_vai_para_o_criativo(self):
+        from trilha_briefing.exportar import pacote_copy
+        iv = pacote_copy(carregar_cliente(self.pasta))["identidade_visual"]
+        self.assertEqual(iv["tipografia"]["titulos"], "Poppins")
+        self.assertIn("estilo_imagem", iv)
+
     def test_sem_plano_nao_tem_veiculacao(self):
         from trilha_briefing.exportar import pacote_copy
         (self.pasta / "campanhas.yaml").unlink()
