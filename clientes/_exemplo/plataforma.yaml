@@ -1,0 +1,68 @@
+# A marca: quem é, como quer ser lembrada, como fala.
+jornada:
+  resultado: "300 alunos ativos e matrícula previsível o ano todo"
+  conhecido_por: "a escola onde adulto destrava a fala em poucos meses"
+  fazer: ["mostrar aula real, com aluno real, falando", "contar a virada de alunos que travavam"]
+  aprender: ["roteiro de vídeo curto", "captação de depoimento em vídeo"]
+
+associacoes:
+  queremos: [turma pequena, falar desde a primeira aula, adulto ocupado, professor que acompanha]
+  nao_queremos: [cursinho de criança, promessa milagrosa, método decoreba]
+
+posicionamento:
+  para_quem: "adultos que entendem inglês mas travam para falar"
+  categoria: "uma escola de conversação em turmas pequenas"
+  diferenca: "faz cada aluno falar a maior parte da aula, com reposição em qualquer horário"
+  razoes_para_acreditar:
+    - { texto: "Turmas de até 6 alunos", fonte: cliente, status: validada, evidencia: "grade de turmas" }
+    - { texto: "Nota 4,9 com 87 avaliações no Google", fonte: dados, status: validada, evidencia: "perfil do Google" }
+  percepcao_atual: "uma escola de bairro simpática"
+  percepcao_desejada: "a referência para adulto que precisa falar inglês no trabalho"
+
+historia:
+  catalisador: "A fundadora perdeu uma promoção por travar numa entrevista em inglês, mesmo com anos de curso"
+  verdade_central: "Ninguém aprende a falar ouvindo o professor falar"
+  prova: "Nas aulas, o aluno fala em média 70% do tempo (medido pela coordenação)"
+
+voz:
+  assinatura: marca_pessoa
+  nome_pessoa: Marina (fundadora)
+  abordagem: conversacional
+  tom: [próximo, direto, encorajador]
+  assim_sim:
+    - "Você entende a reunião inteira. Falta a frase sair na hora — é isso que a aula treina."
+    - "Turma de até 6: você fala em todas as aulas."
+    - "Perdeu a aula? Repõe em qualquer horário da grade."
+  assim_nao:
+    - "Fluência garantida em 3 meses!  # promessa que não dá para cumprir"
+    - "O melhor curso de inglês da cidade  # adjetivo sem fato"
+    - "Imperdível: matrícula grátis!  # atrai quem desiste no 2º mês"
+  termos_obrigatorios: []
+  termos_proibidos: [imperdível, fluência garantida, método revolucionário]
+
+identidade_visual:
+  cores: { primaria: "#123C69", secundaria: "#F2B33D", fundo: "#FFFFFF", texto: "#1A1A1A" }
+  tipografia: { titulos: Poppins, texto: Inter }
+  logo: assets/logo.svg
+  estilo_imagem: "alunos reais em aula, sem banco de imagem"
+
+temas:                           # poucos temas, repetidos: é a repetição que cria a associação
+  - { nome: "Destravar a fala", peso: 40, formatos: [reels com aluno, antes/depois em áudio], canais: [Instagram, Meta Ads], exemplo: "3 frases para não travar na reunião" }
+  - { nome: "Bastidores da aula", peso: 30, formatos: [vídeo da turma, story], canais: [Instagram] }
+  - { nome: "Inglês no trabalho", peso: 20, formatos: [carrossel, post no LinkedIn], canais: [Instagram, LinkedIn] }
+  - { nome: "Histórias de alunos", peso: 10, formatos: [depoimento em vídeo], canais: [Instagram, Meta Ads] }
+
+compliance:
+  registros_profissionais: []
+  avisos_legais: ["Resultados variam conforme frequência e dedicação."]
+  promessas_proibidas: ["fluência garantida", "aprenda em 30 dias"]
+  politica_privacidade_url: https://exemplo.com.br/privacidade
+  base_legal_lgpd: consentimento
+
+atendimento:
+  sla_resposta: 30min
+  handoff: direto
+  canais: [WhatsApp, Instagram Direct]
+  horario_comercial: "seg–sex 9h–19h"
+
+preco: { anuncio: nunca, whatsapp: valor_cheio, landing: a_partir_de }

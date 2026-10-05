@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trilha-briefing"
+version = "0.1.0"
+description = "Briefing, marca e estratégia por cliente: entender o cliente antes de anunciar"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.5", "pyyaml>=6"]
+
+[tool.setuptools]
+packages = ["trilha_briefing"]
+
+[tool.setuptools.package-data]
+trilha_briefing = ["modelo/*", "modelo/ofertas/*"]

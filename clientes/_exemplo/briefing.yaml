@@ -1,0 +1,49 @@
+# Cliente de exemplo (dados fictícios): escola de inglês para adultos.
+# O briefing é o que o cliente diz. Ele responde o questionário (python -m trilha_briefing questionario)
+# e o assessor transcreve e completa na reunião de kickoff.
+cliente:
+  id: _exemplo
+  nome: Escola Exemplo de Inglês
+  segmento: escola de idiomas
+  playbook: padrao
+  cidade_atuacao: Curitiba/PR e online
+  site: https://exemplo.com.br
+  redes: ["instagram.com/escolaexemplo"]
+  whatsapp: "5541900000000"
+  tempo_mercado: 9 anos
+
+negocio:
+  o_que_vende: Curso de inglês para adultos que precisam falar no trabalho, em turmas de até 6 alunos, presencial e online
+  modelo_receita: recorrencia
+  tipo_compra: misto             # necessidade (promoção, entrevista) + desejo (viajar, autoestima)
+  como_vende_hoje: [indicação de alunos, Instagram orgânico, Google Meu Negócio]
+  ciclo_venda_dias: 12
+  time_comercial: "1 consultora de matrículas (seg–sex 9h–19h) agenda a aula experimental; a coordenadora fecha"
+  crm: Kommo
+
+resultado_desejado:
+  em_12_meses: Sair de 180 para 300 alunos ativos sem depender só de indicação
+  conhecido_por: a escola onde adulto destrava a fala em poucos meses
+  sucesso_significa: alunos ativos no fim do mês e matrículas vindas de mídia paga
+
+historico:
+  funcionou:
+    - { texto: "Aula experimental gratuita converte 1 em cada 3 que comparecem", fonte: dados, status: validada, evidencia: "planilha de matrículas jan–set" }
+    - { texto: "Indicação com desconto de 10% para quem indica", fonte: cliente }
+  nao_funcionou:
+    - { texto: "Promoção de matrícula grátis atraiu muita gente que desistiu no 2º mês", fonte: cliente }
+  ja_investiu_em_midia: "Impulsionamento no Instagram, ~R$ 500/mês em 2025, sem medir matrículas"
+
+restricoes:
+  verba_mensal_max: 6000
+  prazos: ["campanha de volta às aulas pronta até 15/01", "campanha de julho pronta até 15/06"]
+  regras_legais: ["LGPD: consentimento para contato"]
+  nao_pode: ["prometer fluência em prazo fixo", "comparar nominalmente com outras escolas"]
+
+stakeholders:
+  - { nome: Marina, papel: sócia-diretora, influencia: alta, interesse: alta, espera: "previsibilidade de matrículas" }
+  - { nome: Paulo, papel: coordenador pedagógico, influencia: media, interesse: alta, espera: "aluno com perfil para as turmas" }
+  - { nome: Júlia, papel: consultora de matrículas, influencia: baixa, interesse: alta, espera: "lead que atende o telefone" }
+
+preenchido_por: [cliente, assessor]
+data: 2026-10-01

@@ -1,0 +1,11 @@
+__pycache__/
+*.egg-info/
+dist/
+.venv/
+.env
+
+# Clientes reais têm estratégia, números e dados pessoais (LGPD). Por padrão ficam fora do Git;
+# só o exemplo fictício é versionado. Se este repositório for privado e você quiser versionar
+# os clientes aqui, apague as duas linhas abaixo.
+clientes/*
+!clientes/_exemplo/

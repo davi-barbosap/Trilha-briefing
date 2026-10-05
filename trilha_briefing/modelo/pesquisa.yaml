@@ -1,0 +1,25 @@
+# O que o mercado e os clientes reais mostram.
+# fonte: cliente | mercado | dados | assessor   status: hipotese | validada | refutada
+personas: []
+#  - id: nome-curto
+#    nome: ""
+#    quem_e: ""
+#    dores: []
+#    desejos: []
+#    objecoes: []
+#    ganchos: []
+#    nivel_consciencia: consciente_do_problema   # inconsciente | consciente_do_problema | consciente_da_solucao | consciente_do_produto | pronto_para_comprar
+#    onde_esta: []
+#    gatilho_compra: ""
+escuta: []                        # { fonte, quantidade, data, resumo } — sem escuta, persona é opinião
+concorrentes: []                  # 3 a 5: { nome, promessa, posicionamento_preco, fortes, fracos, canais, aprender }
+unicidade: ""
+swot: { forcas: [], fraquezas: [], oportunidades: [], ameacas: [] }
+sazonalidade: []                  # { periodo, efeito: alta|baixa, motivo }
+maturidade:                       # 0 a 3 (nota de maturidade do Trilha)
+  rastreamento: null
+  crm: null
+  capacidade_criativa: null
+  historico_conta: null
+  verba: null
+  observacoes: ""

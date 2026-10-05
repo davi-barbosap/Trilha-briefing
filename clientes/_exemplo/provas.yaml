@@ -1,0 +1,14 @@
+# O que sustenta cada promessa. Número precisa de fonte; depoimento, de autorização por escrito.
+provas:
+  - { tipo: numero, numero: "4,9", texto: "de nota com 87 avaliações no Google", fonte: "perfil do Google, 25/09/2026" }
+  - { tipo: numero, numero: "6", texto: "alunos no máximo por turma", fonte: "grade de turmas" }
+  - { tipo: numero, numero: "+1.200", texto: "adultos formados desde 2017", fonte: "sistema acadêmico" }
+  - { tipo: depoimento, texto: "Em quatro meses eu apresentei o resultado do trimestre em inglês, sem ler.", autor: "Renata, analista de dados", autorizado: true, formato: video, link: "drive/depoimentos/renata.mp4" }
+  - { tipo: depoimento, texto: "A reposição salvou: viajo a trabalho e nunca perdi conteúdo.", autor: "Carlos, gerente comercial", autorizado: true }
+  - { tipo: depoimento, texto: "Professora maravilhosa!", autor: "aluna do Google", autorizado: false }
+historias:
+  - titulo: "Da reunião em silêncio à apresentação do trimestre"
+    antes: "Renata entendia tudo nas reuniões com o time dos EUA e não abria a boca"
+    virada: "Treinou, em turma de 5, as frases das próprias reuniões"
+    resultado: "Em 4 meses apresentou o fechamento do trimestre em inglês"
+    autorizado: true
