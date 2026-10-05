@@ -1,7 +1,7 @@
 """Linha de comando do trilha-briefing.
 
     python -m trilha_briefing novo <id>                       cria clientes/<id>/ a partir do modelo
-    python -m trilha_briefing questionario [--assessor]       perguntas do kickoff para o cliente
+    python -m trilha_briefing questionario [--para cliente|reuniao|assessor]   perguntas do briefing
     python -m trilha_briefing validar <pasta>                 confere o esquema de todos os arquivos
     python -m trilha_briefing lacunas <pasta>                 o que falta por etapa e o que bloqueia a aprovação
     python -m trilha_briefing revisar <pasta>                 avisos críticos (promessa, prova, verba, canais…)
@@ -58,7 +58,7 @@ def cmd_novo(a) -> int:
 
 
 def cmd_questionario(a) -> int:
-    print(questionario.gerar(a.cliente, a.assessor))
+    print(questionario.gerar(a.cliente, para="assessor" if a.assessor else a.para))
     return 0
 
 
@@ -191,7 +191,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="trilha_briefing", description="Briefing, marca e estratégia por cliente")
     sub = ap.add_subparsers(dest="comando", required=True)
     s = sub.add_parser("novo"); s.add_argument("id"); s.add_argument("--pasta", default="clientes"); s.set_defaults(f=cmd_novo)
-    s = sub.add_parser("questionario"); s.add_argument("--cliente", default=""); s.add_argument("--assessor", action="store_true")
+    s = sub.add_parser("questionario"); s.add_argument("--cliente", default="")
+    s.add_argument("--para", choices=["cliente", "reuniao", "assessor"], default="cliente")
+    s.add_argument("--assessor", action="store_true", help="o mesmo que --para assessor")
     s.set_defaults(f=cmd_questionario)
     for nome, f in (("validar", cmd_validar), ("lacunas", cmd_lacunas), ("revisar", cmd_revisar),
                     ("economia", cmd_economia), ("canais", cmd_canais), ("grade", cmd_grade)):

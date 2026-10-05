@@ -299,11 +299,35 @@ class TestApresentar(Base):
 
 
 class TestCli(Base):
-    def test_questionario(self):
-        texto = questionario.gerar("Escola", assessor=True)
-        self.assertIn("1. O que vocês vendem?", texto)
-        self.assertIn("→ `briefing: negocio.o_que_vende`", texto)
-        self.assertNotIn("→", questionario.gerar("Escola"))
+    def test_questionario_tres_momentos(self):
+        cliente = questionario.gerar("Escola")
+        self.assertIn("O que vocês vendem?", cliente)
+        self.assertNotIn("→", cliente)
+        self.assertNotIn("●", cliente)
+        reuniao = questionario.gerar("Escola", para="reuniao")
+        self.assertIn("● Se precisar escolher um", reuniao)
+        self.assertIn("Roteiro das entrevistas", reuniao)
+        assessor = questionario.gerar("Escola", assessor=True)
+        self.assertIn("→ `briefing.capacidade.leads_dia`", assessor)
+        self.assertIn("◆ Avaliações no Google", assessor)
+        self.assertEqual(assessor.count("→"), len(questionario.perguntas()))
+
+    def test_campos_do_questionario_existem(self):
+        # Cada "arquivo.campo" citado no questionário precisa existir no esquema.
+        from trilha_briefing import esquema as e
+        modelos = {"briefing": e.Briefing, "pesquisa": e.Pesquisa, "plataforma": e.Plataforma, "estrategia": e.Estrategia,
+                   "ofertas": e.Oferta}
+        import re
+        for _, _, _, campo in questionario.perguntas():
+            for arquivo, caminho in re.findall(r"\b(briefing|pesquisa|plataforma|estrategia|ofertas)\.([a-z0-9_.\[\]]+)", campo):
+                modelo = modelos[arquivo]
+                for parte in caminho.replace("[]", "").split(".")[:2]:
+                    self.assertIn(parte, modelo.model_fields, f"{arquivo}.{caminho} ({campo})")
+                    anotacao = modelo.model_fields[parte].annotation
+                    filhos = [a for a in getattr(anotacao, "__args__", (anotacao,)) if isinstance(a, type) and hasattr(a, "model_fields")]
+                    if not filhos:
+                        break
+                    modelo = filhos[0]
 
     def test_novo(self):
         self.assertEqual(main(["novo", "cliente-novo", "--pasta", str(self.tmp)]), 0)
