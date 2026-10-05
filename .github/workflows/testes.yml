@@ -19,7 +19,12 @@ jobs:
       - run: python -m trilha_briefing validar clientes/_exemplo
       - run: python -m trilha_briefing lacunas clientes/_exemplo
       - run: python -m trilha_briefing revisar clientes/_exemplo
+      - run: python -m trilha_briefing plano clientes/_exemplo
       - run: python -m trilha_briefing exportar clientes/_exemplo --para trilha
       - run: python -m trilha_briefing exportar clientes/_exemplo --para lp --oferta conversacao-adultos
       - run: python -m trilha_briefing exportar clientes/_exemplo --para copy
       - run: python -m trilha_briefing apresentar clientes/_exemplo
+      - name: O pacote instalado leva as regras padrão e os modelos
+        run: |
+          pip install --no-deps --target /tmp/instalado .
+          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_briefing.campanhas as m, trilha_briefing; from pathlib import Path; assert m.ARQUIVO_PADRAO.exists(); assert (Path(trilha_briefing.__file__).parent / 'modelo' / 'estrategia.yaml').exists(); m.regras_do_plano()"
