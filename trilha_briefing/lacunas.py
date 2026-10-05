@@ -6,6 +6,7 @@ Lacuna é informação que ainda não existe. Não é julgamento de qualidade: i
 from __future__ import annotations
 
 from trilha_briefing.esquema import FONTES_DE_ESCUTA, ClienteCompleto, Persona
+from trilha_briefing.revisao import bloqueantes
 
 ETAPAS = ("briefing", "pesquisa", "plataforma", "provas", "ofertas", "estrategia")
 
@@ -200,4 +201,5 @@ def bloqueios_aprovacao(c: ClienteCompleto) -> list[str]:
         b.append("nenhuma prova utilizável (número com fonte ou depoimento autorizado)")
     if not any(cp.status == "ativo" for cp in e.canais):
         b.append("nenhum canal ativo")
+    b += [f"revisão: {a.texto}" for a in bloqueantes(c)]
     return b

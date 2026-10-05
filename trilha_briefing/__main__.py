@@ -87,13 +87,21 @@ def cmd_lacunas(a) -> int:
     return 0
 
 
+ICONE = {"bloqueia": "✗", "atencao": "⚠", "sugestao": "·"}
+ROTULO = {"bloqueia": "Bloqueia", "atencao": "Atenção", "sugestao": "Sugestão"}
+
+
 def cmd_revisar(a) -> int:
     c = _carregar(a.pasta)
     avisos = revisar(c)
-    for av in avisos:
-        print(f"⚠ {av}")
+    for nivel in ICONE:
+        do_nivel = [av for av in avisos if av.nivel == nivel]
+        if do_nivel:
+            print(f"{ROTULO[nivel]} ({len(do_nivel)})")
+            for av in do_nivel:
+                print(f"  {ICONE[nivel]} {av.texto}")
     print(f"{len(avisos)} aviso(s).")
-    return 0
+    return 1 if any(av.nivel == "bloqueia" for av in avisos) else 0
 
 
 def cmd_economia(a) -> int:

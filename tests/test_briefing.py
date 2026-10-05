@@ -13,7 +13,11 @@ from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ErroCliente, Item, carregar_cliente
 from trilha_briefing.exportar import exportar_lp, oferta_trilha, pagina_lp, perfil_parcial
 from trilha_briefing.lacunas import bloqueios_aprovacao, lacunas
-from trilha_briefing.revisao import revisar
+from trilha_briefing.revisao import revisar as _revisar
+
+
+def revisar(c):
+    return [a.texto for a in _revisar(c)]
 
 EXEMPLO = Path(__file__).parent.parent / "clientes" / "_exemplo"
 
@@ -149,6 +153,35 @@ class TestRevisao(Base):
     def test_sem_escuta_bloqueia_aprovacao(self):
         self.editar("pesquisa.yaml", lambda d: d.update(escuta=[]))
         self.assertTrue(any("escuta" in b for b in bloqueios_aprovacao(carregar_cliente(self.pasta))))
+
+
+class TestGravidade(Base):
+    def test_exemplo_sem_bloqueio_e_cli_ok(self):
+        self.assertFalse([a for a in _revisar(carregar_cliente(EXEMPLO)) if a.nivel == "bloqueia"])
+        self.assertEqual(main(["revisar", str(EXEMPLO)]), 0)
+
+    def test_bloqueio_vira_lacuna_e_cli_falha(self):
+        self.editar("briefing.yaml", lambda d: d["negocio"].update(modelo_receita="venda_direta"))
+        c = carregar_cliente(self.pasta)
+        self.assertTrue(any("modelo de receita diferente" in b for b in bloqueios_aprovacao(c)))
+        self.assertEqual(main(["revisar", str(self.pasta)]), 1)
+
+    def test_ticket_divergente(self):
+        self.editar("ofertas/conversacao-adultos.yaml", lambda d: d["condicoes"].update(ticket_medio=900))
+        self.assertTrue(any("ticket da oferta principal" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_prova_de_autoridade_precisa_de_fonte_nao_de_autorizacao(self):
+        from trilha_briefing.esquema import Prova, Provas
+        p = Provas(provas=[Prova(tipo="certificacao", texto="ISO 9001", fonte="certificado nº 123")])
+        self.assertEqual(len(p.utilizaveis()), 1)
+
+    def test_melhorar_nao_e_adjetivo_vago(self):
+        def dif(d):
+            d["diferenciais"] = ["Aulas para melhorar a pronúncia", "O melhor método", "Turmas de até 6"]
+        self.editar("ofertas/conversacao-adultos.yaml", dif)
+        vagos = [a for a in revisar(carregar_cliente(self.pasta)) if "adjetivo sem fato" in a]
+        self.assertEqual(len(vagos), 1)
+        self.assertIn("O melhor método", vagos[0])
 
 
 class TestCanais(Base):

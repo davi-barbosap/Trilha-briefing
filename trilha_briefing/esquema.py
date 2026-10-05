@@ -324,8 +324,12 @@ class Provas(_Base):
     historias: list[HistoriaCliente] = Field(default_factory=list)
 
     def utilizaveis(self, tipo: str | None = None) -> list[Prova]:
-        """Provas que podem ir para anúncio e página: número com fonte, depoimento autorizado."""
-        ok = [p for p in self.provas if (p.fonte if p.tipo == "numero" else p.autorizado)]
+        """Provas que podem ir para anúncio e página.
+
+        Fato (número, autoridade, mídia, certificação) precisa de fonte; pessoa (depoimento, case)
+        precisa de autorização de uso de nome e imagem.
+        """
+        ok = [p for p in self.provas if (p.autorizado if p.tipo in ("depoimento", "case") else p.fonte)]
         return [p for p in ok if tipo is None or p.tipo == tipo]
 
 
