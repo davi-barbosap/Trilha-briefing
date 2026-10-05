@@ -290,6 +290,13 @@ class TestApresentar(Base):
         self.assertNotIn("nao_informada", html)
         self.assertLess(html.index("Inglês para falar no trabalho"), html.index("Aula experimental</h3>"))
 
+    def test_hipotese_marcada_e_risco_interno_fora(self):
+        html = gerar_html(carregar_cliente(EXEMPLO))
+        self.assertIn("Já tentei e não funcionou comigo</li>", html)  # validada: sem marca
+        self.assertIn("Aplicativo é mais barato <span class=\"hip\">a confirmar</span>", html)
+        self.assertNotIn("Consultora não dá conta", html)
+        self.assertIn("Lead agenda e não comparece", html)
+
 
 class TestCli(Base):
     def test_questionario(self):

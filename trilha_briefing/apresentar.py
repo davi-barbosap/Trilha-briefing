@@ -41,6 +41,18 @@ def _lista(itens: list[str], classe: str = "") -> str:
     return f"<ul class=\"{classe}\">" + "".join(f"<li>{escape(i)}</li>" for i in itens) + "</ul>"
 
 
+MARCA_HIPOTESE = ' <span class="hip">a confirmar</span>'
+
+
+def _itens(itens) -> str:
+    """Afirmações para o cliente: refutadas saem; hipóteses aparecem marcadas como 'a confirmar'."""
+    vivos = [i for i in itens if i.status != "refutada"]
+    if not vivos:
+        return ""
+    linhas = [f"<li>{escape(i.texto)}{'' if i.status == 'validada' else MARCA_HIPOTESE}</li>" for i in vivos]
+    return "<ul>" + "".join(linhas) + "</ul>"
+
+
 def _secao(titulo: str, corpo: str, numero: int) -> str:
     if not corpo.strip():
         return ""
@@ -70,11 +82,11 @@ def gerar_html(c: ClienteCompleto) -> str:
         if pe.nivel_consciencia:
             cards += f"<p class=\"etiqueta\">{escape(NIVEL[pe.nivel_consciencia])}</p>"
         if pe.dores:
-            cards += "<p class=\"rotulo\">O que dói</p>" + _lista([i.texto for i in pe.dores[:3]])
+            cards += "<p class=\"rotulo\">O que dói</p>" + _itens(pe.dores[:3])
         if pe.desejos:
-            cards += "<p class=\"rotulo\">O que procura</p>" + _lista([i.texto for i in pe.desejos[:3]])
+            cards += "<p class=\"rotulo\">O que procura</p>" + _itens(pe.desejos[:3])
         if pe.objecoes:
-            cards += "<p class=\"rotulo\">O que trava a decisão</p>" + _lista([i.texto for i in pe.objecoes[:3]])
+            cards += "<p class=\"rotulo\">O que trava a decisão</p>" + _itens(pe.objecoes[:3])
         cards += "</div>"
     if p.escuta:
         total = sum(e.quantidade for e in p.escuta)
@@ -94,7 +106,7 @@ def gerar_html(c: ClienteCompleto) -> str:
     if any((s.forcas, s.fraquezas, s.oportunidades, s.ameacas)):
         corpo += "<div class=\"swot\">"
         for nome, itens in (("Forças", s.forcas), ("Fraquezas", s.fraquezas), ("Oportunidades", s.oportunidades), ("Ameaças", s.ameacas)):
-            corpo += f"<div><h3>{nome}</h3>{_lista([i.texto for i in itens])}</div>"
+            corpo += f"<div><h3>{nome}</h3>{_itens(itens)}</div>"
         corpo += "</div>"
     if p.sazonalidade:
         corpo += "<p class=\"rotulo\">Calendário</p>" + _lista(
@@ -158,6 +170,9 @@ def gerar_html(c: ClienteCompleto) -> str:
         if est.orcamento.verba_mensal:
             corpo += f"<div><strong>{_brl(est.orcamento.verba_mensal)}</strong><span>verba mensal depois de validar</span></div>"
         corpo += "</div>"
+        if est.economia.estimados:
+            corpo += ("<p class=\"nota\">Parte das taxas é estimativa e será trocada pelos números reais do CRM "
+                      "nas primeiras semanas; os tetos de custo serão recalculados.</p>")
         conv = conversoes_na_validacao(est)
         if conv is not None:
             corpo += (f"<p class=\"nota\">A verba de validação é o máximo que se aceita investir até saber se funciona. "
@@ -178,7 +193,7 @@ def gerar_html(c: ClienteCompleto) -> str:
     corpo = ""
     if est.premissas:
         corpo += "<p class=\"rotulo\">Contamos com</p>" + _lista(est.premissas)
-    riscos = sorted(est.riscos, key=lambda r: -r.nota)[:5]
+    riscos = sorted((r for r in est.riscos if not r.interno), key=lambda r: -r.nota)[:5]
     if riscos:
         corpo += "<p class=\"rotulo\">Riscos e o que faremos</p>" + _lista([f"{r.descricao} → {r.resposta}" for r in riscos])
     secoes.append(("Premissas e riscos", corpo))
@@ -191,7 +206,9 @@ def gerar_html(c: ClienteCompleto) -> str:
         corpo += "<p class=\"rotulo\">O que vamos testar primeiro</p>" + _lista([f"{h.hipotese} — sucesso: {h.criterio_sucesso}" for h in hip])
     secoes.append(("Como vamos medir", corpo))
 
-    html_secoes = "".join(_secao(t, corpo, i) for i, (t, corpo) in enumerate([s for s in secoes if s[1].strip()], start=1))
+    legenda = ("<p class=\"nota legenda\">Itens marcados <span class=\"hip\">a confirmar</span> são hipóteses: "
+               "entram no plano e são confirmados com a escuta e os dados.</p>")
+    html_secoes = legenda + "".join(_secao(t, corpo, i) for i, (t, corpo) in enumerate([s for s in secoes if s[1].strip()], start=1))
     return f"""<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Plano de marketing — {escape(b.cliente.nome)}</title>
@@ -205,7 +222,7 @@ main{{padding:0 20px 64px}}section{{padding:40px 0;border-bottom:1px solid var(-
 h3{{margin:0 0 .4em;font-size:1.1rem}}.destaque{{font-size:1.2rem;font-weight:600;border-left:4px solid var(--s);padding-left:14px}}
 .rotulo{{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;opacity:.7;margin:1.2em 0 .3em}}
 .etiqueta{{display:inline-block;font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:999px;background:color-mix(in srgb,var(--s) 25%,var(--f))}}
-.nota{{font-size:.9rem;opacity:.75}}ul,ol{{margin:.3em 0 1em;padding-left:1.2em}}
+.nota{{font-size:.9rem;opacity:.75}}.hip{{font-size:.75rem;font-weight:600;padding:1px 8px;border-radius:999px;border:1px dashed currentColor;opacity:.7;white-space:nowrap}}ul,ol{{margin:.3em 0 1em;padding-left:1.2em}}
 .grade{{display:grid;gap:16px}}.cartao,.oferta{{border:1px solid var(--l);border-radius:14px;padding:20px}}.oferta+.oferta{{margin-top:16px}}
 .swot,.de-para{{display:grid;gap:16px;margin:1em 0}}.swot>div,.de-para>div{{background:color-mix(in srgb,var(--p) 5%,var(--f));border-radius:12px;padding:14px 16px}}
 .tabela{{overflow-x:auto}}table{{width:100%;min-width:480px;border-collapse:collapse;margin:1em 0;font-size:.95rem}}th,td{{text-align:left;padding:8px;border-bottom:1px solid var(--l);vertical-align:top}}

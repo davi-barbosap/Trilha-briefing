@@ -639,6 +639,7 @@ class Risco(_Base):
     probabilidade: int = Field(ge=1, le=5)
     impacto: int = Field(ge=1, le=5)
     resposta: str = ""
+    interno: bool = False  # fica fora da apresentação ao cliente (ex.: risco que envolve uma pessoa do time dele)
 
     @property
     def nota(self) -> int:
