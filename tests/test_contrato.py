@@ -1,10 +1,10 @@
-"""Contrato com o Trilha e a Trilha-LP: o que exportamos passa nos esquemas deles.
+"""Contrato com o Trilha-ads e a Trilha-LP: o que exportamos passa nos esquemas deles.
 
 Os repositórios não dependem um do outro, então este teste só roda com os dois ao lado:
 
-    PYTHONPATH=../Trilha:../Trilha-LP python -m unittest tests.test_contrato -v
+    PYTHONPATH=../Trilha-ads:../Trilha-LP python -m unittest tests.test_contrato -v
 
-Sem eles, os testes são pulados (a CI deste repositório não tem acesso aos outros).
+Sem eles, os testes são pulados. A CI clona os dois (são públicos) e roda o teste a cada push.
 """
 
 import shutil
@@ -30,7 +30,7 @@ except ImportError:
 EXEMPLO = Path(__file__).parent.parent / "clientes" / "_exemplo"
 
 
-@unittest.skipUnless(TEM_REPOS, "Trilha e Trilha-LP fora do PYTHONPATH")
+@unittest.skipUnless(TEM_REPOS, "Trilha-ads e Trilha-LP não instalados")
 class TestContrato(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())

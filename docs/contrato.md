@@ -1,18 +1,18 @@
-# Contrato com o Trilha e a Trilha-LP
+# Contrato com o Trilha-ads, a Trilha-LP e o Trilha-copy
 
-O trilha-briefing é a fonte. O Trilha e a Trilha-LP recebem arquivos gerados por ele. O contrato é de dados, não de código: nenhum dos repositórios importa o outro.
+O Trilha-briefing é a fonte. O Trilha-ads, a Trilha-LP e o Trilha-copy recebem arquivos gerados por ele, gravados nas pastas de cada ferramenta no Trilha-clientes (`--saida ads`, `--saida lp/<id>`, `--saida copy`). O contrato é de dados, não de código: nenhum dos repositórios importa o outro.
 
 Os arquivos exportados trazem no topo o comentário "edite lá, não aqui". Uma mudança feita direto no arquivo gerado se perde na próxima exportação.
 
-## Trilha — `exportar --para trilha`
+## Trilha-ads — `exportar --para trilha`
 
 | Gerado | Vem de | Observação |
 |---|---|---|
 | `marca.yaml` | `plataforma.yaml` (voz, identidade, compliance, atendimento, preço) + `provas.yaml` | formato do núcleo §5.1; `pessoa_gramatical` derivada da assinatura; só provas utilizáveis (número com fonte, depoimento autorizado) |
-| `ofertas/<id>.yaml` | `ofertas/<id>.yaml` | passa no esquema de oferta do Trilha; `objecoes[].resposta` → `resposta_do_time`; `condicoes` → `condicoes_comerciais`; personas → `perfil_lead.perfil`; `ciclo_venda_dias` → `perfil_lead.jornada_media_dias` |
-| `perfil.parcial.yaml` | `briefing.yaml` + `estrategia.yaml` | `cliente`, `metrica_principal`, `economia` e `verba`. **Parcial:** `plataformas`, `crm`, `conversao`, `freio` e `operacao` só existem depois do acesso às contas e são completados no Trilha |
+| `ofertas/<id>.yaml` | `ofertas/<id>.yaml` | passa no esquema de oferta do Trilha-ads; `objecoes[].resposta` → `resposta_do_time`; `condicoes` → `condicoes_comerciais`; personas → `perfil_lead.perfil`; `ciclo_venda_dias` → `perfil_lead.jornada_media_dias` |
+| `perfil.parcial.yaml` | `briefing.yaml` + `estrategia.yaml` | `cliente`, `metrica_principal`, `economia` e `verba`. **Parcial:** `plataformas`, `crm`, `conversao`, `freio` e `operacao` só existem depois do acesso às contas e são completados no Trilha-ads |
 
-`cliente.playbook` vira o `segmento` do Trilha (aponta para `playbooks/<segmento>/`). `cliente.segmento` é texto livre e fica só aqui.
+`cliente.playbook` vira o `segmento` do Trilha-ads (aponta para `playbooks/<segmento>/`). `cliente.segmento` é texto livre e fica só aqui.
 
 ### Economia
 
@@ -22,7 +22,7 @@ Os arquivos exportados trazem no topo o comentário "edite lá, não aqui". Uma 
 - custo por qualificado e por agendamento dividem pela taxa de cada etapa;
 - verba mínima viável = 50 leads por semana no CPL máximo.
 
-Se as fórmulas mudarem no Trilha, mudam aqui. O teste `test_mesmos_numeros_do_trilha` fixa os valores do exemplo.
+Se as fórmulas mudarem no Trilha-ads, mudam aqui. O teste `test_mesmos_numeros_do_trilha` fixa os valores do exemplo.
 
 A margem sobre o CAC, no teto de custo, é sempre `1 / pct_investivel`. Com `pct_investivel` acima de 33%, ela fica abaixo de 3×, e a revisão avisa.
 
@@ -45,7 +45,7 @@ Gera um rascunho de `pagina.yaml` por oferta e origem (`meta` abre com a dor, `g
 
 O que faltar sai como `# PENDENTE:` no topo do arquivo. O texto sai cru: reescreva com a voz da marca e valide com `python -m trilha_lp validar`.
 
-## Trilha-copywritter — `exportar --para copy`
+## Trilha-copy — `exportar --para copy`
 
 Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferramenta de copy recusa versões que não conhece.
 
@@ -67,15 +67,15 @@ Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_cop
 ## Teste de contrato
 
 `tests/test_contrato.py` exporta o exemplo e valida o resultado com o código real dos outros repositórios:
-- as ofertas passam no esquema do Trilha;
-- a economia dá os mesmos números na calculadora do Trilha;
+- as ofertas passam no esquema do Trilha-ads;
+- a economia dá os mesmos números na calculadora do Trilha-ads;
 - a página da oferta principal passa no esquema da Trilha-LP;
 - a página sem WhatsApp não passa.
 
-Os repositórios não dependem um do outro, então o teste só roda com os dois clonados ao lado:
+Os repositórios não dependem um do outro. O teste roda com os dois clonados ao lado; sem eles, é pulado. A CI clona os dois e roda a cada push:
 
 ```bash
-PYTHONPATH=../Trilha:../Trilha-LP python -m unittest tests.test_contrato -v
+PYTHONPATH=../Trilha-ads:../Trilha-LP python -m unittest tests.test_contrato -v
 ```
 
 ## Grade de criativos
@@ -83,6 +83,6 @@ PYTHONPATH=../Trilha:../Trilha-LP python -m unittest tests.test_contrato -v
 O `codigo` de cada célula da grade (`estrategia.grade`) é o código do criativo:
 - vai no `utm_content`;
 - vai na mensagem pré-preenchida do WhatsApp (Trilha-LP);
-- é lido pelo raio-x do Trilha (`codigo_criativo`).
+- é lido pelo raio-x do Trilha-ads (`codigo_criativo`).
 
 Use o mesmo código nas três pontas.

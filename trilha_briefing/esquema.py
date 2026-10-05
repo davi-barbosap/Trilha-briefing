@@ -102,7 +102,7 @@ class Cliente(_Base):
     id: Id
     nome: str
     segmento: str  # texto livre: odontologia, escola de idiomas, software B2B, loja de móveis…
-    playbook: str = "padrao"  # playbooks/<playbook>/ no Trilha
+    playbook: str = "padrao"  # playbooks/<playbook>/ no Trilha-ads
     site: str = ""
     redes: list[str] = Field(default_factory=list)
     whatsapp: Annotated[str, Field(pattern=r"^(55\d{10,11})?$")] = ""  # 55 + DDD + número, só dígitos
@@ -293,7 +293,7 @@ class Sazonalidade(_Base):
 
 
 class Maturidade(_Base):
-    """Nota de maturidade do Trilha (núcleo §3.2), de 0 a 3 por dimensão."""
+    """Nota de maturidade do Trilha-ads (núcleo §3.2), de 0 a 3 por dimensão."""
 
     rastreamento: Nota | None = None
     crm: Nota | None = None
@@ -555,7 +555,7 @@ class VendasForaDoDigital(_Base):
 
 
 class Aderencia(_Base):
-    """Diagnóstico de aderência ao digital do Trilha (núcleo §3.5), na parte que vale para qualquer segmento."""
+    """Diagnóstico de aderência ao digital do Trilha-ads (núcleo §3.5), na parte que vale para qualquer segmento."""
 
     perfil_compradores: str = ""
     reputacao: Literal["ativo", "neutra", "obstaculo", "nao_avaliado"] = "nao_avaliado"
@@ -629,7 +629,7 @@ class Kr(_Base):
 
 
 class Economia(_Base):
-    """Mesmos campos do `economia` do perfil.yaml do Trilha (núcleo §3.1)."""
+    """Mesmos campos do `economia` do perfil.yaml do Trilha-ads (núcleo §3.1)."""
 
     modelo_receita: Literal["venda_direta", "comissao", "recorrencia"]
     ticket_medio: float | None = None

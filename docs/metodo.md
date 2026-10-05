@@ -19,7 +19,7 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 5. **Promessa que dá para cobrar.** Resultado observável, prazo e condição (para quem vale). Sem isso, a promessa não diferencia e ainda gera cliente frustrado.
 6. **Saber medir antes de lançar.** UTMs, origem gravada no CRM, conversão confirmada, motivos de perda, código do criativo e relatório combinado. Sem os seis, a estratégia não é aprovada.
 7. **Uma variável por teste, volume antes de concluir.** Hipótese tem critério de sucesso definido antes e mínimo de conversões. Abaixo do mínimo, o resultado é inconclusivo, por mais bonito que pareça.
-8. **Verba de validação é limite de perda.** É o máximo que o cliente aceita investir até saber se funciona, combinado antes. Os tetos de custo vêm da mesma calculadora do Trilha.
+8. **Verba de validação é limite de perda.** É o máximo que o cliente aceita investir até saber se funciona, combinado antes. Os tetos de custo vêm da mesma calculadora do Trilha-ads.
 
 ## Etapas e arquivos
 
@@ -51,7 +51,7 @@ Também entram:
 - Personas com dores, desejos, objeções, ganchos, nível de consciência e gatilho de compra.
 - Quem **não** atender (persona negativa) e como filtrar: exclusão de público, palavra-chave negativa, pergunta de qualificação.
 - Benchmark de 3 a 5 concorrentes, terminando em **unicidade** (o que só este cliente tem).
-- SWOT, calendário de sazonalidade e a nota de maturidade do Trilha (0–3 em rastreamento, CRM, capacidade criativa, histórico de conta e verba).
+- SWOT, calendário de sazonalidade e a nota de maturidade do Trilha-ads (0–3 em rastreamento, CRM, capacidade criativa, histórico de conta e verba).
 
 **Marca.**
 - Jornada (resultado → conhecido por → fazer → aprender) e associações (o que queremos e o que não queremos que lembrem).
@@ -65,7 +65,7 @@ Também entram:
 
 **Estratégia.**
 - **Por quê:** objetivo com meta, prazo e resultados-chave.
-- **Quanto:** economia unitária (mesmos campos do Trilha) e verba de validação.
+- **Quanto:** economia unitária (mesmos campos do Trilha-ads) e verba de validação.
 - **Como:** abordagem (direta, inbound ou as duas) e canais com papel, status, verba e justificativa. `canais` sugere a ordem por **intenção**:
   - quem busca já quer comprar (busca da marca, do produto, do setor);
   - quem é impactado no feed precisa ser convencido (interesses, semelhantes, vídeo);
@@ -75,14 +75,14 @@ Também entram:
 - **Quando:** marcos (fundação → validação → decisão), sem cronograma semana a semana.
 
 **Testes.**
-- A ordem para mexer quando algo não vai bem: criativo → público → objetivo → página → oferta. É a mesma ordem de diagnóstico do dossiê do Trilha.
+- A ordem para mexer quando algo não vai bem: criativo → público → objetivo → página → oferta. É a mesma ordem de diagnóstico do dossiê do Trilha-ads.
 - Cada hipótese aponta os códigos da grade que testa, a etapa do funil em que o volume é contado, o mínimo **por variação** e quantas variações disputam. A verba de validação precisa pagar mínimo × variações; a conta usa o custo no teto, que é o ponto de equilíbrio. Acima do teto, a verba compra menos.
 - O evento de otimização (`evento_otimizacao`) é o que a verba sustenta com cerca de 50 eventos por semana. A métrica principal pode ficar mais abaixo no funil e ser acompanhada no CRM.
 - Horizonte de cada teste: núcleo (o que já funciona), adjacente (novo público ou oferta próxima) ou ruptura.
 
 ## Ciclo
 
-- **Semanal:** fica no Trilha (dossiê, raio-x do funil, relatório). Esta ferramenta não repete esses números.
+- **Semanal:** fica no Trilha-ads (dossiê, raio-x do funil, relatório). Esta ferramenta não repete esses números.
 - **Trimestral:**
   - `fechar-ciclo --nome 2026-T4` guarda uma cópia do estado e um resumo em `historico/`;
   - atualize as hipóteses com os resultados;
@@ -98,7 +98,7 @@ O método junta uma aula de branding (jornada, associações, história, provas,
 - **Números de case e autopromoção** não viram benchmark. A referência é o histórico dos próprios clientes.
 - **Palavra-chave de concorrente:** há decisões no Brasil tratando o uso da marca do concorrente como palavra-chave como concorrência desleal. O canal exige aprovação do cliente.
 - **Escassez e medo:** só com evidência. Escassez falsa é publicidade enganosa (CDC), e conselhos profissionais têm regras próprias.
-- **CPL e CAC:** uma definição só, a do dicionário de métricas do Trilha. A economia usa as mesmas fórmulas.
-- **Degraus de maturidade:** usamos a nota de maturidade do Trilha, que já liga e desliga módulos lá.
+- **CPL e CAC:** uma definição só, a do dicionário de métricas do Trilha-ads. A economia usa as mesmas fórmulas.
+- **Degraus de maturidade:** usamos a nota de maturidade do Trilha-ads, que já liga e desliga módulos lá.
 - **Gantt semanal:** virou marcos. Para um assessor, o cronograma detalhado vira peso.
 - **Temas internos de agência** (contratação, papéis de squad) não entram na ferramenta do cliente.
