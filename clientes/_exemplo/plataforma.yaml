@@ -39,6 +39,7 @@ voz:
     - "Imperdível: matrícula grátis!  # atrai quem desiste no 2º mês"
   termos_obrigatorios: []
   termos_proibidos: [imperdível, fluência garantida, método revolucionário]
+  intensidade: 2                 # próximo e direto; nada de euforia: o público já se decepcionou com promessa de rede
 
 identidade_visual:
   cores: { primaria: "#123C69", secundaria: "#F2B33D", fundo: "#FFFFFF", texto: "#1A1A1A" }

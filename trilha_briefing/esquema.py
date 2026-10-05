@@ -65,11 +65,34 @@ class Item(_Base):
     fonte: Fonte = "nao_informada"
     status: Status = "hipotese"
     evidencia: str = ""  # onde está a prova: entrevista, print, relatório, link
+    mencoes: int | None = Field(default=None, ge=0)  # quantas pessoas disseram isso na escuta (alcance)
 
     @model_validator(mode="before")
     @classmethod
     def _de_texto(cls, v: Any) -> Any:
         return _fonte_sem_ambiguidade({"texto": v} if isinstance(v, str) else v)
+
+
+class Crenca(_Base):
+    """Crença que impede a compra. Cada uma pede uma peça ou um argumento que a derrube."""
+
+    texto: str
+    tipo: Literal["metodo", "interna", "externa"]  # o método não funciona | eu não consigo | o ambiente não deixa
+    quebra: str = ""  # como derrubar: prova, lógica, história, demonstração
+    fonte: Fonte = "nao_informada"
+    status: Status = "hipotese"
+    evidencia: str = ""
+    mencoes: int | None = Field(default=None, ge=0)
+
+    _fonte = model_validator(mode="before")(classmethod(lambda cls, v: _fonte_sem_ambiguidade(v)))
+
+
+class Frase(_Base):
+    """Fala literal de quem compra, sem nome (LGPD). A copy devolve essas palavras ao leitor."""
+
+    texto: str
+    origem: str  # ligação de vendas, entrevista, conversa no WhatsApp, avaliação
+    sobre: Literal["dor", "desejo", "medo", "objecao", "crenca", "outro"] = "outro"
 
 
 # ---------- briefing.yaml: o que o cliente diz ----------
@@ -219,7 +242,12 @@ class Persona(_Base):
     desejos: list[Item] = Field(default_factory=list)  # a transformação que procura
     objecoes: list[Item] = Field(default_factory=list)
     ganchos: list[Item] = Field(default_factory=list)  # o que faz parar e prestar atenção
+    medos: list[Item] = Field(default_factory=list)  # o que teme que aconteça se não resolver (o "inferno")
+    crencas: list[Crenca] = Field(default_factory=list)
+    micro_problemas: list[Item] = Field(default_factory=list)  # os problemas que a pessoa acha que tem (pautas)
+    frases: list[Frase] = Field(default_factory=list)
     nivel_consciencia: NivelConsciencia | None = None
+    sofisticacao: Literal["baixa", "media", "alta"] | None = None  # quantas promessas parecidas já ouviu
     onde_esta: list[str] = Field(default_factory=list)
     gatilho_compra: str = ""  # o que faz decidir agora
 
@@ -330,6 +358,7 @@ class Voz(_Base):
     assim_nao: list[str] = Field(default_factory=list)
     termos_obrigatorios: list[str] = Field(default_factory=list)
     termos_proibidos: list[str] = Field(default_factory=list)
+    intensidade: int | None = Field(default=None, ge=1, le=5)  # termostato: 1 sóbrio … 5 euforia de lançamento
 
 
 CHAVES_COR = {"primaria", "secundaria", "fundo", "texto", "apoio"}
@@ -404,6 +433,7 @@ class Plataforma(_Base):
 
 
 class Prova(_Base):
+    id: Id | None = None  # para as peças de copy citarem a prova usada
     tipo: Literal["depoimento", "numero", "case", "autoridade", "midia", "certificacao"]
     texto: str
     numero: str = ""  # para tipo numero: "+300", "4,8/5", "92%"
@@ -412,6 +442,8 @@ class Prova(_Base):
     autorizado: bool = False  # autorização de uso de nome, imagem e depoimento
     formato: Literal["texto", "video", "imagem", "print"] = "texto"
     link: str = ""
+    personas: list[str] = Field(default_factory=list)  # para quem ela convence: prova parecida com quem lê
+    perfil: str = ""  # quem é o protagonista: idade, segmento, situação de partida (sem dado sensível)
 
 
 class HistoriaCliente(_Base):
@@ -420,6 +452,8 @@ class HistoriaCliente(_Base):
     virada: str
     resultado: str
     autorizado: bool = False
+    personas: list[str] = Field(default_factory=list)
+    perfil: str = ""
 
 
 class Provas(_Base):
@@ -443,6 +477,8 @@ class BigIdea(_Base):
     oportunidade: str = ""  # o que mudou no mercado ou na vida do cliente
     inimigo: str = ""  # o que mantém o problema (um hábito, uma crença, um método ruim), nunca uma pessoa
     mecanismo_unico: str = ""  # como a oferta resolve de um jeito que só ela resolve
+    crenca_comum: str = ""  # o que o mercado acredita ("todos acham X")
+    por_que_falha: str = ""  # por que isso não resolve ("está errado porque Y"); o mecanismo é o Z
 
 
 class Promessa(_Base):
@@ -473,6 +509,28 @@ class ObjecaoOferta(_Base):
     status: Status = "hipotese"
 
     _fonte = model_validator(mode="before")(classmethod(lambda cls, v: _fonte_sem_ambiguidade(v)))
+
+
+class Diferencial(Item):
+    """Diferencial com a escada do "e daí?": característica → benefício → resultado → quem a pessoa vira."""
+
+    e_dai: list[str] = Field(default_factory=list)
+
+
+class Alternativa(_Base):
+    """O que mais a pessoa pode fazer com o mesmo dinheiro ou esforço. A oferta compete com isso também."""
+
+    alternativa: str
+    por_que_nao: str = ""
+
+
+class Urgencia(_Base):
+    tipo: Literal["prazo", "lote", "preco", "evento", "sazonal"]
+    texto: str
+    motivo: str = ""  # por que existe o limite; urgência sem motivo soa a truque
+    data: date | None = None
+    real: bool = False
+    evidencia: str = ""
 
 
 class Escassez(_Base):
@@ -522,14 +580,18 @@ class Oferta(_Base):
     big_idea: BigIdea = Field(default_factory=BigIdea)
     promessa: Promessa | None = None
     antes_depois: list[AntesDepois] = Field(default_factory=list)
-    diferenciais: list[Item] = Field(default_factory=list)
+    diferenciais: list[Diferencial] = Field(default_factory=list)
     raridade: str = ""
+    bastidores: list[Item] = Field(default_factory=list)  # o cuidado que o setor inteiro tem e ninguém conta (Schlitz)
+    alternativas: list[Alternativa] = Field(default_factory=list)
     como_funciona: list[Passo] = Field(default_factory=list)
     subtitulo: str = ""  # topo da página: dor + como a oferta resolve; vazio = 3 primeiros diferenciais
     beneficios: list[Passo] = Field(default_factory=list)  # 4 a 8 { titulo, texto } escritos para a página
     objecoes: list[ObjecaoOferta] = Field(default_factory=list)
     inversao_risco: str = ""  # o que o cliente deixa de arriscar: garantia, teste, devolução
     escassez: Escassez | None = None
+    urgencia: Urgencia | None = None
+    custo_inacao: str = ""  # o que custa continuar como está (por mês, por ciclo)
     condicoes: Condicoes = Field(default_factory=Condicoes)
     aderencia: Aderencia = Field(default_factory=Aderencia)
     cta: str = ""
@@ -631,6 +693,7 @@ class Celula(_Base):
     nivel_consciencia: NivelConsciencia | None = None
     formato: str = ""
     prioridade: int = Field(default=2, ge=1, le=3)
+    promessa: str = ""  # a promessa da oferta ajustada ao medo desta persona; vazio = a da oferta
 
 
 class Risco(_Base):
@@ -826,4 +889,16 @@ def _referencias(lidos: dict[str, Any], ofertas: list[Oferta], pasta: Path) -> d
             problemas.append(f"{h.id}: códigos fora da grade {faltam}")
     if problemas:
         erros["hipoteses.yaml"] = "; ".join(problemas)
+    provas: Provas = lidos.get("provas", Provas())
+    problemas = []
+    ids_provas = [p.id for p in provas.provas if p.id]
+    if len(ids_provas) != len(set(ids_provas)):
+        problemas.append("ids de prova repetidos")
+    for i, p in enumerate([*provas.provas, *provas.historias]):
+        faltam = [x for x in p.personas if x not in personas]
+        if faltam:
+            rotulo = getattr(p, "id", None) or getattr(p, "titulo", None) or f"#{i}"
+            problemas.append(f"{rotulo}: personas inexistentes {faltam}")
+    if problemas:
+        erros["provas.yaml"] = "; ".join(problemas)
     return erros

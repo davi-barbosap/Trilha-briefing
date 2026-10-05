@@ -3,6 +3,7 @@
 - Trilha: `marca.yaml`, `ofertas/<id>.yaml` (passam no esquema do Trilha) e `perfil.parcial.yaml`
   (economia, métrica e verba; contas, CRM e conversões o assessor completa no Trilha).
 - Trilha-LP: rascunho de `pagina.yaml` por oferta e origem. O texto sai cru: reescrever com a voz da marca.
+- Trilha-copywritter: `copy.yaml`, o contrato com tudo o que a copy pode usar (e nada que ela não possa).
 """
 
 from __future__ import annotations
@@ -274,3 +275,57 @@ def exportar_lp(c: ClienteCompleto, saida: str | Path, oferta: str | None = None
             caminho.write_text(_yaml(dados, cab), encoding="utf-8")
             escritos.append((caminho, pend))
     return escritos
+
+
+# ---------- Trilha-copywritter ----------
+
+VERSAO_CONTRATO_COPY = 1
+
+
+def pacote_copy(c: ClienteCompleto) -> dict:
+    """Tudo o que a ferramenta de copy pode usar, e só isso.
+
+    Provas entram só se forem utilizáveis (número com fonte, depoimento autorizado); histórias só autorizadas.
+    Concorrentes entram só pelo nome, para a revisão avisar quando uma peça os cita.
+    """
+    b, p, pl, est = c.briefing, c.pesquisa, c.plataforma, c.estrategia
+    return {
+        "contrato": VERSAO_CONTRATO_COPY,
+        "gerado_em": date.today().isoformat(),
+        "cliente": {
+            "id": b.cliente.id, "nome": b.cliente.nome, "segmento": b.cliente.segmento, "playbook": b.cliente.playbook,
+            "whatsapp": b.cliente.whatsapp, "area": b.area.descricao() if b.area else "",
+        },
+        "voz": pl.voz.model_dump(mode="json"),
+        "posicionamento": pl.posicionamento.model_dump(mode="json"),
+        "compliance": {
+            "termos_proibidos": pl.voz.termos_proibidos,
+            "promessas_proibidas": pl.compliance.promessas_proibidas,
+            "registros_profissionais": pl.compliance.registros_profissionais,
+            "avisos_legais": pl.compliance.avisos_legais,
+            "regras_legais": b.restricoes.regras_legais,
+            "nao_pode": b.restricoes.nao_pode,
+        },
+        "unicidade": p.unicidade,
+        "concorrentes": [x.nome for x in p.concorrentes],
+        "personas": [x.model_dump(mode="json") for x in p.personas],
+        "nao_atender": [x.model_dump(mode="json") for x in p.nao_atender],
+        "ofertas": [o.model_dump(mode="json") for o in c.ofertas],
+        "provas": [x.model_dump(mode="json") for x in c.provas.utilizaveis()],
+        "historias": [h.model_dump(mode="json") for h in c.provas.historias if h.autorizado],
+        "grade": [x.model_dump(mode="json") for x in est.grade],
+        "hipoteses": [h.model_dump(mode="json") for h in c.hipoteses.hipoteses],
+        "metrica_principal": est.metrica_principal,
+        "evento_otimizacao": est.evento_otimizacao or est.metrica_principal,
+    }
+
+
+def exportar_copy(c: ClienteCompleto, saida: str | Path) -> Path:
+    caminho = Path(saida) / c.briefing.cliente.id / "copy.yaml"
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    cab = [
+        f"Contrato com o Trilha-copywritter, gerado pelo trilha-briefing a partir de clientes/{c.briefing.cliente.id}/.",
+        "Edite lá, não aqui. Importe com: python -m trilha_copy importar <este arquivo>",
+    ]
+    caminho.write_text(_yaml(pacote_copy(c), cab), encoding="utf-8")
+    return caminho

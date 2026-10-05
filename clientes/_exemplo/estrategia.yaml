@@ -42,10 +42,10 @@ canais:
   - { canal: organico, plataforma: instagram, papel: construir marca, status: ativo, justificativa: "linha editorial da plataforma" }
 
 grade:                           # públicos × argumentos; o código vai na UTM e na mensagem do WhatsApp
-  - { codigo: PT01, publico: "Profissional travado (Meta)", argumento: "Você entende, mas a frase não sai", persona: profissional-travado, oferta: aula-experimental, nivel_consciencia: consciente_da_solucao, formato: reels com aluno, prioridade: 1 }
+  - { codigo: PT01, publico: "Profissional travado (Meta)", argumento: "Você entende, mas a frase não sai", persona: profissional-travado, oferta: aula-experimental, nivel_consciencia: consciente_da_solucao, formato: reels com aluno, prioridade: 1, promessa: "Na primeira aula você já fala mais inglês do que no último mês de reuniões" }
   - { codigo: PT02, publico: "Profissional travado (Meta)", argumento: "Turma de até 6: você fala em todas as aulas", persona: profissional-travado, oferta: aula-experimental, formato: vídeo da turma, prioridade: 1 }
   - { codigo: PT03, publico: "Profissional travado (Meta)", argumento: "Repõe em qualquer horário", persona: profissional-travado, oferta: conversacao-adultos, formato: carrossel, prioridade: 2 }
-  - { codigo: GB01, publico: "Busca 'inglês para adultos' (Google)", argumento: "Turma de até 6: você fala em todas as aulas", oferta: aula-experimental, prioridade: 1 }
+  - { codigo: GB01, publico: "Busca 'inglês para adultos' (Google)", argumento: "Turma de até 6: você fala em todas as aulas", persona: profissional-travado, oferta: aula-experimental, prioridade: 1 }
   - { codigo: VA01, publico: "Viajante (Meta)", argumento: "Resolva sozinho na próxima viagem", persona: viajante, oferta: aula-experimental, nivel_consciencia: consciente_do_problema, formato: reels, prioridade: 3 }
 
 premissas:

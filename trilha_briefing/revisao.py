@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from dataclasses import dataclass
+from datetime import date
 from typing import Literal
 
 from trilha_briefing.economia import calcular, conversoes_no_teto
@@ -113,18 +114,38 @@ def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
                 avisos.append(Aviso("sugestao", f"ofertas.{o.id}.diferenciais[{i}]: adjetivo sem fato (\"{d.texto}\")"))
         if o.escassez and not (o.escassez.real and o.escassez.evidencia):
             avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.escassez sem evidência: escassez falsa é publicidade enganosa (CDC)"))
+        if o.urgencia:
+            u = o.urgencia
+            if not (u.real and (u.evidencia or u.motivo)):
+                avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.urgencia sem motivo ou evidência: prazo inventado é publicidade enganosa (CDC)"))
+            if u.data and u.data < date.today():
+                avisos.append(Aviso("atencao", f"ofertas.{o.id}.urgencia vencida em {u.data:%d/%m/%Y}: atualize antes de usar em peças"))
+        sem_escada = [d.texto for d in o.diferenciais if not d.e_dai]
+        if sem_escada and o.degrau == "principal":
+            avisos.append(Aviso("sugestao", f"ofertas.{o.id}: {len(sem_escada)} diferencial(is) sem a escada do \"e daí?\" "
+                                            f"(ex.: \"{sem_escada[0]}\"): a copy precisa do resultado, não da característica"))
         sem_resposta = [ob.objecao for ob in o.objecoes if not ob.resposta]
         if sem_resposta:
             avisos.append(Aviso("atencao", f"ofertas.{o.id}: objeção sem resposta — {sem_resposta[0]}"))
 
 
 def _provas(c: ClienteCompleto, avisos: list[Aviso]) -> None:
+    sem_persona = [p for p in c.provas.utilizaveis() if p.tipo in ("depoimento", "case") and not p.personas]
+    if sem_persona:
+        avisos.append(Aviso("sugestao", f"{len(sem_persona)} depoimento(s) sem persona: a copy não sabe para quem eles convencem "
+                                        "(prova parecida com quem lê convence mais)"))
     for i, p in enumerate(c.provas.provas):
         if p.tipo in ("numero", "autoridade", "midia", "certificacao") and not p.fonte:
             avisos.append(Aviso("atencao", f"provas[{i}]: {p.tipo} sem fonte (\"{(p.numero + ' ' + p.texto).strip()}\")"))
         if p.tipo in ("depoimento", "case") and not p.autorizado:
             avisos.append(Aviso("atencao", f"provas[{i}]: {p.tipo} sem autorização de uso de {p.autor or 'quem aparece'}: "
                                            "fica fora de anúncios e páginas"))
+
+
+def _crencas(c: ClienteCompleto, avisos: list[Aviso]) -> None:
+    sem_quebra = [f"{p.id}: {cr.texto}" for p in c.pesquisa.personas for cr in p.crencas if not cr.quebra]
+    if sem_quebra:
+        avisos.append(Aviso("sugestao", f"{len(sem_quebra)} crença(s) sem a forma de derrubar (ex.: {sem_quebra[0]})"))
 
 
 def _marca(c: ClienteCompleto, avisos: list[Aviso]) -> None:
@@ -209,7 +230,7 @@ def _canais(c: ClienteCompleto, avisos: list[Aviso]) -> None:
             avisos.append(Aviso("atencao", f"risco alto sem resposta: {r.descricao} (nota {r.nota})"))
 
 
-REGRAS = [_origem, _consistencia, _copy, _provas, _marca, _economia, _volume, _canais]
+REGRAS = [_origem, _consistencia, _copy, _provas, _crencas, _marca, _economia, _volume, _canais]
 
 
 def revisar(c: ClienteCompleto) -> list[Aviso]:

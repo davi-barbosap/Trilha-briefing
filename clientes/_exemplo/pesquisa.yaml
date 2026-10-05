@@ -4,19 +4,36 @@ personas:
     nome: Profissional travado
     quem_e: "28–40 anos, analista ou coordenador, entende inglês escrito mas trava para falar em reunião"
     dores:
-      - { texto: "Fico calado na reunião com o time de fora mesmo sabendo o assunto", fonte: consumidor, status: validada, evidencia: "8 de 12 entrevistas" }
+      - { texto: "Fico calado na reunião com o time de fora mesmo sabendo o assunto", fonte: consumidor, status: validada, evidencia: "8 de 12 entrevistas", mencoes: 8 }
       - { texto: "Já fiz curso e larguei no meio", fonte: dados, status: validada, evidencia: "motivo mais citado nas conversas do Kommo" }
     desejos:
       - { texto: "Conseguir falar numa reunião sem ensaiar antes", fonte: consumidor, evidencia: "entrevistas com alunos" }
       - { texto: "Ser considerado para a vaga que pede inglês", fonte: consumidor }
     objecoes:
       - { texto: "Não tenho tempo fixo na semana", fonte: dados, status: validada, evidencia: "conversas do Kommo, set/2026" }
-      - { texto: "Já tentei e não funcionou comigo", fonte: consumidor, status: validada, evidencia: "5 de 12 entrevistas" }
+      - { texto: "Já tentei e não funcionou comigo", fonte: consumidor, status: validada, evidencia: "5 de 12 entrevistas", mencoes: 5 }
       - { texto: "Aplicativo é mais barato", fonte: mercado }
     ganchos:
       - { texto: "Você entende tudo, mas a frase não sai na hora", fonte: assessor }
       - { texto: "A reunião em inglês que você deixou alguém falar por você", fonte: assessor }
+    medos:
+      - { texto: "Perder a promoção para alguém que fala inglês pior, mas fala", fonte: consumidor, evidencia: "entrevistas com alunos", mencoes: 4 }
+      - { texto: "Ser chamado para apresentar em inglês sem aviso", fonte: consumidor, mencoes: 3 }
+    crencas:
+      - { texto: "Curso de inglês não funciona para adulto, só para criança", tipo: metodo, quebra: "+1.200 adultos formados; depoimento da Renata", fonte: dados, evidencia: "conversas do Kommo" }
+      - { texto: "Eu já tentei e não levo jeito para idioma", tipo: interna, quebra: "o problema era o método (ouvir o professor), não você: na turma de 6 você fala", fonte: consumidor, mencoes: 5 }
+      - { texto: "Com a rotina que eu tenho, não dá para ter horário fixo", tipo: externa, quebra: "reposição em qualquer horário da grade; depoimento do Carlos", fonte: dados, mencoes: 14 }
+    micro_problemas:
+      - "Como responder rápido sem pensar em português antes"
+      - "Como entender sotaques diferentes numa call"
+      - "Como apresentar números em inglês"
+    frases:
+      - { texto: "Eu entendo tudo, mas na hora de falar a frase não sai", origem: entrevista com aluno, sobre: dor }
+      - { texto: "Fico ensaiando a frase e quando vou falar o assunto já mudou", origem: entrevista com aluno, sobre: dor }
+      - { texto: "Já comecei três cursos e larguei todos no segundo mês", origem: conversa no WhatsApp, sobre: crenca }
+      - { texto: "Queria só não passar vergonha na reunião de segunda", origem: ligação de vendas, sobre: desejo }
     nivel_consciencia: consciente_da_solucao
+    sofisticacao: media                # já ouviu "fluência em X meses" de escolas de rede e de aplicativos
     onde_esta: [Instagram, LinkedIn, Google]
     gatilho_compra: "reunião com equipe estrangeira, processo seletivo ou promoção à vista"
   - id: viajante
@@ -31,6 +48,7 @@ personas:
     ganchos:
       - { texto: "A viagem em que você vai pedir o próprio café", fonte: assessor }
     nivel_consciencia: consciente_do_problema
+    sofisticacao: baixa
     onde_esta: [Instagram, Facebook]
     gatilho_compra: "viagem marcada para os próximos 6 meses"
 

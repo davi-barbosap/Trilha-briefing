@@ -45,6 +45,25 @@ Gera um rascunho de `pagina.yaml` por oferta e origem (`meta` abre com a dor, `g
 
 O que faltar sai como `# PENDENTE:` no topo do arquivo. O texto sai cru: reescreva com a voz da marca e valide com `python -m trilha_lp validar`.
 
+## Trilha-copywritter — `exportar --para copy`
+
+Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferramenta de copy recusa versões que não conhece.
+
+| Bloco | Vem de | Observação |
+|---|---|---|
+| `cliente` | `briefing.yaml` | id, nome, segmento, playbook, WhatsApp, área |
+| `voz`, `posicionamento` | `plataforma.yaml` | inclui `voz.intensidade`, o termostato de 1 a 5 |
+| `compliance` | `plataforma.yaml` + `briefing.restricoes` | termos e promessas proibidas, registros, avisos, regras legais, o que não pode |
+| `personas`, `nao_atender` | `pesquisa.yaml` | com medos, crenças (método, interna, externa), micro-problemas, frases literais, sofisticação |
+| `concorrentes` | `pesquisa.yaml` | **só os nomes**, para a revisão avisar quando uma peça cita um concorrente |
+| `ofertas` | `ofertas/` | com bastidores, alternativas, urgência, custo de não agir, escada do "e daí?" |
+| `provas`, `historias` | `provas.yaml` | **só as utilizáveis**: número e autoridade com fonte, depoimento e história autorizados |
+| `grade`, `hipoteses` | `estrategia.yaml`, `hipoteses.yaml` | a peça de copy nasce de uma célula da grade e se liga a uma hipótese |
+
+O que não é utilizável nem chega à ferramenta de copy: um depoimento sem autorização não pode ir parar num anúncio por engano.
+
+Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto.
+
 ## Teste de contrato
 
 `tests/test_contrato.py` exporta o exemplo e valida o resultado com o código real dos outros repositórios:

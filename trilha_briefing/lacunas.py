@@ -58,6 +58,12 @@ def _pesquisa(c: ClienteCompleto) -> list[str]:
             falta.append("nível de consciência")
         if pe.objecoes and not escutada(pe):
             falta.append("objeção vinda da escuta (consumidor ou dados)")
+        if not pe.frases:
+            falta.append("frases literais de quem compra")
+        if not pe.crencas:
+            falta.append("crenças que impedem a compra (método, interna, externa)")
+        if pe.sofisticacao is None:
+            falta.append("sofisticação (quantas promessas parecidas já ouviu)")
         if falta:
             f.append(f"persona {pe.id}: {', '.join(falta)}")
     if not p.escuta:
@@ -95,6 +101,8 @@ def _plataforma(c: ClienteCompleto) -> list[str]:
         f.append("história da marca: verdade central")
     if pl.voz.assinatura is None or not pl.voz.tom:
         f.append("voz: assinatura e tom")
+    if pl.voz.intensidade is None:
+        f.append("voz: intensidade de 1 a 5 (o quanto a comunicação pode soar vendedora)")
     if len(pl.voz.assim_sim) < 3 or len(pl.voz.assim_nao) < 3:
         f.append("voz: 3 exemplos de 'assim sim' e 3 de 'assim não'")
     if not {"primaria", "secundaria"} <= set(pl.identidade_visual.cores):
@@ -145,6 +153,13 @@ def _ofertas(c: ClienteCompleto) -> list[str]:
             falta.append("inversão de risco")
         if o.aderencia.aderencia_digital == "nao_avaliado":
             falta.append("diagnóstico de aderência ao digital")
+        if o.degrau == "principal":
+            if not o.bastidores:
+                falta.append("bastidores (o cuidado que o setor tem e ninguém conta)")
+            if not (o.big_idea.crenca_comum and o.big_idea.por_que_falha):
+                falta.append("processo: o que o mercado acredita e por que falha")
+            if not o.alternativas:
+                falta.append("alternativas que a pessoa tem e por que não resolvem")
         if falta:
             f.append(f"oferta {o.id}: {', '.join(falta)}")
     return f
