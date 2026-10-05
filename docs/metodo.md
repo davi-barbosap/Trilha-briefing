@@ -31,6 +31,7 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 | Provas | `provas.yaml` | O que sustenta cada promessa (com fonte e autorização) | cliente fornece, assessor organiza |
 | Ofertas | `ofertas/<id>.yaml` | O que se vende, para quem, com que promessa, em que degrau da escada | assessor |
 | Estratégia | `estrategia.yaml` | Objetivo, economia, verba, canais, grade de criativos, riscos, marcos, medição | assessor; aprovado com o cliente |
+| Plano de campanhas | `campanhas.yaml` | Que campanhas, com que verba, evento, público, células, testes, nomes e fase | assessor; aprovado com o cliente |
 | Testes | `hipoteses.yaml` | O que está sendo testado e o que já se aprendeu | assessor |
 
 ## Ferramentas por etapa
@@ -73,6 +74,19 @@ Também entram:
 - **O que produzir:** grade públicos × argumentos, em que cada célula vira um briefing de criativo com código. O código vai na UTM e na mensagem do WhatsApp.
 - **Riscos:** probabilidade × impacto e a resposta a cada um.
 - **Quando:** marcos (fundação → validação → decisão), sem cronograma semana a semana.
+
+**Plano de campanhas.** É como a estratégia vira campanhas, conjuntos e anúncios. `plano --sugerir` monta um rascunho a partir dos canais, da grade, da verba e da economia; `plano` mostra o que ele significa em números e o que não fecha. Cinco regras guiam o plano, e todas podem ser mudadas (abaixo):
+
+1. **O plano registra decisões, não espelha a conta.** Ele guarda o que o cliente aprova: canal, plataforma, evento de otimização, verba, fase, públicos, palavras-chave, que célula roda onde. A estrutura real (IDs, conjuntos pausados) fica nas plataformas, e o Trilha-ads compara o planejado com o que está rodando. Subir campanha a partir do plano não é o objetivo: as interfaces mudam e o erro sai caro.
+2. **Poucos conjuntos, só quantos a verba aguenta.** Um conjunto precisa de cerca de 50 eventos de otimização por semana para sair do aprendizado no Meta. O plano calcula, no teto de custo, quantos eventos a verba de cada campanha compra e quantos conjuntos cabem. As células da grade viram anúncios dentro de poucos conjuntos; o criativo escolhe a pessoa.
+3. **Cada hipótese diz como vai ser testada.** Duas células no mesmo conjunto não são um teste justo: a plataforma reparte a verba como quiser. O plano pede o método (teste A/B da plataforma, conjuntos separados com a mesma verba, ou comparação dentro do conjunto, que é só direcional) e confere se o volume fecha no prazo.
+4. **Nomes curtos, com o código da célula como âncora.** O anúncio se chama `PT01 | v1` e o `utm_content` é o código. As características do criativo (persona, argumento, formato) ficam nos arquivos, ligadas ao código, e não no nome, que alguém digita à mão.
+5. **Muda de fase quando os números batem, não pelo calendário.** Fundação → validação → otimização → escala. Cada fase tem o que exige para entrar (medição completa; custo até um múltiplo do teto com um volume mínimo; semanas estáveis), e o `plano` mostra isso em reais. Na escala, a verba sobe aos poucos.
+
+**Onde mudar as regras.**
+- **Para todos os clientes:** `trilha_briefing/regras/campanhas.yaml`. Registre no CHANGELOG.
+- **Só para um cliente:** bloco `regras:` no `campanhas.yaml` dele, com só as chaves que mudam. Exemplo: `regras: { aprendizado: { nivel: sugestao } }`.
+- **Cada regra tem gravidade:** bloqueia, atenção, sugestão ou `desligada`. Também é configurável se o plano é obrigatório para aprovar a estratégia (`plano.obrigatorio_para_aprovar`, desligado por padrão).
 
 **Testes.**
 - A ordem para mexer quando algo não vai bem: criativo → público → objetivo → página → oferta. É a mesma ordem de diagnóstico do dossiê do Trilha-ads.

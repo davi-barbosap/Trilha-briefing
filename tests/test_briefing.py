@@ -124,7 +124,7 @@ class TestRevisao(Base):
 
     def test_volume_conta_todas_as_variacoes(self):
         # R$ 8.000 / R$ 49,68 = 161 leads: cabem 50 × 2 variações, não 50 × 4
-        self.assertFalse(any("h01" in a for a in revisar(carregar_cliente(EXEMPLO))))
+        self.assertFalse(any("h01" in a and "verba de validação" in a for a in revisar(carregar_cliente(EXEMPLO))))
         self.editar("hipoteses.yaml", lambda d: d["hipoteses"][0].update(variacoes=4))
         self.assertTrue(any("h01-gancho-travar precisa de 200 lead" in a for a in revisar(carregar_cliente(self.pasta))))
 

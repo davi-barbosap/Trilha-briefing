@@ -8,6 +8,7 @@
     python -m trilha_briefing economia <pasta>                tetos de custo e verba de validação
     python -m trilha_briefing canais <pasta>                  ordem sugerida de canais × o que está no plano
     python -m trilha_briefing grade <pasta>                   grade públicos × argumentos com códigos
+    python -m trilha_briefing plano <pasta> [--sugerir]       plano de campanhas: verba, aprendizado, testes, nomes, fases
     python -m trilha_briefing exportar <pasta> --para trilha|lp|copy [--saida dist]
     python -m trilha_briefing apresentar <pasta> [--saida dist]
     python -m trilha_briefing fechar-ciclo <pasta> --nome 2026-T4   guarda o estado antes da revisão trimestral
@@ -20,6 +21,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from trilha_briefing import campanhas as plano_campanhas
 from trilha_briefing import questionario
 from trilha_briefing.apresentar import apresentar
 from trilha_briefing.ciclo import fechar_ciclo
@@ -28,7 +30,7 @@ from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ErroCliente, carregar_cliente
 from trilha_briefing.exportar import exportar_copy, exportar_lp, exportar_trilha
 from trilha_briefing.lacunas import bloqueios_aprovacao, lacunas
-from trilha_briefing.revisao import revisar
+from trilha_briefing.revisao import avisos_do_plano, revisar
 
 MODELO = Path(__file__).parent / "modelo"
 
@@ -146,6 +148,28 @@ def cmd_canais(a) -> int:
     return 0
 
 
+def cmd_plano(a) -> int:
+    c = _carregar(a.pasta)
+    regras = plano_campanhas.regras_do_plano(c.campanhas)
+    if a.sugerir:
+        destino = Path(a.pasta) / "campanhas.yaml"
+        if destino.exists():
+            print(f"✗ {destino} já existe; para ver a sugestão sem gravar, apague ou renomeie o arquivo atual")
+            return 1
+        destino.write_text(plano_campanhas.sugestao_em_yaml(c, plano_campanhas.sugerir(c, regras)), encoding="utf-8")
+        carregar_cliente(a.pasta)  # a sugestão precisa passar na validação
+        print(f"✓ {destino} (sugestão: revise públicos, palavras-chave, verbas e o método de cada teste)")
+        return 0
+    if not c.campanhas.campanhas:
+        print(f"✗ sem campanhas.yaml: python -m trilha_briefing plano {a.pasta} --sugerir")
+        return 1
+    print(plano_campanhas.em_texto(c, regras))
+    avisos = avisos_do_plano(c)
+    for x in avisos:
+        print(f"{ICONE[x.nivel]} {x.texto}")
+    return 1 if any(x.nivel == "bloqueia" for x in avisos) else 0
+
+
 def cmd_grade(a) -> int:
     c = _carregar(a.pasta)
     grade = c.estrategia.grade
@@ -216,6 +240,9 @@ def main(argv: list[str] | None = None) -> int:
     for nome, f in (("validar", cmd_validar), ("lacunas", cmd_lacunas), ("revisar", cmd_revisar),
                     ("economia", cmd_economia), ("canais", cmd_canais), ("grade", cmd_grade)):
         s = sub.add_parser(nome); s.add_argument("pasta"); s.set_defaults(f=f)
+    s = sub.add_parser("plano"); s.add_argument("pasta")
+    s.add_argument("--sugerir", action="store_true", help="grava um rascunho de campanhas.yaml a partir da estratégia")
+    s.set_defaults(f=cmd_plano)
     s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--para", choices=["trilha", "lp", "copy"], required=True)
     s.add_argument("--saida", default="dist"); s.add_argument("--oferta"); s.add_argument("--origem", choices=["meta", "google"])
     s.set_defaults(f=cmd_exportar)

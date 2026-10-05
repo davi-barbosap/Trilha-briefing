@@ -1,5 +1,44 @@
 # Mudanças
 
+## 0.4.0 — plano de campanhas (out/2026)
+
+### Novo
+- **`campanhas.yaml`:** o plano de campanhas do cliente. Cada campanha tem canal, plataforma, evento de otimização, fase e verba. Cada conjunto tem público, palavras-chave, correspondência, exclusões e as células da grade que viram anúncios ali. A campanha também guarda as negativas (Google) e os testes, com o método de cada um.
+- **`plano`:** mostra o plano em números:
+  - eventos por semana no teto de custo e quantos conjuntos cabem para sair do aprendizado;
+  - prazo de cada teste;
+  - nomes e UTMs;
+  - o que cada campanha precisa para mudar de fase.
+- **`plano --sugerir`:** grava um rascunho a partir dos canais, da grade, da verba e da economia. Junta as células num conjunto só quando a verba não aguenta um por persona.
+- **Regras editáveis** em `trilha_briefing/regras/campanhas.yaml`, com override por cliente no bloco `regras:` e gravidade configurável (inclusive `desligada`):
+  1. o plano registra decisões e não espelha a conta;
+  2. poucos conjuntos, só quantos a verba aguenta;
+  3. cada hipótese diz como vai ser testada;
+  4. nomes curtos com o código da célula;
+  5. mudança de fase quando os números batem.
+
+### Revisão e lacunas
+- **Bloqueia:**
+  - verba das campanhas acima do teto;
+  - nome de anúncio ou UTM sem `{codigo}` (gravidade configurável).
+- **Atenção:**
+  - soma das campanhas diferente da verba da estratégia;
+  - mais conjuntos do que a verba aguenta, ou nem um conjunto sai do aprendizado;
+  - teste sem método, com variações no mesmo conjunto quando deveriam estar separadas, ou que não fecha no prazo;
+  - campanha numa fase sem a medição completa;
+  - campanha de busca sem palavra-chave;
+  - célula de prioridade 1 sem campanha.
+- **Sugestão:**
+  - comparação dentro do conjunto é só direcional;
+  - hipótese do núcleo sem teste no plano;
+  - célula ou canal sem campanha.
+- **Lacuna:** plano de campanhas, quando há canal pago ativo. Só bloqueia a aprovação com `plano.obrigatorio_para_aprovar`.
+- **Validação:**
+  - canal, célula, hipótese e fase precisam existir;
+  - ids não se repetem;
+  - `id_plataforma` só com `espelho.ids_da_plataforma`.
+- **Apresentação:** tabela "Como a verba se divide", sem nomes, UTMs nem regras.
+
 ## 0.3.1 — organização do ecossistema (out/2026)
 
 Nenhuma mudança de comportamento.

@@ -1,0 +1,48 @@
+# Plano de campanhas: as decisões de mídia aprovadas com o cliente. A estrutura real fica nas plataformas,
+# e o Trilha-ads compara o planejado com o que está rodando.
+#   python -m trilha_briefing plano clientes/_exemplo
+#
+# Regras padrão: trilha_briefing/regras/campanhas.yaml. Para mudar só para este cliente, use o bloco
+# `regras:` com só as chaves que mudam. Exemplo: regras: { aprendizado: { nivel: sugestao } }
+regras: {}
+
+campanhas:
+  - id: google-marca
+    canal: busca_marca
+    plataforma: google
+    fase: validacao
+    conjuntos:
+      - id: marca
+        palavras_chave: ["escola exemplo de inglês", "escola exemplo inglês curitiba"]
+        correspondencia: frase
+
+  - id: google-ingles-adultos
+    canal: busca_produto
+    plataforma: google
+    fase: validacao
+    conjuntos:
+      - id: ingles-adultos
+        palavras_chave: ["curso de inglês para adultos", "aula de inglês para adultos", "inglês conversação curitiba"]
+        correspondencia: frase
+        celulas: [GB01]
+    negativas: ["grátis", "pdf", "apostila", "emprego", "professor de inglês", "online grátis"]
+
+  - id: meta-profissional
+    canal: interesses
+    plataforma: meta
+    fase: validacao
+    # 45% + os 10% do remarketing, que só liga com 1.000 visitas (estrategia.yaml): sem isso, o teste da h01
+    # não fecha nas 8 semanas da validação.
+    verba_mensal: 2750
+    conjuntos:
+      # Um conjunto só: a verba não sustenta um por persona (ver `plano`). O público amplo deixa o Meta achar
+      # quem responde; o criativo é que escolhe a pessoa.
+      - id: amplo
+        publico: "Curitiba e São José dos Pinhais + 15 km, 25 a 50 anos, sem interesses"
+        exclusoes: ["leads dos últimos 30 dias", "alunos atuais"]
+        celulas: [PT01, PT02, PT03]
+    testes:
+      # Comparação dentro do conjunto: um A/B com verba igual pediria o dobro do prazo. O resultado é
+      # direcional; se ficar apertado, vira A/B na otimização.
+      - { hipotese: h01-gancho-travar, metodo: comparacao_no_conjunto }
+    observacoes: "VA01 (viajante, prioridade 3) entra quando a verba passar de R$ 8.000"
