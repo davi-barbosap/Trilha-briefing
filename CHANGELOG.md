@@ -1,5 +1,15 @@
 # Mudanças
 
+## 0.3.1 — organização do ecossistema (out/2026)
+
+Nenhuma mudança de comportamento.
+
+- **Nomes:** as outras ferramentas passam a ser citadas pelo nome atual: Trilha-ads, Trilha-copy e Trilha-LP.
+- **Clientes reais** ficam no repositório privado Trilha-clientes, pasta `briefing/`. A exportação grava direto na pasta de cada ferramenta (`--saida copy`, `--saida ads`, `--saida lp/<id>`).
+- **Decisão 001 aceita:** este repositório é a fonte do cadastro. O Trilha-ads registrou o mesmo na ADR-005 dele.
+- **CI:** clona o Trilha-ads e a Trilha-LP e roda o teste de contrato de verdade, em vez de pulá-lo. Também exporta para a copy.
+- **README:** cada comando com o que faz, as duas etapas (diagnóstico e planejamento), o que não faz e a situação atual.
+
 ## 0.3.0 — campos para a copy (out/2026)
 
 O que as aulas de copy mostraram que faltava na fonte, e o contrato com o Trilha-copywritter.
