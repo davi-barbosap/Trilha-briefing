@@ -1,0 +1,48 @@
+# Regras padrão do plano de campanhas (python -m trilha_briefing plano).
+#
+# Mudar para todos os clientes: edite este arquivo e registre no CHANGELOG.
+# Mudar só para um cliente: bloco `regras:` no campanhas.yaml dele, com só as chaves que mudam.
+#
+# Gravidade de cada regra: bloqueia | atencao | sugestao | desligada.
+
+# 1. O plano registra decisões aprovadas com o cliente; a estrutura real fica nas plataformas.
+espelho:
+  ids_da_plataforma: false      # true: campanha e conjunto aceitam `id_plataforma`, para ligar plano e conta pelo ID
+
+# 2. Poucos conjuntos, só quantos a verba aguenta.
+aprendizado:
+  nivel: atencao
+  eventos_por_semana:           # eventos de otimização que um conjunto precisa por semana para sair do aprendizado
+    meta: 50                    # referência publicada pelo Meta
+    tiktok: 50
+    google: null                # o Google não publica um número fixo; preencha para conferir
+    linkedin: null
+
+# 3. Cada hipótese diz como vai ser testada.
+testes:
+  nivel: atencao                # teste sem método, ou que não cabe no prazo de validação
+  metodo_padrao: null           # null = escolher em cada teste; ou ab_plataforma | conjuntos_separados | comparacao_no_conjunto
+  comparacao_conclui: false     # false: comparação dentro do mesmo conjunto é direcional e não conclui a hipótese
+
+# 4. Nomes curtos, com o código da célula como âncora.
+nomes:
+  nivel: bloqueia               # anúncio sem o código não é atribuído no raio-x
+  campanha: "{cliente} | {campanha}"
+  conjunto: "{conjunto}"
+  anuncio: "{codigo} | v{versao}"
+  utm: "utm_source={plataforma}&utm_medium=pago&utm_campaign={campanha}&utm_content={codigo}"
+
+# 5. Muda de fase quando os números batem a meta, não pelo calendário.
+fases:
+  nivel: atencao                # campanha numa fase sem cumprir o que a fase exige no plano
+  ordem: [fundacao, validacao, otimizacao, escala]
+  entrar:                       # para ENTRAR em cada fase; custo em múltiplos do teto do evento de otimização
+    validacao: { medicao_completa: true }
+    otimizacao: { custo_ate_x_teto: 1.3, eventos_minimos: 50 }
+    escala: { custo_ate_x_teto: 1.0, eventos_minimos: 100, semanas_estaveis: 2 }
+  escala_aumento_max_pct: 20    # quanto a verba sobe de cada vez na escala (referência de mercado, não regra das plataformas)
+  escala_intervalo_dias: 3
+
+# O plano é obrigatório para aprovar a estratégia?
+plano:
+  obrigatorio_para_aprovar: false
