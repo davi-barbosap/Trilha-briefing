@@ -27,4 +27,4 @@ jobs:
       - name: O pacote instalado leva as regras padrão e os modelos
         run: |
           pip install --no-deps --target /tmp/instalado .
-          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_briefing.campanhas as m, trilha_briefing; from pathlib import Path; assert m.ARQUIVO_PADRAO.exists(); assert (Path(trilha_briefing.__file__).parent / 'modelo' / 'estrategia.yaml').exists(); m.regras_do_plano()"
+          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_briefing.campanhas as m, trilha_briefing; from pathlib import Path; assert '/tmp/instalado' in m.__file__, m.__file__; assert m.ARQUIVO_PADRAO.exists(); assert (Path(trilha_briefing.__file__).parent / 'modelo' / 'estrategia.yaml').exists(); m.regras_do_plano()"
