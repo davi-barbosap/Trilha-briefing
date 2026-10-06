@@ -1,0 +1,2070 @@
+# Questionário do briefing. Editável: o formulário, o Markdown e a importação leem daqui.
+#
+# Momentos: cliente (formulário, o cliente responde sozinho), reuniao (kickoff), assessor (dados e acessos).
+# Cada pergunta: id (não mude depois de usar: as respostas antigas se ligam por ele), bloco, pergunta, ajuda,
+# tipo (texto_curto, texto_longo, numero, moeda, porcentagem, escolha, multipla, lista, sim_nao, link, telefone),
+# opcoes, obrigatoria, campo (caminho no esquema que a resposta preenche), alimenta (quando não há campo direto)
+# e condicao ({pergunta: <id anterior>, em: [valores]}). O arquivo é conferido ao carregar.
+#
+# Como formular uma pergunta nova:
+# - Linguagem do dono, sem jargão. Escreva como se fala no WhatsApp; pixel, UTM, CRM, ticket, lead e funil só
+#   aparecem nas perguntas do assessor.
+# - Uma coisa por pergunta. Se a frase tem dois pontos de interrogação ou um “e” que junta assuntos, vira duas
+#   perguntas — senão a resposta cobre só a primeira parte.
+# - Fato, número, nome ou exemplo no lugar de adjetivo. “Turmas de até 6” e não “atendimento de qualidade”.
+# - Pergunte pelo que aconteceu, não pelo que acham que aconteceria: últimos 12 meses, um mês normal, o último
+#   cliente. O passado é fato; a previsão é opinião.
+# - Peça as palavras exatas do cliente, entre aspas, sem resumir nem corrigir — e sem nome, telefone ou foto (LGPD).
+# - Nenhuma pergunta sugere a resposta. Opções de escolha incluem o “não”, o “nunca” e o “não sei” quando eles
+#   existem na vida real.
+# - “Não sei” é resposta válida e vira pauta da reunião, nunca chute. Obrigatória só o mínimo sem o qual não dá para
+#   começar.
+# - Cada pergunta mostra por que existe ou um exemplo de boa resposta (ajuda). Exemplo genérico, de vários ramos,
+#   nunca de um segmento só.
+# - Números com unidade e base clara: R$ por mês, “de cada R$ 100”, dias, contatos por dia. Quando o exato não
+#   existe, ofereça faixas. Peça o fato (contatos e vendas no mês) e calcule a taxa, em vez de pedir a taxa.
+# - Quem sabe responde. O dono responde o negócio e o cliente dele; o técnico (acessos, rastreamento, IDs do CRM,
+#   regras de plataforma) fica com o assessor; o que pede conversa (marca, big idea, bastidores) fica para a
+#   reunião.
+# - Vozes separadas: tudo o que vem do formulário é a opinião da empresa (fonte: empresa, status: hipótese) até a
+#   escuta de quem compra confirmar.
+# - Genérico por padrão. Pergunta de um segmento só aparece por condição (tipo_negocio), e o resto do formulário
+#   serve para qualquer ramo.
+
+versao: "2026-10"
+blocos:
+- id: empresa
+  titulo: Sobre a empresa
+  objetivo: 'Para começar, o básico: o que vocês fazem e onde atendem.'
+  tempo_min: 3
+- id: objetivos
+  titulo: Onde vocês querem chegar
+  objetivo: Saber aonde vocês querem chegar define o que vamos medir e o que conta como sucesso.
+  tempo_min: 3
+- id: oferta
+  titulo: O que vocês vendem
+  objetivo: Entender o que vocês vendem, por quanto e como funciona evita anúncio que promete o que a operação não entrega.
+  tempo_min: 6
+- id: numeros
+  titulo: Números do negócio
+  objetivo: Com alguns números aproximados calculamos quanto dá para investir para conquistar cada cliente sem perder dinheiro.
+  tempo_min: 3
+- id: clientes
+  titulo: Quem compra de vocês e por quê
+  objetivo: 'Esta é a parte mais importante: os melhores anúncios repetem o que seus clientes pensam e dizem.'
+  tempo_min: 10
+- id: atendimento
+  titulo: Do primeiro contato à venda
+  objetivo: O anúncio traz o contato, mas quem transforma em venda é o atendimento — precisamos saber quanto ele aguenta.
+  tempo_min: 3
+- id: concorrencia
+  titulo: Concorrentes
+  objetivo: Seu cliente sempre compara vocês com alguém; precisamos saber com quem.
+  tempo_min: 1
+- id: marca
+  titulo: Como vocês querem ser lembrados
+  objetivo: O jeito como vocês querem ser lembrados orienta o tom de cada anúncio e de cada mensagem.
+  tempo_min: 3
+- id: provas
+  titulo: Provas e depoimentos
+  objetivo: Promessa sem prova não convence; aqui levantamos o que já existe e o que pode ser usado.
+  tempo_min: 2
+- id: escuta
+  titulo: Conversar com seus clientes
+  objetivo: Ouvir alguns clientes de vocês nos dá as palavras certas para os anúncios.
+  tempo_min: 1
+- id: regras
+  titulo: Regras e aprovação
+  objetivo: Conhecer as regras do seu ramo e quem aprova o quê evita anúncio reprovado e campanha parada.
+  tempo_min: 2
+- id: historico
+  titulo: O que já foi feito
+  objetivo: O que já funcionou com vocês é o primeiro lugar onde procurar o que repetir.
+  tempo_min: 2
+- id: materiais
+  titulo: Materiais e acessos
+  objetivo: Com o material e os contatos certos à mão, começamos sem esperar.
+  tempo_min: 2
+- id: acessos_medicao
+  titulo: Acessos e medição (assessor)
+  objetivo: Medir antes de anunciar é o que permite saber, depois, o que funcionou.
+perguntas:
+- id: respondente
+  momento: cliente
+  bloco: empresa
+  pergunta: Quem está respondendo? Diga seu nome e sua função na empresa.
+  ajuda: Assim sabemos com quem conversar sobre cada resposta.
+  tipo: texto_curto
+  alimenta: briefing.stakeholders (quem respondeu o questionário)
+- id: tipo_negocio
+  momento: cliente
+  bloco: empresa
+  pergunta: Qual destas opções descreve melhor o seu negócio?
+  ajuda: Escolha a mais próxima. Ela só serve para mostrar algumas perguntas específicas do seu ramo.
+  tipo: escolha
+  obrigatoria: true
+  opcoes:
+  - valor: servico_local
+    rotulo: Serviço com atendimento presencial (oficina, salão, academia, escritório…)
+  - valor: saude
+    rotulo: Saúde ou estética (clínica, consultório, odontologia, terapia…)
+  - valor: servico_profissional
+    rotulo: Serviço profissional regulamentado (advocacia, contabilidade, arquitetura, engenharia…)
+  - valor: educacao
+    rotulo: Educação presencial ou ao vivo (escola, curso, idiomas, treinamento)
+  - valor: produto_digital
+    rotulo: Produto digital (curso gravado, mentoria, assinatura, comunidade)
+  - valor: comercio_local
+    rotulo: Loja física ou comércio de bairro
+  - valor: alimentacao
+    rotulo: Alimentação (restaurante, delivery, confeitaria, bar)
+  - valor: ecommerce
+    rotulo: Loja online / e-commerce
+  - valor: b2b
+    rotulo: Venda para outras empresas (serviços, software, indústria, distribuição)
+  - valor: imoveis
+    rotulo: Imóveis (incorporadora, construtora, imobiliária, corretor, loteamento)
+  - valor: automoveis
+    rotulo: Veículos (concessionária, revenda, locadora)
+  - valor: turismo
+    rotulo: Turismo e hospedagem (hotel, pousada, agência, eventos)
+  - valor: outro
+    rotulo: Outro
+  alimenta: condições do formulário; playbook do Trilha-ads; briefing.cliente.segmento (o assessor detalha)
+- id: o_que_vende
+  momento: cliente
+  bloco: empresa
+  pergunta: O que vocês vendem? Explique como contaria para alguém que nunca ouviu falar da empresa.
+  ajuda: 'Palavras do dia a dia, sem slogan. Ex.: “curso de inglês para adultos que precisam falar no trabalho, em turmas
+    de até 6 alunos, presencial e online”.'
+  tipo: texto_longo
+  obrigatoria: true
+  campo: briefing.negocio.o_que_vende
+- id: tempo_mercado
+  momento: cliente
+  bloco: empresa
+  pergunta: Há quanto tempo a empresa existe?
+  ajuda: 'Ex.: “9 anos; há 3 neste endereço”.'
+  tipo: texto_curto
+  campo: briefing.cliente.tempo_mercado
+- id: alcance
+  momento: cliente
+  bloco: empresa
+  pergunta: Onde vocês conseguem atender ou entregar?
+  ajuda: 'Define onde os anúncios vão aparecer: anúncio visto por quem vocês não atendem é dinheiro perdido.'
+  tipo: escolha
+  obrigatoria: true
+  opcoes:
+  - valor: local
+    rotulo: Só na minha cidade ou bairro
+  - valor: regional
+    rotulo: Em algumas cidades ou na região
+  - valor: nacional
+    rotulo: No Brasil todo, com entrega ou atendimento no local
+  - valor: online
+    rotulo: Online, sem depender de onde a pessoa mora
+  campo: briefing.area.alcance
+- id: cidades
+  momento: cliente
+  bloco: empresa
+  pergunta: Quais cidades ou bairros vocês atendem?
+  ajuda: 'Um por linha. Ex.: “Curitiba/PR”, “São José dos Pinhais/PR”.'
+  tipo: lista
+  campo: briefing.area.cidades
+  condicao:
+    pergunta: alcance
+    em:
+    - local
+    - regional
+- id: raio_km
+  momento: cliente
+  bloco: empresa
+  pergunta: Até quantos quilômetros de distância ainda vale a pena atender um cliente?
+  ajuda: Pense no cliente mais distante que ainda compensa. Só o número, em km.
+  tipo: numero
+  campo: briefing.area.raio_km
+  condicao:
+    pergunta: alcance
+    em:
+    - local
+    - regional
+- id: site
+  momento: cliente
+  bloco: empresa
+  pergunta: Qual é o endereço do site?
+  ajuda: Se não tiverem site, deixe em branco.
+  tipo: link
+  campo: briefing.cliente.site
+- id: redes
+  momento: cliente
+  bloco: empresa
+  pergunta: Quais perfis a empresa usa nas redes sociais e no Google?
+  ajuda: Um link por linha (Instagram, Facebook, LinkedIn, TikTok, YouTube, perfil da empresa no Google).
+  tipo: lista
+  campo: briefing.cliente.redes
+- id: meta_12_meses
+  momento: cliente
+  bloco: objetivos
+  pergunta: Daqui a 12 meses, o que precisa ter acontecido para vocês dizerem que valeu a pena?
+  ajuda: 'Use números se puder. Ex.: “sair de 180 para 300 alunos ativos sem depender só de indicação”, “abrir a segunda unidade
+    com a agenda cheia”.'
+  tipo: texto_longo
+  obrigatoria: true
+  campo: briefing.resultado_desejado.em_12_meses
+  alimenta: estrategia.objetivo; plataforma.jornada.resultado
+- id: numero_de_sucesso
+  momento: cliente
+  bloco: objetivos
+  pergunta: Qual número vocês vão olhar todo mês para saber se está dando certo?
+  ajuda: 'Escolha um só. Ex.: vendas no mês, faturamento, clientes novos, consultas agendadas.'
+  tipo: texto_curto
+  campo: briefing.resultado_desejado.sucesso_significa
+- id: numero_hoje
+  momento: cliente
+  bloco: objetivos
+  pergunta: Quanto é esse número hoje, num mês normal?
+  ajuda: Só o número, aproximado. É o ponto de partida para medir a evolução.
+  tipo: numero
+  campo: estrategia.objetivo.baseline
+- id: prazos_fixos
+  momento: cliente
+  bloco: objetivos
+  pergunta: Há alguma data importante nos próximos meses?
+  ajuda: 'Lançamento, inauguração, evento, data forte do seu ramo. Uma por linha, com a data. Ex.: “volta às aulas: campanha
+    pronta até 15/01”.'
+  tipo: lista
+  campo: briefing.restricoes.prazos
+  alimenta: estrategia.marcos
+- id: por_que_agora
+  momento: reuniao
+  bloco: objetivos
+  pergunta: O que aconteceu nos últimos meses que fez vocês buscarem uma assessoria agora?
+  ajuda: 'Ouça a justificativa com as palavras do dono: falta de previsibilidade, queda de indicação, concorrente novo, sócio
+    novo.'
+  alimenta: 'justificativas do projeto e expectativa (curso: o “por quê” do planejamento); estrategia.premissas'
+- id: fracasso_3_meses
+  momento: reuniao
+  bloco: objetivos
+  pergunta: O que faria vocês acharem, daqui a 3 meses, que não deu certo?
+  ajuda: 'Revela a expectativa real e o critério de parada. Compare com o ciclo de venda: venda que leva meses não aparece
+    em 30 dias.'
+  alimenta: estrategia.riscos; hipoteses (critério de sucesso); combinado de expectativa
+- id: prioridade_6_meses
+  momento: reuniao
+  bloco: objetivos
+  pergunta: Se tiver que escolher uma prioridade para os próximos 6 meses, qual é?
+  tipo: escolha
+  opcoes:
+  - valor: volume
+    rotulo: Mais clientes, mesmo com margem menor
+  - valor: lucro
+    rotulo: Mais lucro por cliente, mesmo com menos volume
+  - valor: previsibilidade
+    rotulo: Vendas mais previsíveis mês a mês
+  - valor: novidade
+    rotulo: Fazer um produto, serviço ou unidade nova decolar
+  alimenta: estrategia.objetivo e krs; escolha da oferta principal
+- id: o_que_conta_como_resultado
+  momento: reuniao
+  bloco: objetivos
+  pergunta: No dia a dia, o que vamos contar como resultado da campanha?
+  ajuda: Quanto mais perto da venda, mais confiável o número e mais tempo leva para ter volume. Contato barato que não compra
+    não é resultado.
+  tipo: escolha
+  opcoes:
+  - valor: lead
+    rotulo: Cada contato que chega
+  - valor: lead_qualificado
+    rotulo: Contatos com o perfil certo
+  - valor: agendamento
+    rotulo: Reuniões, visitas ou consultas agendadas
+  - valor: venda
+    rotulo: Vendas fechadas
+  campo: estrategia.metrica_principal
+- id: premissas
+  momento: reuniao
+  bloco: objetivos
+  pergunta: Do lado de vocês, o que precisa acontecer para dar certo?
+  ajuda: 'Verba disponível no dia, contato respondido rápido, fotos e vídeos, aprovação em dia. Para cada item, pergunte:
+    e se não acontecer?'
+  tipo: lista
+  campo: estrategia.premissas
+  alimenta: estrategia.riscos (probabilidade × impacto)
+- id: produto_principal
+  momento: cliente
+  bloco: oferta
+  pergunta: Qual produto ou serviço vocês mais querem vender nos próximos meses?
+  ajuda: 'Só um; os outros entram depois. Ex.: “implante dentário”, “plano anual da academia”, “consultoria de implantação
+    do sistema”.'
+  tipo: texto_curto
+  obrigatoria: true
+  campo: ofertas.nome
+  alimenta: ofertas/<id>.yaml com degrau principal
+- id: imoveis_estagio
+  momento: cliente
+  bloco: oferta
+  pergunta: Em que fase está o empreendimento?
+  tipo: escolha
+  opcoes:
+  - valor: lancamento
+    rotulo: Lançamento
+  - valor: em_obras
+    rotulo: Em obras
+  - valor: pronto
+    rotulo: Pronto
+  - valor: ultimas_unidades
+    rotulo: Últimas unidades
+  - valor: nao_se_aplica
+    rotulo: Não é um empreendimento (revenda, aluguel, terrenos avulsos)
+  campo: ofertas.estagio
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - imoveis
+- id: imoveis_ancoras
+  momento: cliente
+  bloco: oferta
+  pergunta: Que lugares conhecidos ficam perto do imóvel? Diga o nome e a distância ou o tempo.
+  ajuda: 'Ex.: “a 500 m do Shopping X”, “5 min de carro do Hospital Y”. Evite “perto de tudo”: não convence ninguém.'
+  tipo: lista
+  campo: ofertas.localizacao
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - imoveis
+- id: saude_convenio
+  momento: cliente
+  bloco: oferta
+  pergunta: Vocês atendem por convênio, particular ou os dois?
+  tipo: escolha
+  opcoes:
+  - valor: particular
+    rotulo: Só particular
+  - valor: convenio
+    rotulo: Só convênio
+  - valor: ambos
+    rotulo: Os dois
+  alimenta: ofertas.qualificacao; pesquisa.nao_atender (convênios não aceitos)
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - saude
+- id: turmas
+  momento: cliente
+  bloco: oferta
+  pergunta: Quando começam as próximas turmas e quantas vagas há em cada uma?
+  ajuda: Datas e vagas reais permitem falar em prazo sem inventar urgência.
+  tipo: texto_curto
+  campo: ofertas.urgencia
+  alimenta: ofertas.escassez (só se real); briefing.capacidade
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - educacao
+    - produto_digital
+- id: formato_de_venda_digital
+  momento: cliente
+  bloco: oferta
+  pergunta: 'Como vocês vendem: abrindo turmas em datas ou o tempo todo?'
+  tipo: escolha
+  opcoes:
+  - valor: lancamento
+    rotulo: Em datas, com abertura e fechamento (lançamento)
+  - valor: perpetuo
+    rotulo: O tempo todo
+  - valor: ambos
+    rotulo: Os dois
+  alimenta: estrategia.abordagem; ofertas.urgencia
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - produto_digital
+- id: veiculos_tipo
+  momento: cliente
+  bloco: oferta
+  pergunta: O que vocês vendem ou alugam?
+  tipo: escolha
+  opcoes:
+  - valor: novos
+    rotulo: Veículos novos
+  - valor: seminovos
+    rotulo: Seminovos e usados
+  - valor: ambos
+    rotulo: Novos e seminovos
+  - valor: locacao
+    rotulo: Locação
+  alimenta: ofertas/<id>.yaml (uma oferta por linha de produto); pesquisa.personas
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - automoveis
+- id: entrega_e_troca
+  momento: cliente
+  bloco: oferta
+  pergunta: Como funcionam frete, prazo de entrega e troca?
+  ajuda: 'Ex.: “frete grátis acima de R$ 299; entrega em 3 a 7 dias úteis; troca em 30 dias”. São as dúvidas mais comuns antes
+    de comprar online.'
+  tipo: texto_curto
+  alimenta: ofertas.objecoes (frete, prazo); ofertas.inversao_risco (troca)
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - ecommerce
+- id: porta_entrada
+  momento: cliente
+  bloco: oferta
+  pergunta: Existe um jeito de o cliente começar com vocês gastando pouco ou nada?
+  ajuda: Uma porta de entrada costuma baratear o primeiro contato e aproximar quem ainda não confia.
+  tipo: escolha
+  opcoes:
+  - valor: gratis
+    rotulo: Sim, gratuito (avaliação, aula experimental, amostra, diagnóstico)
+  - valor: pago
+    rotulo: Sim, uma versão menor e mais barata
+  - valor: nao
+    rotulo: Não existe
+  - valor: poderia
+    rotulo: Não existe, mas poderíamos criar
+  alimenta: 'ofertas: degrau isca ou entrada'
+- id: porta_entrada_qual
+  momento: cliente
+  bloco: oferta
+  pergunta: Qual é essa porta de entrada e quanto custa?
+  ajuda: 'Ex.: “avaliação gratuita de 30 minutos”, “kit de amostras por R$ 49”.'
+  tipo: texto_curto
+  alimenta: ofertas/<id>.yaml (degrau isca ou entrada)
+  condicao:
+    pergunta: porta_entrada
+    em:
+    - gratis
+    - pago
+- id: preco_faixa
+  momento: cliente
+  bloco: oferta
+  pergunta: Quanto custa o produto principal? Se varia, diga de quanto a quanto.
+  ajuda: 'Ex.: “de R$ 1.800 a R$ 4.500, conforme o tamanho”. Fica entre nós: só vai para anúncio se vocês autorizarem na próxima
+    pergunta.'
+  tipo: texto_curto
+  campo: ofertas.condicoes.faixa_preco
+- id: preco_no_anuncio
+  momento: cliente
+  bloco: oferta
+  pergunta: O preço pode aparecer nos anúncios?
+  tipo: escolha
+  opcoes:
+  - valor: valor_cheio
+    rotulo: Sim, o valor completo
+  - valor: a_partir_de
+    rotulo: Só “a partir de R$ …”
+  - valor: parcela
+    rotulo: Só o valor da parcela
+  - valor: nunca
+    rotulo: Não; preço só na conversa
+  alimenta: plataforma.preco.anuncio
+- id: condicoes_pagamento
+  momento: cliente
+  bloco: oferta
+  pergunta: Quais formas de pagamento e parcelamento podem ser divulgadas?
+  ajuda: 'Ex.: “Pix com 5% de desconto; até 10x sem juros no cartão; financiamento próprio em 24x”.'
+  tipo: texto_curto
+  campo: ofertas.condicoes.pagamento
+- id: condicao_especial
+  momento: cliente
+  bloco: oferta
+  pergunta: Há alguma condição especial valendo agora? Diga qual é e até quando vale.
+  ajuda: 'Só condições reais; se não houver, deixe em branco. Ex.: “matrícula grátis até 31/01, porque as turmas começam em
+    fevereiro”.'
+  tipo: texto_curto
+  campo: ofertas.condicoes.condicao_excepcional
+  alimenta: ofertas.condicoes.validade; ofertas.urgencia (só se real)
+- id: como_funciona
+  momento: cliente
+  bloco: oferta
+  pergunta: Como funciona, do pedido até o cliente receber o que comprou? Liste os passos.
+  ajuda: 'De 3 a 5 passos, na ordem, como explicaria a um cliente. Ex.: “1. avaliação gratuita; 2. plano com preço fechado;
+    3. sessões semanais; 4. revisão em 30 dias”.'
+  tipo: lista
+  campo: ofertas.como_funciona
+- id: garantia
+  momento: cliente
+  bloco: oferta
+  pergunta: Se o cliente não ficar satisfeito, o que acontece?
+  ajuda: Garantia, troca, devolução, teste grátis, refazer o serviço — ou nada disso. Responda o que vale hoje, não o que
+    gostariam.
+  tipo: texto_curto
+  campo: ofertas.inversao_risco
+- id: cuidados_invisiveis
+  momento: cliente
+  bloco: oferta
+  pergunta: Que cuidados vocês têm nos bastidores que o cliente não vê?
+  ajuda: 'Conferências, testes, padrões, materiais, treinamento. Pode ser algo que todo o seu setor faz: se ninguém conta,
+    vira diferencial. Ex.: “cada peça é testada duas vezes antes de sair”, “ligamos no dia seguinte para todo paciente operado”.'
+  tipo: texto_longo
+  campo: ofertas.bastidores
+- id: diferenciais
+  momento: reuniao
+  bloco: oferta
+  pergunta: 'Por que um cliente escolhe vocês e não outra opção? Só vale fato: número, nome, prazo, garantia ou método.'
+  ajuda: Compare com o que o cliente disse em por_que_escolheram. Se a resposta for “qualidade” ou “atendimento”, peça um
+    exemplo de semana passada.
+  campo: ofertas.diferenciais
+- id: e_dai
+  momento: reuniao
+  bloco: oferta
+  pergunta: 'Para cada diferencial, “e daí?”: o que isso muda para o cliente, até chegar no resultado que ele quer?'
+  ajuda: 'Ex.: turmas de 6 → cada aluno fala mais na aula → destrava a conversa em meses → apresenta em inglês na reunião.'
+  campo: ofertas.diferenciais[].e_dai
+- id: raridade
+  momento: reuniao
+  bloco: oferta
+  pergunta: Existe algo raro de verdade (o único da região, o primeiro a fazer, há anos sem igual)? Como provar?
+  campo: ofertas.raridade
+- id: bastidores_visita
+  momento: reuniao
+  bloco: oferta
+  pergunta: 'Mostrem a operação por dentro: o que acontece desde o pedido até a entrega que o cliente nunca vê?'
+  ajuda: Quem faz acha tudo óbvio. Pergunte o porquê de cada etapa e anote números (quantas conferências, quantos testes,
+    quantos anos de formação).
+  campo: ofertas.bastidores
+- id: outros_produtos
+  momento: reuniao
+  bloco: oferta
+  pergunta: 'Que outros produtos podem entrar: um mais barato para começar, um mais caro para quem já é cliente, algo recorrente?'
+  tipo: lista
+  alimenta: 'ofertas/<id>.yaml: degraus isca, entrada, premium, recorrente'
+- id: promessa
+  momento: reuniao
+  bloco: oferta
+  pergunta: O que o cliente consegue depois de comprar, em quanto tempo e para quem isso vale?
+  ajuda: 'Promessa que dá para cobrar: resultado observável, prazo e condição. Confira com as regras do ramo.'
+  campo: ofertas.promessa
+- id: antes_depois
+  momento: reuniao
+  bloco: oferta
+  pergunta: 'Como é a situação do cliente antes e depois: o que ele tem, como se sente, como é o dia a dia e como os outros
+    o veem?'
+  campo: ofertas.antes_depois
+- id: crenca_comum
+  momento: reuniao
+  bloco: oferta
+  pergunta: O que o mercado costuma dizer ou fazer que vocês acham errado?
+  campo: ofertas.big_idea.crenca_comum
+- id: por_que_falha
+  momento: reuniao
+  bloco: oferta
+  pergunta: Por que isso não resolve o problema do cliente?
+  campo: ofertas.big_idea.por_que_falha
+- id: custo_inacao
+  momento: reuniao
+  bloco: oferta
+  pergunta: O que custa para o cliente continuar como está por mais 6 meses, em dinheiro, tempo ou risco?
+  campo: ofertas.custo_inacao
+- id: urgencia_real
+  momento: reuniao
+  bloco: oferta
+  pergunta: Existe um prazo ou limite real (turma, lote, vagas, estoque, tabela, estação)? Por que existe e como comprovar?
+  ajuda: Urgência sem motivo soa a truque, e escassez falsa é publicidade enganosa (CDC).
+  campo: ofertas.urgencia
+  alimenta: ofertas.escassez (só com evidência)
+- id: pergunta_filtro
+  momento: reuniao
+  bloco: oferta
+  pergunta: Que pergunta, com 2 a 4 respostas, separa um bom contato de um curioso no formulário ou na primeira mensagem?
+  ajuda: 'Parta de bom_contato. Ex.: “Para quando você precisa? Este mês / em 3 meses / só pesquisando”.'
+  campo: ofertas.qualificacao
+- id: respostas_objecoes
+  momento: reuniao
+  bloco: oferta
+  pergunta: Para cada dúvida listada no questionário, o que o time responde hoje e que prova mostra?
+  ajuda: Peça a resposta que funciona ao vivo, com o exemplo ou o número que convence.
+  campo: ofertas.objecoes
+- id: mecanismo
+  momento: assessor
+  bloco: oferta
+  pergunta: 'Proponha o mecanismo único: o jeito próprio de resolver, em 3 passos e com nome. Valide com o cliente.'
+  campo: ofertas.big_idea.mecanismo_unico
+- id: inimigo
+  momento: assessor
+  bloco: oferta
+  pergunta: 'O que mantém o cliente preso ao problema: um hábito, uma crença ou um método ruim (nunca uma pessoa)?'
+  campo: ofertas.big_idea.inimigo
+- id: oportunidade
+  momento: assessor
+  bloco: oferta
+  pergunta: O que mudou no mercado ou na vida do cliente que torna a oferta mais necessária agora?
+  campo: ofertas.big_idea.oportunidade
+- id: aderencia_digital
+  momento: assessor
+  bloco: oferta
+  pergunta: 'Com vendas fora do digital, reputação, perfil de quem comprou e ticket: qual a aderência da oferta principal
+    ao digital?'
+  ajuda: Produto que não vende pessoalmente pede nutrição mais longa, prova social mais forte e objeção tratada já no criativo.
+    Alto padrão raramente converte em tráfego frio.
+  tipo: escolha
+  opcoes:
+  - valor: alta
+    rotulo: Alta
+  - valor: media
+    rotulo: Média
+  - valor: baixa
+    rotulo: Baixa
+  campo: ofertas.aderencia.aderencia_digital
+  alimenta: ofertas.aderencia.justificativa
+- id: modelo_receita
+  momento: cliente
+  bloco: numeros
+  pergunta: Como o cliente paga pelo produto principal?
+  ajuda: Muda a conta de quanto vale um cliente e de quanto dá para investir para conquistá-lo.
+  tipo: escolha
+  obrigatoria: true
+  opcoes:
+  - valor: venda_direta
+    rotulo: Paga a cada compra (mesmo que volte a comprar depois)
+  - valor: recorrencia
+    rotulo: Paga todo mês, por assinatura ou contrato
+  - valor: comissao
+    rotulo: Vocês ganham comissão sobre a venda de outra empresa (corretagem, representação)
+  campo: briefing.negocio.modelo_receita
+- id: ticket_medio
+  momento: cliente
+  bloco: numeros
+  pergunta: Quanto vale, em média, uma venda?
+  ajuda: Faturamento de um mês dividido pelo número de vendas. Aproximado serve.
+  tipo: moeda
+  campo: estrategia.economia.ticket_medio
+  alimenta: ofertas.condicoes.ticket_medio
+  condicao:
+    pergunta: modelo_receita
+    em:
+    - venda_direta
+- id: compras_por_ano
+  momento: cliente
+  bloco: numeros
+  pergunta: Em média, quantas vezes o mesmo cliente compra por ano?
+  ajuda: Se a maioria compra uma vez só, responda 1.
+  tipo: numero
+  alimenta: valor do cliente ao longo do tempo (ajuste do ticket na economia)
+  condicao:
+    pergunta: modelo_receita
+    em:
+    - venda_direta
+- id: mensalidade
+  momento: cliente
+  bloco: numeros
+  pergunta: Qual é o valor médio da mensalidade?
+  tipo: moeda
+  campo: estrategia.economia.mensalidade
+  condicao:
+    pergunta: modelo_receita
+    em:
+    - recorrencia
+- id: meses_cliente
+  momento: cliente
+  bloco: numeros
+  pergunta: Por quantos meses, em média, um cliente continua pagando?
+  ajuda: 'Se não souber, pense em quem entrou há um ano: quantos ainda estão?'
+  tipo: numero
+  campo: estrategia.economia.meses_retencao
+  condicao:
+    pergunta: modelo_receita
+    em:
+    - recorrencia
+- id: valor_medio_bem
+  momento: cliente
+  bloco: numeros
+  pergunta: Qual é o valor médio do que é vendido (o imóvel, o veículo, o contrato)?
+  tipo: moeda
+  campo: estrategia.economia.valor_medio_bem
+  condicao:
+    pergunta: modelo_receita
+    em:
+    - comissao
+- id: comissao_pct
+  momento: cliente
+  bloco: numeros
+  pergunta: Qual é a comissão de vocês sobre esse valor?
+  ajuda: 'Em %. Ex.: 5.'
+  tipo: porcentagem
+  campo: estrategia.economia.comissao_pct
+  condicao:
+    pergunta: modelo_receita
+    em:
+    - comissao
+- id: margem
+  momento: cliente
+  bloco: numeros
+  pergunta: De cada R$ 100 que entram numa venda, quanto sobra depois dos custos diretos dessa venda?
+  ajuda: 'Custos diretos: produto, material, comissão, imposto, frete. Não desconte aluguel nem salários fixos. Ex.: sobram
+    R$ 40 → responda 40.'
+  tipo: porcentagem
+  campo: estrategia.economia.margem_contribuicao
+- id: contatos_mes
+  momento: cliente
+  bloco: numeros
+  pergunta: Quantos pedidos de informação (contatos novos) chegam por mês, somando todos os canais?
+  ajuda: WhatsApp, telefone, redes, site, loja. Aproximado serve.
+  tipo: numero
+  campo: briefing.negocio.contatos_mes
+  alimenta: taxa de fechamento de hoje (vendas ÷ contatos), conferida contra a economia na revisão; linha de base do objetivo
+- id: vendas_mes
+  momento: cliente
+  bloco: numeros
+  pergunta: E quantas vendas (ou clientes novos) fecham por mês?
+  tipo: numero
+  campo: briefing.negocio.vendas_mes
+  alimenta: taxa de fechamento de hoje, conferida contra a economia; estrategia.objetivo.baseline
+- id: ciclo_venda
+  momento: cliente
+  bloco: numeros
+  pergunta: Do primeiro contato até a compra, quanto tempo costuma levar?
+  tipo: escolha
+  opcoes:
+  - valor: '1'
+    rotulo: No mesmo dia
+  - valor: '7'
+    rotulo: Até uma semana
+  - valor: '30'
+    rotulo: Até um mês
+  - valor: '90'
+    rotulo: De 1 a 3 meses
+  - valor: '180'
+    rotulo: Mais de 3 meses
+  campo: briefing.negocio.ciclo_venda_dias
+- id: sazonalidade
+  momento: cliente
+  bloco: numeros
+  pergunta: Em que meses vocês vendem mais e em quais vendem menos?
+  ajuda: 'Se souber o motivo, conte. Ex.: “mais em janeiro e julho (férias); menos em dezembro”.'
+  tipo: texto_curto
+  campo: pesquisa.sazonalidade
+- id: verba_mensal_max
+  momento: cliente
+  bloco: numeros
+  pergunta: Quanto podem investir por mês em anúncios, no máximo?
+  ajuda: Só o valor pago ao Google, ao Meta e a outras plataformas, sem a assessoria e sem a produção de conteúdo.
+  tipo: moeda
+  obrigatoria: true
+  campo: briefing.restricoes.verba_mensal_max
+  alimenta: estrategia.orcamento.teto_mensal
+- id: verba_teste
+  momento: cliente
+  bloco: numeros
+  pergunta: Nos primeiros 2 a 3 meses, até quanto aceitam investir em anúncios sabendo que é uma fase de teste e pode não
+    se pagar?
+  ajuda: 'É o limite de perda combinado antes de começar: o teste serve para descobrir o que funciona com o seu cliente.'
+  tipo: moeda
+  campo: estrategia.orcamento.verba_validacao
+- id: pct_investivel
+  momento: reuniao
+  bloco: numeros
+  pergunta: Da sobra de cada venda, quanto aceitam gastar para conquistar um cliente novo?
+  ajuda: Em %. Com a margem, define o custo máximo por cliente e por contato.
+  tipo: porcentagem
+  campo: estrategia.economia.pct_investivel
+- id: taxa_qualificacao
+  momento: reuniao
+  bloco: numeros
+  pergunta: De cada 10 contatos, quantos têm o perfil certo (região, orçamento, necessidade)?
+  ajuda: Estimativa até o CRM confirmar; marque em economia.estimados.
+  tipo: porcentagem
+  campo: estrategia.economia.taxa_qualificacao
+- id: taxa_agendamento
+  momento: reuniao
+  bloco: numeros
+  pergunta: De cada 10 contatos, quantos chegam a agendar e comparecer (visita, consulta, reunião)?
+  tipo: porcentagem
+  campo: estrategia.economia.taxa_agendamento
+- id: semanas_validacao
+  momento: reuniao
+  bloco: numeros
+  pergunta: Por quantas semanas aceitam testar antes de decidir continuar, ajustar ou parar?
+  tipo: numero
+  campo: estrategia.orcamento.semanas_validacao
+- id: clientes_ideais
+  momento: cliente
+  bloco: clientes
+  pergunta: Pense em 2 ou 3 clientes dos últimos 12 meses que vocês gostariam de ter em dobro. Quem são e por que compraram?
+  ajuda: Sem nomes. Idade aproximada (ou porte da empresa), profissão ou ramo, onde moram, o que compraram e o motivo. Descrever
+    pessoas reais funciona melhor do que descrever um “público-alvo”.
+  tipo: texto_longo
+  obrigatoria: true
+  campo: pesquisa.personas
+- id: b2b_decisor
+  momento: cliente
+  bloco: clientes
+  pergunta: Nas empresas que compram de vocês, quem decide a compra e quem usa no dia a dia? Diga o cargo de cada um.
+  tipo: texto_curto
+  campo: pesquisa.personas[].quem_e
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - b2b
+- id: b2b_porte
+  momento: cliente
+  bloco: clientes
+  pergunta: De que tamanho são as empresas que mais compram de vocês?
+  ajuda: 'Em funcionários ou faturamento. Ex.: “indústrias de 50 a 200 funcionários”.'
+  tipo: texto_curto
+  alimenta: pesquisa.personas; pesquisa.nao_atender (porte que não compensa)
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - b2b
+- id: imoveis_finalidade
+  momento: cliente
+  bloco: clientes
+  pergunta: Quem compra costuma comprar para morar ou para investir?
+  ajuda: Muda completamente a comunicação.
+  tipo: escolha
+  opcoes:
+  - valor: morar
+    rotulo: Principalmente para morar
+  - valor: investir
+    rotulo: Principalmente para investir
+  - valor: ambos
+    rotulo: Os dois, em proporções parecidas
+  campo: ofertas.aderencia.perfil_compradores
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - imoveis
+- id: problema_do_cliente
+  momento: cliente
+  bloco: clientes
+  pergunta: Que problema o cliente quer resolver quando procura vocês?
+  ajuda: 'Conte como isso atrapalha o dia a dia dele. Ex.: “perde reunião importante porque não entende o inglês do chefe”,
+    “a loja vende bem, mas o estoque vive errado”.'
+  tipo: texto_longo
+  campo: pesquisa.personas[].dores
+- id: momento_da_compra
+  momento: cliente
+  bloco: clientes
+  pergunta: O que costuma estar acontecendo na vida (ou na empresa) do cliente quando ele decide procurar vocês?
+  ajuda: 'O empurrão que faz a pessoa agir agora. Ex.: “foi promovida e precisa apresentar em inglês”, “a dor nas costas impediu
+    de trabalhar”, “perdeu um cliente grande”.'
+  tipo: texto_longo
+  campo: pesquisa.personas[].gatilho_compra
+  alimenta: pesquisa.personas[].ganchos
+- id: por_que_escolheram
+  momento: cliente
+  bloco: clientes
+  pergunta: Quando um cliente conta por que escolheu vocês, o que ele diz?
+  ajuda: 'Com as palavras dele, entre aspas, mesmo que pareçam simples. Ex.: “vocês foram os únicos que explicaram o preço
+    antes”. Frases assim viram título de anúncio.'
+  tipo: texto_longo
+  campo: pesquisa.personas[].desejos
+  alimenta: pesquisa.personas[].frases (relato da empresa); ofertas.diferenciais (a confirmar na escuta)
+- id: duvidas_e_receios
+  momento: cliente
+  bloco: clientes
+  pergunta: Que dúvidas ou receios aparecem em quase toda conversa antes de fechar?
+  ajuda: Uma por linha, do jeito que o cliente fala. Costumam ser sobre o produto (“isso funciona mesmo?”), sobre a própria
+    pessoa (“não sei se consigo”, “não é para mim”) ou sobre a situação dela (“agora não dá”, “meu sócio não vai aprovar”).
+  tipo: lista
+  campo: pesquisa.personas[].objecoes
+  alimenta: pesquisa.personas[].crencas (o assessor separa em método, interna e externa)
+- id: motivos_nao_compram
+  momento: cliente
+  bloco: clientes
+  pergunta: Quando alguém pede informação e não compra, por que é? Liste do motivo mais comum para o menos comum.
+  ajuda: 'Ex.: “achou caro”, “estava só pesquisando”, “mora longe”, “parou de responder”, “fechou com outro”. Se ninguém sabe,
+    marque “não sei”: isso também diz muito.'
+  tipo: lista
+  alimenta: motivos de perda do Kommo (Trilha-ads); ofertas.objecoes; pesquisa.nao_atender
+- id: alternativas
+  momento: cliente
+  bloco: clientes
+  pergunta: Antes de chegar até vocês, o que o cliente costuma tentar ou considerar no lugar?
+  ajuda: 'Resolver sozinho, adiar, vídeo no YouTube, um concorrente mais barato, outro tipo de solução. Para cada um, diga
+    por que não resolveu. Ex.: “aplicativo de idiomas: aprende palavras, mas não consegue conversar”.'
+  tipo: texto_longo
+  campo: ofertas.alternativas
+  alimenta: pesquisa.personas[].crencas (método); pesquisa.personas[].sofisticacao
+- id: frases_reais
+  momento: cliente
+  bloco: clientes
+  pergunta: Copie aqui de 3 a 5 mensagens reais de clientes em que eles descrevem o problema ou o que querem.
+  ajuda: 'De WhatsApp, e-mail ou avaliações. Sem nome, telefone ou foto. Pode colar do jeito que veio, com erros e tudo: as
+    palavras exatas do cliente são o material mais valioso para os anúncios.'
+  tipo: texto_longo
+  campo: pesquisa.personas[].frases
+- id: onde_se_informam
+  momento: cliente
+  bloco: clientes
+  pergunta: Antes de comprar, onde esses clientes pesquisam ou pedem opinião?
+  ajuda: Marque todos que você conhece.
+  tipo: multipla
+  opcoes:
+  - valor: google
+    rotulo: Google (busca e mapas)
+  - valor: instagram
+    rotulo: Instagram
+  - valor: youtube
+    rotulo: YouTube
+  - valor: tiktok
+    rotulo: TikTok
+  - valor: facebook
+    rotulo: Facebook e grupos
+  - valor: linkedin
+    rotulo: LinkedIn
+  - valor: grupos_whatsapp
+    rotulo: Grupos de WhatsApp
+  - valor: indicacao
+    rotulo: Amigos, familiares ou colegas
+  - valor: especialistas
+    rotulo: Especialistas ou influenciadores do ramo
+  - valor: sites_avaliacao
+    rotulo: Sites de avaliação, portais ou marketplaces
+  - valor: eventos
+    rotulo: Feiras e eventos
+  campo: pesquisa.personas[].onde_esta
+- id: necessidade_ou_desejo
+  momento: cliente
+  bloco: clientes
+  pergunta: As pessoas compram de vocês mais porque precisam ou porque querem?
+  ajuda: Quem precisa costuma procurar no Google; quem deseja costuma ser despertado por anúncios nas redes.
+  tipo: escolha
+  opcoes:
+  - valor: necessidade
+    rotulo: 'Porque precisam: urgência, obrigação, problema que não dá para adiar'
+  - valor: desejo
+    rotulo: 'Porque querem: prazer, conquista, status, presente'
+  - valor: misto
+    rotulo: As duas coisas, em proporções parecidas
+  campo: briefing.negocio.tipo_compra
+- id: como_chegam
+  momento: cliente
+  bloco: clientes
+  pergunta: Quando entram em contato, a maioria dos clientes…
+  tipo: escolha
+  opcoes:
+  - valor: inconsciente
+    rotulo: '…nem sabia que tinha esse problema: descobre conversando'
+  - valor: consciente_do_problema
+    rotulo: …sabe que tem um problema, mas não sabe como resolver
+  - valor: consciente_da_solucao
+    rotulo: …sabe que tipo de solução quer e está comparando opções
+  - valor: consciente_do_produto
+    rotulo: …já conhece vocês e quer tirar dúvidas
+  - valor: pronto_para_comprar
+    rotulo: …já chega decidida, perguntando preço e prazo
+  campo: pesquisa.personas[].nivel_consciencia
+- id: clientes_que_nao_servem
+  momento: reuniao
+  bloco: clientes
+  pergunta: Que tipo de cliente não vale a pena atender?
+  ajuda: Quem deu trabalho, desistiu, não pagou ou nunca fecha. Descreva o perfil e pergunte como reconhecer esse perfil antes
+    de gastar com ele (região, porte, orçamento, urgência).
+  tipo: lista
+  campo: pesquisa.nao_atender
+  alimenta: pesquisa.nao_atender[].como_filtrar (exclusão de público, palavra-chave negativa, pergunta de qualificação)
+- id: quem_comprou_recentemente
+  momento: reuniao
+  bloco: clientes
+  pergunta: 'Quem comprou nos últimos 3 meses: faixa de renda ou porte, onde mora, o que faz, para que comprou e o que motivou
+    a compra?'
+  ajuda: 'Com o CRM ou a lista de vendas aberta. Para que comprou: uso próprio, presente, para a empresa, para revender ou
+    investir.'
+  campo: ofertas.aderencia.perfil_compradores
+  alimenta: 'pesquisa.personas (fonte: dados)'
+- id: medo
+  momento: reuniao
+  bloco: clientes
+  pergunta: Do que o cliente tem medo que aconteça se não resolver o problema?
+  campo: pesquisa.personas[].medos
+- id: desejo_depois
+  momento: reuniao
+  bloco: clientes
+  pergunta: Quando dá tudo certo, como o cliente descreve a vida (ou a empresa) dele depois?
+  campo: pesquisa.personas[].desejos
+- id: micro_problemas
+  momento: reuniao
+  bloco: clientes
+  pergunta: Quais são as primeiras perguntas que o cliente faz, ou que digita no Google, antes de saber que precisa de vocês?
+  ajuda: São os problemas que ele acha que tem; viram pautas de conteúdo e de anúncio.
+  tipo: lista
+  campo: pesquisa.personas[].micro_problemas
+- id: quem_seguem
+  momento: reuniao
+  bloco: clientes
+  pergunta: Que pessoas, perfis, sites, eventos ou associações esses clientes acompanham?
+  tipo: lista
+  campo: pesquisa.personas[].onde_esta
+  alimenta: interesses e parcerias na grade de públicos
+- id: sofisticacao
+  momento: assessor
+  bloco: clientes
+  pergunta: 'Pelos anúncios dos concorrentes e pela escuta: quantas promessas parecidas esse cliente já ouviu?'
+  tipo: escolha
+  opcoes:
+  - valor: baixa
+    rotulo: 'Poucas: a promessa direta ainda funciona'
+  - valor: media
+    rotulo: 'Várias: precisa de mecanismo ou prova'
+  - valor: alta
+    rotulo: 'Muitas, e já se decepcionou: precisa de identificação e prova forte'
+  campo: pesquisa.personas[].sofisticacao
+- id: como_chegam_hoje
+  momento: cliente
+  bloco: atendimento
+  pergunta: Por onde chegam os clientes hoje?
+  ajuda: Marque todos que trazem clientes.
+  tipo: multipla
+  opcoes:
+  - valor: indicação
+    rotulo: Indicação
+  - valor: redes sociais (sem anúncio)
+    rotulo: Redes sociais, sem anúncio
+  - valor: Google (busca ou mapa)
+    rotulo: Google (busca ou mapa)
+  - valor: anúncios pagos
+    rotulo: Anúncios pagos
+  - valor: WhatsApp
+    rotulo: WhatsApp (contato direto, lista de transmissão)
+  - valor: loja ou local físico
+    rotulo: Passando na loja ou no local
+  - valor: marketplace ou aplicativo
+    rotulo: Marketplace, portal ou aplicativo
+  - valor: vendedores ou representantes
+    rotulo: Vendedores externos ou representantes
+  - valor: feiras e eventos
+    rotulo: Feiras e eventos
+  - valor: parcerias
+    rotulo: Parcerias
+  - valor: site
+    rotulo: Site
+  campo: briefing.negocio.como_vende_hoje
+- id: vendas_fora_do_digital
+  momento: cliente
+  bloco: atendimento
+  pergunta: Fora da internet (indicação, loja, visitas, vendedores), como estão as vendas do produto principal nos últimos
+    3 meses?
+  ajuda: Se o produto não vende bem pessoalmente, o anúncio só mostra o problema mais rápido e mais caro. Precisamos saber
+    antes.
+  tipo: escolha
+  opcoes:
+  - valor: boa
+    rotulo: Vendendo bem, no ritmo esperado
+  - valor: regular
+    rotulo: Vendendo, mas abaixo do esperado
+  - valor: fraca
+    rotulo: Vendendo pouco ou quase nada
+  - valor: nao_avaliado
+    rotulo: Produto novo, ainda não dá para dizer
+  campo: ofertas.aderencia.vendas_fora_do_digital.avaliacao
+- id: quem_atende
+  momento: cliente
+  bloco: atendimento
+  pergunta: Quem responde as pessoas que entram em contato? Diga quantas pessoas e a função de cada uma.
+  ajuda: 'Ex.: “1 recepcionista responde e agenda; a dona fecha a venda”. Diga também se essas pessoas fazem outras tarefas
+    ao mesmo tempo.'
+  tipo: texto_curto
+  obrigatoria: true
+  campo: briefing.negocio.time_comercial
+- id: horario_atendimento
+  momento: cliente
+  bloco: atendimento
+  pergunta: Em que dias e horários alguém responde as mensagens?
+  ajuda: 'Ex.: “seg a sex 8h–18h; sáb 8h–12h”.'
+  tipo: texto_curto
+  campo: plataforma.atendimento.horario_comercial
+- id: tempo_resposta
+  momento: cliente
+  bloco: atendimento
+  pergunta: Na prática, quanto tempo um contato novo espera pela primeira resposta de uma pessoa?
+  ajuda: Responda o que acontece numa semana normal, não o ideal. Cada hora de espera esfria o contato.
+  tipo: escolha
+  obrigatoria: true
+  opcoes:
+  - valor: 30min
+    rotulo: Até 30 minutos
+  - valor: 2h
+    rotulo: Até 2 horas
+  - valor: dia
+    rotulo: No mesmo dia
+  - valor: 24h+
+    rotulo: No dia seguinte ou mais
+  campo: plataforma.atendimento.sla_resposta
+- id: fora_do_horario
+  momento: cliente
+  bloco: atendimento
+  pergunta: Quando alguém manda mensagem fora do horário, o que acontece?
+  tipo: escolha
+  opcoes:
+  - valor: espera
+    rotulo: Fica sem resposta até o próximo horário de atendimento
+  - valor: automatica
+    rotulo: Recebe uma mensagem automática avisando o horário
+  - valor: robo
+    rotulo: Um robô faz perguntas e agenda
+  - valor: pessoa
+    rotulo: Alguém da equipe responde mesmo assim
+  alimenta: plataforma.atendimento.handoff; fluxos de pré-atendimento
+- id: tentativas
+  momento: cliente
+  bloco: atendimento
+  pergunta: Quando alguém pede informação e para de responder, quantas vezes vocês tentam falar de novo?
+  tipo: escolha
+  opcoes:
+  - valor: '0'
+    rotulo: Nenhuma
+  - valor: '1'
+    rotulo: Uma vez
+  - valor: 2a3
+    rotulo: 2 ou 3 vezes
+  - valor: 4mais
+    rotulo: 4 ou mais, em dias diferentes
+  - valor: depende
+    rotulo: Depende de quem atende
+  alimenta: diagnóstico de cadência (raio-x do funil no Trilha-ads); fluxos de follow-up
+- id: onde_anotam
+  momento: cliente
+  bloco: atendimento
+  pergunta: Onde vocês anotam os contatos e em que pé está cada negociação?
+  ajuda: 'Ex.: “numa planilha”, “só no WhatsApp”, “num caderno”, “no sistema Kommo, RD, HubSpot ou Pipedrive”.'
+  tipo: texto_curto
+  campo: briefing.negocio.crm
+- id: contatos_por_dia
+  momento: cliente
+  bloco: atendimento
+  pergunta: Quantos contatos novos por dia a equipe consegue atender bem, sem deixar ninguém esperando?
+  ajuda: Com a equipe de hoje. Se a campanha trouxer mais que isso, o excedente vira contato perdido.
+  tipo: numero
+  campo: briefing.capacidade.leads_dia
+- id: clientes_novos_max
+  momento: cliente
+  bloco: atendimento
+  pergunta: Quantos clientes novos por mês vocês conseguem atender ou entregar sem perder qualidade?
+  ajuda: O limite de agenda, vagas, estoque ou equipe.
+  tipo: numero
+  campo: briefing.capacidade.clientes_novos_mes
+- id: etapas_da_venda
+  momento: reuniao
+  bloco: atendimento
+  pergunta: Do primeiro contato até a venda, por quais etapas o cliente passa, e quem cuida de cada uma?
+  tipo: lista
+  alimenta: funil do Kommo no Trilha-ads (rótulos das etapas); estrategia.medicao.etapas_e_motivos_perda
+- id: bom_contato
+  momento: reuniao
+  bloco: atendimento
+  pergunta: O que faz um contato ser “bom” para vocês, a ponto de valer seguir com ele?
+  ajuda: 'Critérios objetivos. Ex.: “mora na região, tem pelo menos R$ 2 mil para investir e quer começar este mês”.'
+  alimenta: definição de lead qualificado (estrategia.metrica_principal); ofertas.qualificacao; pesquisa.nao_atender
+- id: conversa_atendente
+  momento: reuniao
+  bloco: atendimento
+  pergunta: 'Com quem atende, 20 minutos: o que o cliente pergunta primeiro, onde a conversa trava e por que ele desiste?'
+  campo: pesquisa.personas[].objecoes
+  alimenta: 'motivos de perda; frases (relato de quem atende, fonte: empresa)'
+- id: abordagem_conversa
+  momento: reuniao
+  bloco: atendimento
+  pergunta: Como o time conduz a conversa por mensagem?
+  tipo: escolha
+  opcoes:
+  - valor: scripted
+    rotulo: Roteiro com opções numeradas ou botões
+  - valor: conversacional
+    rotulo: Conversa livre, com perguntas abertas
+  - valor: misto
+    rotulo: Começa livre e depois segue um roteiro
+  campo: plataforma.voz.abordagem
+- id: primeira_resposta
+  momento: reuniao
+  bloco: atendimento
+  pergunta: Quando chega um contato de anúncio, quem responde primeiro?
+  tipo: escolha
+  opcoes:
+  - valor: direto
+    rotulo: Uma pessoa, direto
+  - valor: bot
+    rotulo: Um robô, que depois passa para uma pessoa
+  - valor: horario
+    rotulo: 'Depende do horário: pessoa no horário comercial, robô fora dele'
+  campo: plataforma.atendimento.handoff
+- id: canais_atendimento
+  momento: reuniao
+  bloco: atendimento
+  pergunta: Por quais canais vocês respondem clientes?
+  tipo: multipla
+  opcoes:
+  - valor: WhatsApp
+    rotulo: WhatsApp
+  - valor: telefone
+    rotulo: Telefone
+  - valor: Instagram Direct
+    rotulo: Instagram Direct
+  - valor: e-mail
+    rotulo: E-mail
+  - valor: chat do site
+    rotulo: Chat do site
+  - valor: presencial
+    rotulo: Presencial
+  campo: plataforma.atendimento.canais
+- id: motivos_perda_categoria
+  momento: assessor
+  bloco: atendimento
+  pergunta: 'Monte com o time a lista de motivos de perda do CRM e ligue cada um a uma categoria: lead, atendimento, comercial
+    ou externo.'
+  alimenta: motivos_perda do playbook no Trilha-ads; estrategia.medicao.etapas_e_motivos_perda
+- id: cliente_oculto
+  momento: assessor
+  bloco: atendimento
+  pergunta: 'Faça dois contatos de teste, um em horário comercial e outro à noite ou no fim de semana: quanto demorou a primeira
+    resposta e como foi a conversa?'
+  ajuda: Compara o tempo declarado com o real antes de pôr verba.
+  tipo: texto_curto
+  campo: plataforma.atendimento.sla_resposta
+  alimenta: raio-x do atendimento; sinais de alerta
+- id: concorrentes
+  momento: cliente
+  bloco: concorrencia
+  pergunta: Com quais empresas os clientes comparam vocês? Liste de 3 a 5.
+  ajuda: Uma por linha, com o site ou o perfil se souber. Vale incluir quem não é concorrente direto, mas disputa o mesmo
+    dinheiro.
+  tipo: lista
+  campo: pesquisa.concorrentes
+- id: preco_vs_concorrentes
+  momento: cliente
+  bloco: concorrencia
+  pergunta: Comparado a esses concorrentes, o preço de vocês é…
+  tipo: escolha
+  opcoes:
+  - valor: abaixo
+    rotulo: Mais baixo
+  - valor: media
+    rotulo: Parecido
+  - valor: acima
+    rotulo: Mais alto
+  campo: ofertas.condicoes.posicionamento_preco
+- id: perde_para_concorrente
+  momento: reuniao
+  bloco: concorrencia
+  pergunta: Quando vocês perdem uma venda para um concorrente, por que é?
+  campo: pesquisa.concorrentes[].fortes
+- id: ganha_do_concorrente
+  momento: reuniao
+  bloco: concorrencia
+  pergunta: E quando ganham de um concorrente, por que é?
+  campo: pesquisa.unicidade
+  alimenta: ofertas.diferenciais
+- id: concorrentes_fortes_fracos
+  momento: reuniao
+  bloco: concorrencia
+  pergunta: 'Para cada concorrente citado: o que faz melhor que vocês, o que faz pior e quanto cobra?'
+  campo: pesquisa.concorrentes[].fracos
+  alimenta: pesquisa.concorrentes[].fortes, posicionamento_preco
+- id: anuncios_concorrentes
+  momento: assessor
+  bloco: concorrencia
+  pergunta: 'Anúncios ativos dos concorrentes (Biblioteca de Anúncios do Meta, buscas no Google): o que prometem e que provas
+    mostram?'
+  campo: pesquisa.concorrentes[].promessa
+  alimenta: pesquisa.personas[].sofisticacao
+- id: marketplaces
+  momento: assessor
+  bloco: concorrencia
+  pergunta: A categoria é vendida em marketplace, portal ou aplicativo do ramo? Quem vende lá e a que preço?
+  tipo: lista
+  campo: briefing.negocio.marketplaces
+- id: buscas_categoria
+  momento: assessor
+  bloco: concorrencia
+  pergunta: Quanto se busca pela categoria na região (Planejador de Palavras-chave, Google Trends)? Que termos aparecem?
+  alimenta: canais de busca; pesquisa.sazonalidade; ofertas.aderencia.aderencia_digital
+- id: unicidade
+  momento: assessor
+  bloco: concorrencia
+  pergunta: 'Depois do benchmark: o que só este cliente tem e os concorrentes não copiam rápido?'
+  campo: pesquisa.unicidade
+- id: swot
+  momento: assessor
+  bloco: concorrencia
+  pergunta: 'Monte a SWOT com o que foi levantado: forças, fraquezas, oportunidades e ameaças, cada uma com fonte.'
+  campo: pesquisa.swot.forcas
+  alimenta: pesquisa.swot.fraquezas, oportunidades, ameacas
+- id: sazonalidade_dados
+  momento: assessor
+  bloco: concorrencia
+  pergunta: 'Confirme a sazonalidade com dados: vendas por mês no CRM ou no sistema e buscas no Google Trends.'
+  campo: pesquisa.sazonalidade
+- id: lembrado_por
+  momento: cliente
+  bloco: marca
+  pergunta: Que 3 palavras vocês querem que venham à cabeça quando alguém ouve o nome da empresa?
+  ajuda: 'Ex.: “pontual”, “especialista em joelho”, “sem surpresa no preço”.'
+  tipo: lista
+  campo: plataforma.associacoes.queremos
+- id: nao_associar
+  momento: cliente
+  bloco: marca
+  pergunta: Com o que vocês não querem ser associados de jeito nenhum?
+  ajuda: 'Ex.: “barato”, “empurra produto”, “promessa milagrosa”. Saber o que evitar protege a marca tanto quanto saber o
+    que buscar.'
+  tipo: lista
+  campo: plataforma.associacoes.nao_queremos
+- id: quem_aparece
+  momento: cliente
+  bloco: marca
+  pergunta: Quem deve aparecer e “assinar” a comunicação?
+  tipo: escolha
+  opcoes:
+  - valor: marca
+    rotulo: A empresa (“aqui é da Clínica X”)
+  - valor: pessoa
+    rotulo: Uma pessoa (“aqui é a Ana”)
+  - valor: marca_pessoa
+    rotulo: As duas (“aqui é a Ana, da Clínica X”)
+  campo: plataforma.voz.assinatura
+- id: nome_pessoa
+  momento: cliente
+  bloco: marca
+  pergunta: Qual é o nome e a função dessa pessoa?
+  tipo: texto_curto
+  campo: plataforma.voz.nome_pessoa
+  condicao:
+    pergunta: quem_aparece
+    em:
+    - pessoa
+    - marca_pessoa
+- id: grava_video
+  momento: cliente
+  bloco: marca
+  pergunta: Essa pessoa topa gravar vídeos curtos para anúncios?
+  tipo: escolha
+  opcoes:
+  - valor: semanal
+    rotulo: Sim, toda semana
+  - valor: as_vezes
+    rotulo: De vez em quando
+  - valor: nao
+    rotulo: Prefere não aparecer em vídeo
+  alimenta: pesquisa.maturidade.capacidade_criativa; formatos da grade
+  condicao:
+    pergunta: quem_aparece
+    em:
+    - pessoa
+    - marca_pessoa
+- id: tom
+  momento: cliente
+  bloco: marca
+  pergunta: Como a empresa fala com os clientes hoje?
+  ajuda: Marque até 3.
+  tipo: multipla
+  opcoes:
+  - valor: próxima e informal
+    rotulo: Próxima e informal
+  - valor: séria e técnica
+    rotulo: Séria e técnica
+  - valor: acolhedora
+    rotulo: Acolhedora
+  - valor: direta e objetiva
+    rotulo: Direta e objetiva
+  - valor: bem-humorada
+    rotulo: Bem-humorada
+  - valor: sofisticada
+    rotulo: Sofisticada
+  - valor: didática
+    rotulo: Didática, explica tudo
+  campo: plataforma.voz.tom
+- id: intensidade
+  momento: cliente
+  bloco: marca
+  pergunta: Quanto a comunicação pode soar vendedora?
+  tipo: escolha
+  opcoes:
+  - valor: '1'
+    rotulo: '1 — sóbria: só informa, sem chamar para comprar'
+  - valor: '2'
+    rotulo: 2 — discreta
+  - valor: '3'
+    rotulo: '3 — equilibrada: informa e convida'
+  - valor: '4'
+    rotulo: 4 — animada
+  - valor: '5'
+    rotulo: 5 — empolgada, clima de promoção ou lançamento
+  campo: plataforma.voz.intensidade
+- id: termos_proibidos
+  momento: cliente
+  bloco: marca
+  pergunta: Que palavras, promessas ou assuntos nunca devem aparecer na comunicação?
+  ajuda: 'Ex.: “garantido”, “o melhor da cidade”, nome de concorrente, política, religião.'
+  tipo: lista
+  campo: plataforma.voz.termos_proibidos
+  alimenta: plataforma.compliance.promessas_proibidas
+- id: elogios
+  momento: reuniao
+  bloco: marca
+  pergunta: Que elogios vocês mais recebem de clientes, parceiros e da equipe?
+  ajuda: O que já é elogiado é o ponto de partida mais forte para a marca. Peça exemplos reais.
+  tipo: lista
+  alimenta: plataforma.historia.verdade_central; plataforma.associacoes; provas
+- id: por_que_comecou
+  momento: reuniao
+  bloco: marca
+  pergunta: Como e por que a empresa começou? O que vocês viam que precisava mudar?
+  campo: plataforma.historia.catalisador
+- id: crenca_central
+  momento: reuniao
+  bloco: marca
+  pergunta: Em que vocês acreditam que muita gente do setor não acredita?
+  ajuda: 'Uma convicção, não uma polêmica. Ex.: “ninguém deveria sair de uma consulta sem entender o próprio exame”.'
+  campo: plataforma.historia.verdade_central
+- id: prova_da_crenca
+  momento: reuniao
+  bloco: marca
+  pergunta: Que fato do dia a dia mostra essa crença na prática?
+  campo: plataforma.historia.prova
+- id: conhecido_por
+  momento: reuniao
+  bloco: marca
+  pergunta: Para chegar à meta de 12 meses, pelo que a empresa precisa ser conhecida?
+  campo: briefing.resultado_desejado.conhecido_por
+  alimenta: plataforma.jornada.conhecido_por; plataforma.posicionamento.percepcao_desejada
+- id: o_que_fazer
+  momento: reuniao
+  bloco: marca
+  pergunta: O que vocês precisam fazer, de forma repetida, para ser conhecidos por isso?
+  tipo: lista
+  campo: plataforma.jornada.fazer
+- id: o_que_aprender
+  momento: reuniao
+  bloco: marca
+  pergunta: O que precisam aprender, ou quem precisam contratar, para conseguir fazer isso?
+  tipo: lista
+  campo: plataforma.jornada.aprender
+- id: percepcao_atual
+  momento: reuniao
+  bloco: marca
+  pergunta: Hoje, como os clientes e o mercado veem a empresa? Com sinceridade.
+  campo: plataforma.posicionamento.percepcao_atual
+- id: assim_sim
+  momento: reuniao
+  bloco: marca
+  pergunta: Mostrem 3 textos, posts ou anúncios (de vocês ou de outros) de que gostam, e digam por quê.
+  tipo: lista
+  campo: plataforma.voz.assim_sim
+- id: assim_nao
+  momento: reuniao
+  bloco: marca
+  pergunta: Agora 3 de que não gostam, e por quê.
+  tipo: lista
+  campo: plataforma.voz.assim_nao
+- id: termos_obrigatorios
+  momento: reuniao
+  bloco: marca
+  pergunta: Que palavras ou expressões a marca sempre usa (nome do método, jeito de chamar o cliente)?
+  tipo: lista
+  campo: plataforma.voz.termos_obrigatorios
+- id: temas
+  momento: reuniao
+  bloco: marca
+  pergunta: Sobre que assuntos vocês conseguem falar toda semana sem esgotar, e que ajudam a vender?
+  ajuda: 'Filtre por três perguntas: o que vocês gostam de falar, o que o cliente quer ouvir agora e o que faz o cliente agir.'
+  campo: plataforma.temas
+- id: consistencia
+  momento: assessor
+  bloco: marca
+  pergunta: Site, redes, perfil do Google e atendimento prometem a mesma coisa?
+  campo: plataforma.posicionamento.percepcao_atual
+- id: posicionamento
+  momento: assessor
+  bloco: marca
+  pergunta: 'Escreva o posicionamento: para quem, em que categoria, com que diferença e com que razões para acreditar.'
+  ajuda: 'Procure a lacuna: o que o mercado não está dizendo e este cliente pode provar.'
+  campo: plataforma.posicionamento.diferenca
+  alimenta: plataforma.posicionamento.para_quem, categoria, razoes_para_acreditar
+- id: identidade_visual
+  momento: assessor
+  bloco: marca
+  pergunta: Extraia do logo e do manual as cores (#RRGGBB), as fontes e o estilo de imagem.
+  campo: plataforma.identidade_visual.estilo_imagem
+  alimenta: plataforma.identidade_visual.cores, tipografia, logo
+- id: provas_fatos
+  momento: cliente
+  bloco: provas
+  pergunta: Que fatos comprovam o trabalho de vocês? Diga de onde vem cada um.
+  ajuda: 'Números, notas de avaliação, prêmios, certificações, aparições na mídia, clientes conhecidos. Ex.: “1.200 pacientes
+    atendidos (sistema)”, “nota 4,9 no Google com 310 avaliações”, “selo X desde 2020”.'
+  tipo: lista
+  campo: provas.provas
+  alimenta: 'provas: numero, autoridade, midia, certificacao (com fonte)'
+- id: depoimentos_existentes
+  momento: cliente
+  bloco: provas
+  pergunta: Que depoimentos de clientes vocês já têm guardados?
+  tipo: multipla
+  opcoes:
+  - valor: video
+    rotulo: Vídeos
+  - valor: print
+    rotulo: Prints de WhatsApp ou e-mail
+  - valor: avaliacoes
+    rotulo: Avaliações online (Google, redes, sites)
+  - valor: antes_depois
+    rotulo: Fotos de antes e depois
+  - valor: case
+    rotulo: Casos escritos, com resultado
+  - valor: nenhum
+    rotulo: Nenhum ainda
+  alimenta: 'provas: depoimento e case (formato)'
+- id: autorizacao_depoimentos
+  momento: cliente
+  bloco: provas
+  pergunta: Os clientes desses depoimentos autorizaram por escrito o uso do nome, da imagem e da fala em anúncios?
+  ajuda: Sem autorização por escrito, depoimento não pode ir para anúncio (LGPD e direito de imagem). Se faltar, ajudamos
+    a pedir.
+  tipo: escolha
+  opcoes:
+  - valor: todos
+    rotulo: Sim, todos
+  - valor: alguns
+    rotulo: Alguns
+  - valor: nenhum
+    rotulo: Nenhum
+  alimenta: provas.provas[].autorizado
+- id: historia_cliente
+  momento: reuniao
+  bloco: provas
+  pergunta: 'Contem a história de um cliente: como estava antes, o que fizeram juntos e como está hoje, com números se tiver.'
+  ajuda: 'Peça um caso parecido com o cliente que se quer atrair: prova convence mais quando quem lê se reconhece nela.'
+  campo: provas.historias
+- id: historia_autorizada
+  momento: reuniao
+  bloco: provas
+  pergunta: Essa história pode ser usada com nome e imagem? Há autorização por escrito?
+  tipo: sim_nao
+  campo: provas.historias[].autorizado
+- id: perfil_dos_depoimentos
+  momento: reuniao
+  bloco: provas
+  pergunta: Quem são as pessoas dos depoimentos (idade aproximada, profissão, situação de partida), e que tipo de cliente
+    cada um convence?
+  campo: provas.provas[].perfil
+  alimenta: provas.provas[].personas
+- id: reclamacoes
+  momento: reuniao
+  bloco: provas
+  pergunta: Existe alguma reclamação que se repete (atraso, atendimento, preço, entrega)? Onde aparece e como vocês respondem?
+  alimenta: ofertas.aderencia.reputacao; estrategia.riscos
+- id: avaliacoes_publicas
+  momento: assessor
+  bloco: provas
+  pergunta: 'Avaliações no Google, comentários e mensagens nas redes: o que se repete em elogios, dúvidas e reclamações?'
+  campo: pesquisa.personas[].objecoes
+  alimenta: 'fonte: consumidor; pesquisa.personas[].frases; provas'
+- id: reputacao
+  momento: assessor
+  bloco: provas
+  pergunta: Pelo Google, Reclame Aqui, redes e portais do ramo, a reputação da empresa é…
+  tipo: escolha
+  opcoes:
+  - valor: ativo
+    rotulo: 'Um ativo: nota alta e elogios recorrentes'
+  - valor: neutra
+    rotulo: Neutra
+  - valor: obstaculo
+    rotulo: 'Um obstáculo: reclamações sem resposta ou nota baixa'
+  campo: ofertas.aderencia.reputacao
+  alimenta: ofertas.aderencia.reputacao_nota
+- id: autoriza_entrevistas
+  momento: cliente
+  bloco: escuta
+  pergunta: Podemos conversar 15 minutos com 3 a 5 clientes recentes de vocês?
+  ajuda: As conversas mostram o que o cliente pensa, com as palavras dele. Sem isso, a estratégia fica baseada em opinião.
+    Os clientes ficam anônimos.
+  tipo: escolha
+  opcoes:
+  - valor: sim
+    rotulo: Sim, eu indico e aviso os clientes
+  - valor: sim_com_ajuda
+    rotulo: Sim, mas preciso de ajuda para escolher e convidar
+  - valor: nao
+    rotulo: Prefiro que não
+  alimenta: 'pesquisa.escuta (fonte: consumidor)'
+- id: autoriza_conversas
+  momento: cliente
+  bloco: escuta
+  pergunta: Podemos ler as conversas de atendimento dos últimos 60 dias, com nomes e telefones escondidos?
+  ajuda: WhatsApp ou sistema de atendimento. Serve para contar quais dúvidas e motivos de desistência mais aparecem.
+  tipo: escolha
+  opcoes:
+  - valor: sim
+    rotulo: Sim
+  - valor: amostra
+    rotulo: Sim, mas eu escolho e envio uma amostra
+  - valor: nao
+    rotulo: Não
+  alimenta: 'pesquisa.escuta (fonte: dados); pesquisa.personas[].frases'
+- id: entrevistas
+  momento: assessor
+  bloco: escuta
+  pergunta: Faça as entrevistas com o roteiro de escuta e registre de onde veio, quantas foram, a data e o resumo.
+  ajuda: Pergunte pelo que aconteceu, peça exemplos e não sugira respostas. Anote as palavras exatas.
+  campo: pesquisa.escuta
+- id: leitura_conversas
+  momento: assessor
+  bloco: escuta
+  pergunta: Nas conversas lidas, conte quantas vezes aparece cada dúvida, objeção e motivo de desistência, e copie as frases
+    exatas.
+  campo: pesquisa.personas[].frases
+  alimenta: 'pesquisa.personas[].objecoes com mencoes (fonte: dados)'
+- id: crencas_por_tipo
+  momento: assessor
+  bloco: escuta
+  pergunta: 'Que crenças travam a compra: sobre o método (“não funciona”), sobre si mesmo (“não consigo”) ou sobre o ambiente
+    (“minha situação não deixa”)? Quantas vezes cada uma aparece e o que a derruba?'
+  campo: pesquisa.personas[].crencas
+- id: regulado
+  momento: cliente
+  bloco: regras
+  pergunta: A sua atividade tem conselho profissional ou regras próprias de publicidade?
+  ajuda: 'Ex.: conselhos de medicina e odontologia, OAB, CRECI, conselho de psicologia, Anvisa para cosméticos e alimentos.'
+  tipo: escolha
+  opcoes:
+  - valor: sim
+    rotulo: Sim
+  - valor: nao
+    rotulo: Não
+  - valor: nao_sei
+    rotulo: Não sei
+  alimenta: plataforma.compliance; revisão de copy
+- id: registro_profissional
+  momento: cliente
+  bloco: regras
+  pergunta: Que registro precisa aparecer na comunicação?
+  ajuda: 'Conselho, número e nome do responsável. Ex.: “Dra. Ana Souza — CRO-PR 12345 — responsável técnica”.'
+  tipo: lista
+  campo: plataforma.compliance.registros_profissionais
+  condicao:
+    pergunta: regulado
+    em:
+    - sim
+- id: regras_publicidade
+  momento: cliente
+  bloco: regras
+  pergunta: O que essas regras proíbem ou exigem nos anúncios?
+  ajuda: 'Ex.: “não mostrar antes e depois”, “não divulgar preço de consulta”, “não prometer resultado”. Se não souber, marque
+    “não sei”: levantamos com vocês.'
+  tipo: lista
+  campo: briefing.restricoes.regras_legais
+  alimenta: plataforma.compliance.promessas_proibidas
+  condicao:
+    pergunta: regulado
+    em:
+    - sim
+    - nao_sei
+- id: politica_privacidade
+  momento: cliente
+  bloco: regras
+  pergunta: Qual é o link da política de privacidade do site?
+  ajuda: 'Anúncios com formulário exigem uma. Se não existir ou você não souber, marque “não sei”: resolvemos no começo.'
+  tipo: link
+  campo: plataforma.compliance.politica_privacidade_url
+- id: lista_clientes
+  momento: cliente
+  bloco: regras
+  pergunta: Vocês têm uma lista de clientes (e-mail ou telefone) que autorizaram receber comunicação da empresa?
+  ajuda: Com autorização, a lista ajuda as plataformas a encontrar pessoas parecidas com seus clientes (LGPD).
+  tipo: escolha
+  opcoes:
+  - valor: ok
+    rotulo: Sim, com autorização registrada
+  - valor: pendente
+    rotulo: Temos a lista, mas não sei se há autorização
+  - valor: nao_tem
+    rotulo: Não temos lista
+  campo: briefing.ativos.lista_clientes_autorizada
+- id: quem_aprova
+  momento: cliente
+  bloco: regras
+  pergunta: Quem aprova os anúncios e os textos antes de irem ao ar?
+  ajuda: De preferência uma pessoa só. Aprovação demorada é o que mais atrasa campanha.
+  tipo: texto_curto
+  obrigatoria: true
+  campo: briefing.aprovacao.responsavel
+- id: prazo_aprovacao
+  momento: cliente
+  bloco: regras
+  pergunta: Em quanto tempo essa pessoa costuma responder um pedido de aprovação?
+  tipo: escolha
+  opcoes:
+  - valor: '4'
+    rotulo: No mesmo turno
+  - valor: '24'
+    rotulo: Em até 1 dia útil
+  - valor: '48'
+    rotulo: Em até 2 dias úteis
+  - valor: '72'
+    rotulo: 3 dias ou mais
+  campo: briefing.aprovacao.prazo_horas
+- id: substituto_aprovacao
+  momento: cliente
+  bloco: regras
+  pergunta: Quem aprova quando essa pessoa não está?
+  tipo: texto_curto
+  campo: briefing.aprovacao.substituto
+- id: stakeholders
+  momento: reuniao
+  bloco: regras
+  pergunta: 'Quem participa das decisões de marketing? Para cada pessoa: função, quanto influencia, quanto se interessa e
+    o que espera do projeto.'
+  ajuda: Inclua quem pode mudar uma decisão depois (sócio, diretor comercial, gerente). Pessoa de alto impacto e pouca proximidade
+    é risco para o projeto.
+  campo: briefing.stakeholders
+- id: requisitos
+  momento: reuniao
+  bloco: regras
+  pergunta: 'Que regras internas precisamos seguir: aprovar artes e página antes de publicar, manual de marca, horários sem
+    anúncio?'
+  tipo: lista
+  campo: estrategia.restricoes
+- id: nao_pode
+  momento: reuniao
+  bloco: regras
+  pergunta: Há algo que a empresa não quer fazer em anúncios, mesmo que seja permitido?
+  ajuda: 'Ex.: falar de preço, citar concorrentes, usar foto de clientes, fazer promoção, usar humor.'
+  tipo: lista
+  campo: briefing.restricoes.nao_pode
+- id: relatorio
+  momento: reuniao
+  bloco: regras
+  pergunta: Quem recebe o relatório, com que frequência e quais números querem ver?
+  alimenta: estrategia.medicao.relatorio_definido; bloco operacao do perfil no Trilha-ads
+- id: promessas_proibidas
+  momento: assessor
+  bloco: regras
+  pergunta: Levante as regras do conselho, do CONAR e do Código do Consumidor que valem para o cliente e liste as promessas
+    proibidas.
+  tipo: lista
+  campo: plataforma.compliance.promessas_proibidas
+  alimenta: plataforma.compliance.avisos_legais
+- id: politica_conferida
+  momento: assessor
+  bloco: regras
+  pergunta: A política de privacidade existe, está no site e cobre os dados coletados em formulário e WhatsApp?
+  tipo: escolha
+  opcoes:
+  - valor: ok
+    rotulo: Sim
+  - valor: pendente
+    rotulo: Existe, mas precisa ajustar
+  - valor: nao_tem
+    rotulo: Não existe
+  campo: briefing.ativos.politica_privacidade
+- id: funcionou
+  momento: cliente
+  bloco: historico
+  pergunta: O que vocês já fizeram para vender mais e deu certo?
+  ajuda: 'Uma ação por linha, com quando foi e o resultado. Ex.: “aula experimental gratuita em 2025: 1 em cada 3 que vinham
+    se matriculava”.'
+  tipo: lista
+  campo: briefing.historico.funcionou
+- id: nao_funcionou
+  momento: cliente
+  bloco: historico
+  pergunta: E o que tentaram e não deu certo?
+  ajuda: 'Diga o motivo, se souber. Ex.: “promoção de matrícula grátis: veio muita gente que desistiu no 2º mês”.'
+  tipo: lista
+  campo: briefing.historico.nao_funcionou
+- id: ja_anunciou
+  momento: cliente
+  bloco: historico
+  pergunta: Vocês já pagaram anúncios na internet?
+  tipo: escolha
+  opcoes:
+  - valor: agora
+    rotulo: Sim, estamos anunciando agora
+  - valor: antes
+    rotulo: Sim, já anunciamos antes
+  - valor: impulsionar
+    rotulo: Só impulsionamos posts
+  - valor: nunca
+    rotulo: Nunca
+  alimenta: pesquisa.maturidade.historico_conta
+- id: anuncios_detalhe
+  momento: cliente
+  bloco: historico
+  pergunta: Onde anunciaram, quanto por mês, por quanto tempo e o que aconteceu?
+  ajuda: 'Ex.: “Instagram, R$ 500 por mês em 2025, por 4 meses: chegaram mensagens, mas quase ninguém comprou”.'
+  tipo: texto_longo
+  campo: briefing.historico.ja_investiu_em_midia
+  condicao:
+    pergunta: ja_anunciou
+    em:
+    - agora
+    - antes
+    - impulsionar
+- id: quem_cuidava
+  momento: cliente
+  bloco: historico
+  pergunta: Quem cuidava dos anúncios?
+  ajuda: 'Se foi uma agência, a conta pode estar no nome dela: precisamos saber para não perder o histórico.'
+  tipo: escolha
+  opcoes:
+  - valor: nos
+    rotulo: Nós mesmos
+  - valor: agencia
+    rotulo: Agência ou freelancer
+  - valor: ambos
+    rotulo: Os dois, em épocas diferentes
+  alimenta: briefing.acessos (de quem é a conta de anúncios); pesquisa.maturidade.historico_conta
+  condicao:
+    pergunta: ja_anunciou
+    em:
+    - agora
+    - antes
+    - impulsionar
+- id: conteudo_hoje
+  momento: cliente
+  bloco: historico
+  pergunta: Quem produz fotos, vídeos e posts da empresa hoje?
+  tipo: escolha
+  opcoes:
+  - valor: ninguem
+    rotulo: Ninguém, com frequência
+  - valor: dono
+    rotulo: O dono ou um sócio
+  - valor: equipe
+    rotulo: Alguém da equipe
+  - valor: terceiro
+    rotulo: Agência ou freelancer
+  alimenta: pesquisa.maturidade.capacidade_criativa; estrategia.premissas
+- id: site_quem_altera
+  momento: reuniao
+  bloco: historico
+  pergunta: Quem consegue alterar o site ou a página de vendas, e em quanto tempo?
+  alimenta: Trilha-LP ou página do cliente; estrategia.premissas
+- id: historico_conta
+  momento: assessor
+  bloco: historico
+  pergunta: 'Analise a conta de anúncios existente: campanhas, gasto, eventos de conversão e o que trouxe venda.'
+  alimenta: 'pesquisa.maturidade.historico_conta (nota 0–3); briefing.historico.funcionou (fonte: dados)'
+- id: whatsapp
+  momento: cliente
+  bloco: materiais
+  pergunta: Qual número de WhatsApp vai receber os contatos dos anúncios?
+  ajuda: 'Com DDD. Ex.: (41) 99999-0000. Se for diferente do número usado hoje, avise.'
+  tipo: telefone
+  campo: briefing.cliente.whatsapp
+- id: logo
+  momento: cliente
+  bloco: materiais
+  pergunta: Vocês têm o logo em arquivo editável (.ai, .pdf, .svg ou .eps)?
+  tipo: escolha
+  opcoes:
+  - valor: ok
+    rotulo: Sim, envio junto
+  - valor: pendente
+    rotulo: Tenho, mas preciso procurar ou pedir a quem fez
+  - valor: nao_tem
+    rotulo: Não tenho
+  campo: briefing.ativos.logo_editavel
+- id: manual_marca
+  momento: cliente
+  bloco: materiais
+  pergunta: Existe um manual de marca (cores, fontes, regras de uso)?
+  tipo: escolha
+  opcoes:
+  - valor: ok
+    rotulo: Sim, envio junto
+  - valor: pendente
+    rotulo: Existe, mas preciso procurar
+  - valor: nao_tem
+    rotulo: Não existe
+  campo: briefing.ativos.manual_marca
+- id: fotos
+  momento: cliente
+  bloco: materiais
+  pergunta: Vocês têm fotos reais da equipe, do local, dos produtos ou de clientes (com autorização)?
+  tipo: escolha
+  opcoes:
+  - valor: ok
+    rotulo: Sim, várias
+  - valor: pendente
+    rotulo: Algumas; precisamos produzir mais
+  - valor: nao_tem
+    rotulo: Não temos
+  campo: briefing.ativos.fotos_reais
+- id: videos
+  momento: cliente
+  bloco: materiais
+  pergunta: E vídeos reais (bastidores, depoimentos, atendimento, produto em uso)?
+  tipo: escolha
+  opcoes:
+  - valor: ok
+    rotulo: Sim, vários
+  - valor: pendente
+    rotulo: Alguns; precisamos produzir mais
+  - valor: nao_tem
+    rotulo: Não temos
+  campo: briefing.ativos.videos_reais
+- id: pasta_materiais
+  momento: cliente
+  bloco: materiais
+  pergunta: Link de uma pasta (Google Drive, Dropbox) com logo, fotos e vídeos
+  ajuda: Se ainda não tiver, deixe em branco e envie depois.
+  tipo: link
+  alimenta: briefing.ativos; plataforma.identidade_visual; criativos
+- id: plataforma_loja
+  momento: cliente
+  bloco: materiais
+  pergunta: Em que plataforma está a loja online?
+  ajuda: 'Ex.: Shopify, Nuvemshop, VTEX, Tray, WooCommerce.'
+  tipo: texto_curto
+  alimenta: rastreamento de compras (assessor); briefing.acessos
+  condicao:
+    pergunta: tipo_negocio
+    em:
+    - ecommerce
+- id: acessos_quem
+  momento: cliente
+  bloco: materiais
+  pergunta: Quem tem as senhas das contas de anúncio, do site, do domínio e do sistema de atendimento? Diga nome e contato.
+  ajuda: Não mande senhas aqui. Só precisamos saber com quem falar para pedir os acessos.
+  tipo: texto_curto
+  alimenta: briefing.acessos (o assessor confere cada um)
+- id: acesso_meta
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: 'Gerenciador de Negócios do Meta: existe, está no nome da empresa e temos acesso de administrador?'
+  tipo: escolha
+  opcoes: &id001
+  - valor: ok
+    rotulo: Ok
+  - valor: pendente
+    rotulo: Pendente
+  - valor: nao_tem
+    rotulo: Não tem (criar)
+  - valor: nao_sei
+    rotulo: Não sei
+  campo: briefing.acessos.meta_business
+- id: acesso_conta_meta
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: 'Conta de anúncios do Meta: é da empresa (não da agência anterior), com forma de pagamento ativa?'
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.conta_anuncios_meta
+- id: pixel_meta
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: Pixel ou conjunto de dados do Meta instalado e recebendo eventos (Gerenciador de Eventos)?
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.pixel_meta
+- id: acesso_google_ads
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: Conta do Google Ads da empresa, com acesso de administrador?
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.google_ads
+- id: tag_google
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: Tag do Google instalada e conversões configuradas?
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.tag_google
+- id: gtm
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: Gerenciador de Tags (GTM) no site, com acesso?
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.gtm
+- id: ga4
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: GA4 coletando dados, com acesso?
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.ga4
+- id: acesso_crm
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: CRM com acesso de administrador (ou decisão de implantar o Kommo)?
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.crm
+- id: acesso_dominio
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: 'Domínio do site: quem administra, e conseguimos verificar o domínio no Meta?'
+  tipo: escolha
+  opcoes: *id001
+  campo: briefing.acessos.dominio
+- id: medicao_utm
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: Os anúncios usam UTMs no padrão da Trilha?
+  tipo: sim_nao
+  campo: estrategia.medicao.utm_padrao
+- id: medicao_crm
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: UTMs e identificadores de clique (gclid, fbclid) chegam gravados no lead do CRM?
+  tipo: sim_nao
+  campo: estrategia.medicao.campos_crm
+- id: medicao_evento
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: O evento de conversão dispara só depois do recebimento confirmado do contato?
+  tipo: sim_nao
+  campo: estrategia.medicao.evento_conversao
+- id: medicao_motivos
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: O CRM tem as etapas padrão e o motivo de perda obrigatório?
+  tipo: sim_nao
+  campo: estrategia.medicao.etapas_e_motivos_perda
+- id: medicao_codigo
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: O código do criativo chega ao lead, inclusive pela mensagem do WhatsApp?
+  tipo: sim_nao
+  campo: estrategia.medicao.codigo_criativo
+- id: ids_kommo
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: 'IDs do funil no Kommo: pipeline, etapas (interesse, reativado, descartado), responsável pelo atendimento e bots
+    encadeados.'
+  alimenta: perfil.yaml do Trilha-ads; fluxos do briefing-trilha
+- id: nota_maturidade
+  momento: assessor
+  bloco: acessos_medicao
+  pergunta: Dê a nota de maturidade de 0 a 3 em rastreamento, CRM, capacidade criativa, histórico de conta e verba.
+  tipo: texto_curto
+  alimenta: pesquisa.maturidade (as cinco notas)
+roteiro_escuta:
+- Me conta como era a situação antes de você procurar a empresa. O que estava acontecendo?
+- O que fez você decidir resolver isso naquele momento, e não antes?
+- Antes de escolher, o que mais você considerou ou tentou? Por que não seguiu com isso?
+- Onde você procurou informação, e em quem confiou para decidir?
+- O que quase fez você desistir ou adiar?
+- Qual era a sua maior preocupação antes de fechar?
+- Por que escolheu esta empresa e não outra?
+- O que mudou depois? Pode me dar um exemplo ou um número?
+- Teve alguma coisa que te surpreendeu, para o bem ou para o mal?
+- Se fosse explicar para um amigo o que eles fazem, o que você diria?
+- Para quem você não recomendaria?
+- Posso usar alguma frase sua, sem o seu nome, na comunicação da empresa?
+sinais_de_alerta:
+- 'Não sabe a margem nem quantos contatos viram venda: a economia fica toda estimada.'
+- 'A primeira resposta leva mais de 2 horas, ou só sai no dia seguinte: o problema é o atendimento, não a mídia.'
+- 'Ninguém tenta falar de novo com quem parou de responder: contato pago que fica no “visualizado” é verba perdida.'
+- 'Ninguém registra por que o contato não comprou: não dá para saber se o gargalo é o lead, o atendimento ou o comercial.'
+- '“Nosso diferencial é a qualidade” ou “o atendimento”: ainda não há posicionamento.'
+- 'Não autoriza nenhuma escuta: as personas serão opinião da empresa.'
+- 'Vendas fracas fora da internet (indicação, loja, visitas): o digital vai expor o problema mais rápido e mais caro.'
+- 'Reputação com reclamações recorrentes sem resposta: a mídia amplifica o problema.'
+- 'A capacidade de atendimento é menor do que os contatos que a verba traz: contato sem resposta é verba perdida.'
+- 'A verba de teste não paga o volume mínimo dos testes: o teste vai terminar inconclusivo.'
+- 'Espera venda em 30 dias com um ciclo de venda de meses: a expectativa precisa ser combinada antes.'
+- 'Quer “muito contato barato” como meta: custo por contato baixo com contato que não compra é prejuízo disfarçado.'
+- 'Ticket alto vendido só para quem nunca ouviu falar da empresa, sem porta de entrada nem prova forte: alto padrão raramente
+  converte em tráfego frio.'
+- 'Quem aprova anúncios leva mais de 2 dias ou não tem substituto: campanha parada e criativo vencido.'
+- 'Promessa de resultado garantido em área regulada (saúde, advocacia, finanças): risco legal antes de risco de mídia.'
+- 'Nenhuma prova utilizável (nem número com fonte nem depoimento autorizado): o anúncio vai prometer sem sustentar.'

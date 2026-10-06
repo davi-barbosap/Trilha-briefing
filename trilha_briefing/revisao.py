@@ -24,6 +24,7 @@ Nivel = Literal["bloqueia", "atencao", "sugestao"]
 NIVEIS: tuple[Nivel, ...] = ("bloqueia", "atencao", "sugestao")
 PALAVRAS_VAGAS = re.compile(r"\b(melhor(es)?|qualidade|excelencia|excelente|incrivel|lider|unico no mercado)\b")
 TOLERANCIA_TICKET = 0.10
+TOLERANCIA_FECHAMENTO = 0.1  # a economia pode supor até 10% acima do que a empresa fecha hoje
 
 
 @dataclass(frozen=True)
@@ -84,6 +85,13 @@ def _consistencia(c: ClienteCompleto, avisos: list[Aviso]) -> None:
         if base and abs(ticket - base) / base > TOLERANCIA_TICKET:
             avisos.append(Aviso("atencao", f"ticket da oferta principal ({_brl(ticket)}) diferente do usado na economia "
                                            f"({_brl(base)}): os tetos de custo partem de um valor que não é o vendido"))
+    contatos, vendas = b.negocio.contatos_mes, b.negocio.vendas_mes
+    if e and contatos and vendas is not None:
+        hoje = vendas / contatos
+        if e.taxa_fechamento > hoje * (1 + TOLERANCIA_FECHAMENTO):
+            avisos.append(Aviso("atencao", f"a economia supõe fechar {e.taxa_fechamento:.0%} dos contatos, mas hoje a "
+                                           f"empresa fecha {hoje:.0%} ({vendas} de {contatos} por mês). Contato de anúncio "
+                                           "costuma fechar menos que indicação: os tetos de custo estão otimistas"))
     maximo, teto = b.restricoes.verba_mensal_max, est.orcamento.teto_mensal
     if maximo and teto and maximo != teto:
         avisos.append(Aviso("atencao", f"teto de verba diferente: briefing diz {_brl(maximo)}, estratégia diz {_brl(teto)}"))

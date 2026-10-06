@@ -25,7 +25,7 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 
 | Etapa | Arquivo | Pergunta | Quem preenche |
 |---|---|---|---|
-| Kickoff | `briefing.yaml` | O que o cliente quer, como vende hoje, o que já tentou, o que não pode? | cliente (questionário) + assessor |
+| Kickoff | `briefing.yaml` | O que o cliente quer, como vende hoje, o que já tentou, o que não pode? | cliente (formulário) + assessor |
 | Pesquisa | `pesquisa.yaml` | Quem compra, por quê, o que trava; concorrentes, SWOT, sazonalidade, maturidade | assessor, com escuta real |
 | Marca | `plataforma.yaml` | Como quer ser lembrada, como fala, sobre o que fala | assessor + cliente |
 | Provas | `provas.yaml` | O que sustenta cada promessa (com fonte e autorização) | cliente fornece, assessor organiza |
@@ -36,10 +36,25 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 
 ## Ferramentas por etapa
 
-**Kickoff.** 77 perguntas em três momentos:
-- ★ **cliente:** o cliente responde sozinho antes da reunião (`questionario`, cerca de 30 minutos);
-- ● **reunião:** aprofundar com o dono e com quem atende (`questionario --para reuniao`, cerca de 90 minutos);
+**Kickoff.** O questionário tem três momentos (`trilha_briefing/questionario/perguntas.yaml`, editável):
+- ★ **cliente:** o cliente responde sozinho, no formulário (`questionario --formulario`).
+  - São cerca de 80 perguntas visíveis e outras que só aparecem pelo ramo ou por uma resposta anterior. Levam cerca de 40 minutos, com progresso salvo, e "não sei" é uma resposta aceita.
+  - As respostas entram com `importar-respostas`.
+- ● **reunião:** aprofundar com o dono e com quem atende (`questionario --para reuniao`, cerca de 90 minutos). É aqui que entram o que pede conversa: a história e a crença da marca, a big idea, os diferenciais com o "e daí?" e a visita aos bastidores.
 - ◆ **assessor:** o que você levanta com acessos, dados e escuta (`questionario --para assessor` mostra tudo, com o campo de cada pergunta).
+
+Como formular as perguntas:
+- **A linguagem é a do dono:** sem jargão.
+- **Uma coisa por pergunta.**
+- **Fato no lugar de taxa:** contatos e vendas por mês, e não "quantos de 10 fecham". A taxa sai da conta, e a revisão avisa quando a economia supõe fechar mais do que a empresa fecha hoje.
+- **As palavras exatas do cliente,** sem nome.
+- **Quem sabe responde:** o técnico fica com o assessor.
+
+As regras completas estão no topo do `perguntas.yaml`. Por que formulário próprio, e não Google Forms: [decisão 002](decisoes/002-questionario-e-formulario.md).
+
+**Ponto crítico.** O formulário é longo de propósito: é ele que poupa a primeira reunião de virar entrevista. Mas comprimento cobra adesão.
+- **Se o cliente desistir no meio:** o que ele já respondeu está salvo, e o resto vira pauta da reunião.
+- **Se acontecer sempre:** corte perguntas no `perguntas.yaml`, em vez de aceitar respostas pela metade.
 
 Também entram:
 - o mapa de stakeholders por influência × interesse;

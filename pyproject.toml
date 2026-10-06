@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trilha-briefing"
-version = "0.4.1"
+version = "0.5.0"
 description = "Briefing, marca e estratégia por cliente: entender o cliente antes de anunciar"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.5", "pyyaml>=6"]
 
 [tool.setuptools]
-packages = ["trilha_briefing"]
+packages = ["trilha_briefing", "trilha_briefing.questionario"]
 
 [tool.setuptools.package-data]
 trilha_briefing = ["modelo/*", "modelo/ofertas/*", "regras/*"]
+"trilha_briefing.questionario" = ["*.yaml"]

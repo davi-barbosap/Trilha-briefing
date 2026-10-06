@@ -127,11 +127,16 @@ class Area(_Base):
 
 
 class Negocio(_Base):
+    """Como a empresa vende hoje. Os números de hoje (contatos e vendas por mês) são a base contra a qual a economia
+    é conferida: a taxa sai da conta, não do palpite."""
+
     o_que_vende: str
     modelo_receita: Literal["venda_direta", "comissao", "recorrencia"]
     tipo_compra: Literal["necessidade", "desejo", "misto"]  # necessidade puxa busca; desejo puxa descoberta
     como_vende_hoje: list[str] = Field(default_factory=list)  # indicação, loja, WhatsApp, representante…
     ciclo_venda_dias: int | None = None
+    contatos_mes: int | None = Field(default=None, ge=0)  # contatos novos num mês normal, hoje, somando os canais
+    vendas_mes: int | None = Field(default=None, ge=0)  # vendas (ou clientes novos) num mês normal, hoje
     time_comercial: str = ""  # quem atende o lead, quantas pessoas, que papéis
     crm: str = ""
     marketplaces: list[str] = Field(default_factory=list)  # onde a categoria já é comprada (iFood, Mercado Livre…)
