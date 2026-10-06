@@ -58,6 +58,16 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
 
 ## Como faz
 
+- **Padrão de texto da Trilha.** As afirmações das ofertas que viram copy (promessa, chamada, diferenciais, benefícios) passam pelo mesmo padrão do Trilha-copy:
+  - termos e promessas proibidos, inclusive os do segmento;
+  - garantia de resultado;
+  - prazo sem urgência real;
+  - promessa de ganho sem ressalva;
+  - autoelogio;
+  - adjetivo sem fato.
+
+  O padrão mora no Trilha-copy; aqui fica a cópia das listas, conferida na CI ([contrato](docs/contrato.md#padrão-de-texto)).
+
 - **Origem de cada afirmação.** Toda afirmação importante diz de onde veio (`fonte`: empresa, consumidor, mercado, dados, assessor) e se já foi confirmada (`status`: hipótese, validada, refutada). A opinião do dono não passa como voz do consumidor.
 - **Escuta antes da estratégia.** A aprovação exige registro de escuta e uma objeção vinda dela para cada persona da oferta principal.
 - **Economia antes da verba.** As metas saem da economia unitária, com as mesmas fórmulas do Trilha-ads; um teste de contrato confere que os números batem.
@@ -130,7 +140,7 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
 
 ## Situação atual
 
-Versão 0.5.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
+Versão 0.5.1, em uso no exemplo e sem cliente real ainda. Próximos passos:
 - o caminho de volta dos resultados do Trilha-ads para as hipóteses e as personas;
 - o Trilha-ads comparar o plano com o que está rodando, quando houver coleta.
 
