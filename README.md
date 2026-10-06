@@ -28,7 +28,9 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, 
 | Comando | O que faz |
 |---|---|
 | `novo <id>` | Cria a pasta do cliente a partir do modelo comentado. |
-| `questionario` | Gera as perguntas do briefing em três momentos. ★ É o questionário que o cliente responde sozinho, em uns 30 minutos (`--para cliente`). ● É o roteiro da reunião de kickoff e da escuta (`--para reuniao`). ◆ É o que o assessor levanta com dados. A versão `--para assessor` mostra o momento e o campo que cada pergunta preenche. |
+| `questionario --formulario arquivo.html` | Gera o **formulário do cliente** (★) num arquivo HTML só. Abre em qualquer navegador e salva o progresso no aparelho. Mostra as perguntas do ramo do cliente, por condição. No fim, o cliente baixa ou copia as respostas e envia para você. Gerado sem `--cliente`, serve para todos: publicado num endereço, o nome vai no link (`?cliente=Nome&quem=Davi`). |
+| `importar-respostas <respostas.json\|-> <pasta>` | Leva as respostas para a pasta do cliente. Guarda o original em `respostas/` e preenche sozinho os campos simples (como hipótese, `fonte: empresa`), sem sobrescrever o que já tem valor. O que não cabe vai numa lista "levar à mão", com o destino e o motivo. `-` lê o texto que o cliente copiou e colou. |
+| `questionario [--para cliente\|reuniao\|assessor]` | O questionário em Markdown. ★ cliente; ● roteiro do kickoff e da escuta; ◆ tudo, com o campo que cada pergunta preenche. As perguntas ficam em `trilha_briefing/questionario/perguntas.yaml`, editável e conferido contra o esquema. |
 | `validar` | Confere o esquema de todos os arquivos e as referências entre eles: personas e ofertas citadas existem, ids não se repetem e a pasta tem o nome do cliente. |
 | `lacunas` | Mostra o que falta em cada etapa e o que bloqueia a aprovação da estratégia. |
 | `revisar` | Dá avisos em três gravidades e sai com erro se algo bloqueia (lista abaixo). |
@@ -124,11 +126,11 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
 - **Não decide.** Sugere a ordem dos canais e confere a consistência; quem decide é o assessor, com o cliente.
 - **Não espelha a conta de anúncios.** O plano registra decisões; a estrutura real fica nas plataformas e quem compara é o Trilha-ads (quando houver coleta).
 - **Ainda não recebe os resultados de volta.** O resultado de cada hipótese é registrado à mão em `hipoteses.yaml`.
-- **O questionário é Markdown:** as respostas do cliente são transcritas à mão para os arquivos.
+- **Não monta persona, oferta nem prova sozinho.** O formulário traz a matéria-prima (clientes reais, dúvidas, frases, provas), mas organizar isso é trabalho do assessor, depois da escuta.
 
 ## Situação atual
 
-Versão 0.4.1, em uso no exemplo e sem cliente real ainda. Próximos passos:
+Versão 0.5.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
 - o caminho de volta dos resultados do Trilha-ads para as hipóteses e as personas;
 - o Trilha-ads comparar o plano com o que está rodando, quando houver coleta.
 
@@ -140,7 +142,9 @@ pip install -e .
 # Clientes reais ficam no Trilha-clientes (privado), pasta briefing/
 cd ../Trilha-clientes
 python -m trilha_briefing novo minha-cliente --pasta briefing
-python -m trilha_briefing questionario --cliente "Minha Cliente" > questionario.md   # ★ envie ao cliente
+python -m trilha_briefing questionario --formulario questionario-minha-cliente.html --cliente "Minha Cliente" --quem-recebe "Seu nome"
+#   ★ envie o arquivo (ou o link do formulário publicado); o cliente devolve um .json
+python -m trilha_briefing importar-respostas respostas-minha-cliente.json briefing/minha-cliente
 python -m trilha_briefing questionario --para reuniao           # ● roteiro do kickoff e da escuta
 python -m trilha_briefing questionario --para assessor          # tudo, com o momento e o campo de cada pergunta
 

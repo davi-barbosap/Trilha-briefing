@@ -22,6 +22,8 @@ negocio:
   tipo_compra: misto              # necessidade (puxa busca) | desejo (puxa descoberta) | misto
   como_vende_hoje: []
   ciclo_venda_dias: null
+  contatos_mes: null              # contatos novos num mês normal, hoje (todos os canais)
+  vendas_mes: null                # vendas ou clientes novos num mês normal, hoje
   time_comercial: ""
   crm: ""
   marketplaces: []                # onde a categoria já é comprada (iFood, Mercado Livre, Doctoralia…)

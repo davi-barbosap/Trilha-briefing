@@ -2,6 +2,8 @@
 
     python -m trilha_briefing novo <id>                       cria clientes/<id>/ a partir do modelo
     python -m trilha_briefing questionario [--para cliente|reuniao|assessor]   perguntas do briefing
+    python -m trilha_briefing questionario --formulario questionario.html [--cliente "Nome"] [--quem-recebe "Davi"]
+    python -m trilha_briefing importar-respostas <respostas.json|-> <pasta>   respostas do formulário → pasta do cliente
     python -m trilha_briefing validar <pasta>                 confere o esquema de todos os arquivos
     python -m trilha_briefing lacunas <pasta>                 o que falta por etapa e o que bloqueia a aprovação
     python -m trilha_briefing revisar <pasta>                 avisos críticos (promessa, prova, verba, canais…)
@@ -23,6 +25,8 @@ from pathlib import Path
 
 from trilha_briefing import campanhas as plano_campanhas
 from trilha_briefing import questionario
+from trilha_briefing.questionario import importar as importacao
+from trilha_briefing.questionario.formulario import gerar_formulario
 from trilha_briefing.apresentar import apresentar
 from trilha_briefing.ciclo import fechar_ciclo
 from trilha_briefing.canais import recomendacoes_gerais, sugerir
@@ -57,13 +61,36 @@ def cmd_novo(a) -> int:
     shutil.copytree(MODELO, destino)
     briefing = destino / "briefing.yaml"
     briefing.write_text(briefing.read_text(encoding="utf-8").replace("ID_DO_CLIENTE", a.id), encoding="utf-8")
-    print(f"✓ {destino} criado. Próximo passo: python -m trilha_briefing questionario --cliente \"Nome\" > questionario.md")
+    print(f"✓ {destino} criado. Próximos passos:\n"
+          f"  1. python -m trilha_briefing questionario --formulario questionario-{a.id}.html --cliente \"Nome\"\n"
+          f"     mande o arquivo (ou o link do formulário publicado) para o cliente responder\n"
+          f"  2. python -m trilha_briefing importar-respostas respostas.json {destino}")
     return 0
 
 
 def cmd_questionario(a) -> int:
+    if a.formulario:
+        destino = Path(a.formulario)
+        destino.write_text(gerar_formulario(a.cliente, a.quem_recebe), encoding="utf-8")
+        print(f"✓ {destino}: formulário do cliente ({len(questionario.perguntas('cliente'))} perguntas). Abre em qualquer "
+              f"navegador, salva o progresso no aparelho e devolve um arquivo de respostas para importar-respostas.")
+        return 0
     print(questionario.gerar(a.cliente, para="assessor" if a.assessor else a.para))
     return 0
+
+
+def cmd_importar_respostas(a) -> int:
+    try:
+        # "-": o cliente usou "Copiar respostas" e o texto veio colado (pbpaste | … importar-respostas - <pasta>)
+        respostas = importacao.ler_texto(sys.stdin.read()) if a.respostas == "-" else a.respostas
+        rel = importacao.importar(respostas, a.pasta)
+    except importacao.RespostasInvalidas as e:
+        print(f"✗ {e}")
+        return 1
+    print(importacao.em_texto(rel), end="")
+    if not rel.erro:
+        print(f"Próximo passo: python -m trilha_briefing lacunas {a.pasta}")
+    return 1 if rel.erro else 0
 
 
 def cmd_validar(a) -> int:
@@ -236,7 +263,12 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("questionario"); s.add_argument("--cliente", default="")
     s.add_argument("--para", choices=["cliente", "reuniao", "assessor"], default="cliente")
     s.add_argument("--assessor", action="store_true", help="o mesmo que --para assessor")
+    s.add_argument("--formulario", metavar="ARQUIVO.html", help="gera o formulário do cliente (★) num HTML só")
+    s.add_argument("--quem-recebe", default="a sua assessoria", help="para quem o cliente envia as respostas")
     s.set_defaults(f=cmd_questionario)
+    s = sub.add_parser("importar-respostas", help="leva as respostas do formulário para a pasta do cliente")
+    s.add_argument("respostas", help="arquivo .json baixado do formulário, ou - para colar o texto copiado")
+    s.add_argument("pasta"); s.set_defaults(f=cmd_importar_respostas)
     for nome, f in (("validar", cmd_validar), ("lacunas", cmd_lacunas), ("revisar", cmd_revisar),
                     ("economia", cmd_economia), ("canais", cmd_canais), ("grade", cmd_grade)):
         s = sub.add_parser(nome); s.add_argument("pasta"); s.set_defaults(f=f)

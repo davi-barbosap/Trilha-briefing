@@ -1,5 +1,41 @@
 # Mudanças
 
+## 0.5.0 — questionário reformulado e formulário do cliente (out/2026)
+
+### Novo
+- **As perguntas viraram dado** (`trilha_briefing/questionario/perguntas.yaml`), conferido ao carregar:
+  - o campo existe no esquema;
+  - as opções cabem no campo;
+  - a condição cita uma pergunta anterior que o cliente vê, com valores que ela tem.
+
+  As regras para formular perguntas novas ficam no topo do arquivo.
+- **Questionário reformulado:** 203 perguntas.
+  - **Por momento:** 105 do cliente (cerca de 80 visíveis, o resto por condição), 58 da reunião e 40 do assessor.
+  - **No formulário:** 27 perguntas de escolha. Só 11 são obrigatórias, e cada pergunta tem ajuda com exemplo.
+  - **Genérico:** a primeira pergunta é o tipo de negócio, e as perguntas de saúde, imóveis, B2B, educação, produto digital, e-commerce e veículos só aparecem para quem é do ramo.
+  - **Fatos no lugar de taxas:** contatos e vendas por mês. A margem vem como "de cada R$ 100", e a verba de teste como limite de perda.
+  - **O técnico** (acessos, rastreamento, IDs do CRM) foi para o assessor.
+  - **O abstrato** (história e crença da marca, big idea, "e daí?") foi para a reunião.
+- **`questionario --formulario`:** formulário do cliente num HTML só.
+  - Progresso salvo no aparelho, uma parte por bloco, perguntas condicionais e "não sei, prefiro falar na reunião".
+  - No fim, a revisão das obrigatórias e as respostas para baixar ou copiar.
+  - Gerado sem cliente, aceita o nome no link (`?cliente=…&quem=…`), para publicar num endereço só.
+  - Testado em tela de celular no Chromium.
+- **`importar-respostas <arquivo|-> <pasta>`:**
+  - guarda as respostas em `respostas/<data>-questionario.json` e `.md`;
+  - preenche sozinho os campos simples, como hipótese (`fonte: empresa`), sem reescrever o arquivo (os comentários ficam) e sem sobrescrever valor existente;
+  - confere cada campo contra o esquema, e o que não cabe vai para "levar à mão" com o motivo (ex.: WhatsApp fora do padrão, bloco de economia incompleto);
+  - se a pasta ficaria inválida, nada é gravado.
+
+  No teste de ponta a ponta, 44 campos foram preenchidos sozinhos numa pasta nova.
+- **Tipo `telefone`:** "(11) 98765-4321" vira `5511987654321`.
+- **`briefing.negocio.contatos_mes` e `vendas_mes`:** a revisão avisa quando a economia supõe fechar mais do que a empresa fecha hoje.
+
+### Mudou
+- `questionario` em Markdown mostra quando uma pergunta é condicional.
+- O `novo` indica o formulário e a importação como próximos passos.
+- Decisão registrada em [docs/decisoes/002](docs/decisoes/002-questionario-e-formulario.md).
+
 ## 0.4.1 — plano de campanhas chega à copy (out/2026)
 
 - **`exportar --para copy`** leva o bloco `veiculacao`: onde cada célula vira anúncio (plataforma, campanha, conjunto), com o nome do anúncio e os parâmetros de URL já resolvidos pelas regras de nomes do plano. O Trilha-copy só preenche o código e a versão da peça e gera a lista de subida. Antes, o nome e a UTM de cada anúncio eram montados à mão na hora de subir, longe do plano.
