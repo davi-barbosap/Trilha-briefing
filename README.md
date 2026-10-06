@@ -45,6 +45,8 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, 
 | `plano [--sugerir]` | Mostra o **plano de campanhas** em números: verba de cada campanha, quantos eventos ela compra por semana no teto de custo, quantos conjuntos cabem para sair do aprendizado, os testes e o prazo para concluir, os nomes e UTMs, e o que cada campanha precisa para mudar de fase. `--sugerir` grava um rascunho a partir dos canais, da grade, da verba e da economia. |
 | `apresentar` | Gera o plano em HTML para o cliente. O que ainda não foi validado aparece marcado como hipótese; afirmações refutadas e riscos marcados como internos ficam de fora. |
 | `fechar-ciclo --nome 2026-T4` | Guarda uma cópia do estado e um resumo antes da revisão trimestral. |
+| `registrar-resultados <retorno.yaml> <pasta>` | **O caminho de volta.** Lê o retorno do Trilha-ads (`ads/<id>/retornos/`): o resultado de cada código de criativo e os motivos de perda do período. Liga os códigos às hipóteses, registra a medição (conversões da variação mais fraca, `rodando`) e diz quais já têm volume para decidir. Guarda uma cópia em `resultados/`. |
+| `decidir <pasta> <hipotese> validada\|refutada\|inconclusiva --aprendizado "…"` | Registra a decisão do assessor e o aprendizado, que vão para a copy na próxima exportação. |
 
 ### 3. Exportação: o contrato com as outras ferramentas
 
@@ -135,13 +137,13 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
 - **Não lê as contas de anúncio nem o Kommo.** Isso é do Trilha-ads.
 - **Não decide.** Sugere a ordem dos canais e confere a consistência; quem decide é o assessor, com o cliente.
 - **Não espelha a conta de anúncios.** O plano registra decisões; a estrutura real fica nas plataformas e quem compara é o Trilha-ads (quando houver coleta).
-- **Ainda não recebe os resultados de volta.** O resultado de cada hipótese é registrado à mão em `hipoteses.yaml`.
+- **Não decide o teste.** Mede, diz se há volume e mostra o critério combinado; validar ou refutar é decisão do assessor (`decidir`).
 - **Não monta persona, oferta nem prova sozinho.** O formulário traz a matéria-prima (clientes reais, dúvidas, frases, provas), mas organizar isso é trabalho do assessor, depois da escuta.
 
 ## Situação atual
 
-Versão 0.5.1, em uso no exemplo e sem cliente real ainda. Próximos passos:
-- o caminho de volta dos resultados do Trilha-ads para as hipóteses e as personas;
+Versão 0.6.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
+- os motivos de perda do retorno sugerirem objeções nas personas e nas ofertas (hoje o relatório lista, e o assessor registra);
 - o Trilha-ads comparar o plano com o que está rodando, quando houver coleta.
 
 ## Como usar
@@ -171,6 +173,10 @@ python -m trilha_briefing exportar  briefing/minha-cliente --para copy   --saida
 python -m trilha_briefing exportar  briefing/minha-cliente --para trilha --saida ads                    # ads/minha-cliente/...
 python -m trilha_briefing exportar  briefing/minha-cliente --para lp --oferta X --saida lp/minha-cliente # lp/minha-cliente/X-meta/...
 python -m trilha_briefing apresentar briefing/minha-cliente     # dist/minha-cliente/plano.html (não versionar)
+
+# O caminho de volta: o retorno do Trilha-ads nas hipóteses
+python -m trilha_briefing registrar-resultados ads/minha-cliente/retornos/2026-10-01_2026-10-31.yaml briefing/minha-cliente
+python -m trilha_briefing decidir briefing/minha-cliente h01-gancho validada --aprendizado "…"
 
 python -m trilha_briefing fechar-ciclo briefing/minha-cliente --nome 2026-T4
 ```

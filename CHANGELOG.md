@@ -1,5 +1,14 @@
 # Mudanças
 
+## 0.6.0 — caminho de volta do Trilha-ads (out/2026)
+
+- **`registrar-resultados <retorno.yaml> <pasta>`:** lê o retorno do período que o Trilha-ads grava em `ads/<id>/retornos/` (contrato `retorno`).
+  - **O que faz:** liga cada código de criativo às hipóteses, conta no evento de cada uma e registra a medição em `hipoteses.yaml`: `conversoes_obtidas` (a variação mais fraca) e `rodando`, sem reescrever o arquivo.
+  - **O que mostra:** quais hipóteses já têm volume para decidir e quais ainda não, quando as variações não são códigos e o retorno não separa, e os motivos de perda mais comuns.
+  - **O que guarda:** uma cópia do retorno em `resultados/`, no Trilha-clientes.
+- **`decidir <pasta> <hipotese> validada|refutada|inconclusiva --aprendizado "…"`:** registra a decisão do assessor. O aprendizado é obrigatório para validar ou refutar e vai para a copy na próxima exportação.
+- **Editor de YAML:** edita um campo de um item de lista pelo `id` (`hipoteses[id].resultado`), mantendo os comentários. Identificadores simples saem sem aspas.
+
 ## 0.5.1 — padrão de texto da Trilha (out/2026)
 
 - **O padrão de texto** mora no Trilha-copy (`trilha_copy/regras/padrao.yaml`). O briefing guarda a cópia das listas que usa em `trilha_briefing/regras/padrao-vocabularios.yaml`, e `tests/test_padrao.py` confere a cópia lista a lista contra o Trilha-copy na CI.

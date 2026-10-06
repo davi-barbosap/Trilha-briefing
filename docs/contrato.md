@@ -67,6 +67,18 @@ O que não é utilizável nem chega à ferramenta de copy: um depoimento sem aut
 
 Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto. Bloco novo e opcional não sobe a versão: a copy ignora o que ainda não conhece.
 
+## Do Trilha-ads de volta — `registrar-resultados`
+
+O Trilha-ads grava `ads/<id>/retornos/<inicio>_<fim>.yaml` (contrato `retorno`, versão 1). O briefing aceita só as versões que conhece.
+
+| Bloco | O que é | O que o briefing faz |
+|---|---|---|
+| `cliente`, `periodo` | o id do cliente e o período medido | recusa retorno de outro cliente; o período nomeia a cópia em `resultados/` |
+| `por_codigo` | por código de criativo: leads, qualificados, agendamentos, comparecimentos, vendas; com gasto, os custos | liga às hipóteses pelo `codigos` e conta no evento de cada uma (`evento` ou a métrica principal) |
+| `motivos_perda` | motivo do Kommo, categoria do playbook e quantos leads | lista os mais comuns no relatório, para o assessor registrar as objeções reais |
+
+Uma hipótese é comparável pelo retorno quando cada variação é um código (`variacoes` igual ao número de `codigos`). Quando as variações estão dentro de um código (página × WhatsApp no mesmo anúncio), o retorno não separa e o relatório diz isso. `tests/test_resultados.py` gera um retorno com o código do Trilha-ads e o registra aqui.
+
 ## Teste de contrato
 
 `tests/test_contrato.py` exporta o exemplo e valida o resultado com o código real dos outros repositórios:
