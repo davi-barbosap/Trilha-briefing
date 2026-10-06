@@ -14,6 +14,8 @@
     python -m trilha_briefing exportar <pasta> --para trilha|lp|copy [--saida dist]
     python -m trilha_briefing apresentar <pasta> [--saida dist]
     python -m trilha_briefing fechar-ciclo <pasta> --nome 2026-T4   guarda o estado antes da revisão trimestral
+    python -m trilha_briefing registrar-resultados <retorno.yaml> <pasta>   o retorno do Trilha-ads nas hipóteses
+    python -m trilha_briefing decidir <pasta> <hipotese> validada|refutada|inconclusiva --aprendizado "…"
 """
 
 from __future__ import annotations
@@ -21,10 +23,11 @@ from __future__ import annotations
 import argparse
 import shutil
 import sys
+from datetime import date
 from pathlib import Path
 
 from trilha_briefing import campanhas as plano_campanhas
-from trilha_briefing import questionario
+from trilha_briefing import questionario, resultados
 from trilha_briefing.questionario import importar as importacao
 from trilha_briefing.questionario.formulario import gerar_formulario
 from trilha_briefing.apresentar import apresentar
@@ -256,6 +259,27 @@ def cmd_fechar_ciclo(a) -> int:
     return 0
 
 
+def cmd_registrar_resultados(a) -> int:
+    try:
+        rel = resultados.registrar(a.retorno, a.pasta)
+    except resultados.RetornoInvalido as e:
+        print(f"✗ {e}")
+        return 1
+    print(resultados.em_texto(rel), end="")
+    return 1 if rel.erro else 0
+
+
+def cmd_decidir(a) -> int:
+    try:
+        mudou = resultados.decidir(a.pasta, a.hipotese, a.resultado, a.aprendizado or "", a.fim)
+    except ValueError as e:
+        print(f"✗ {e}")
+        return 1
+    print("✓ " + "; ".join(mudou))
+    print(f"Próximo passo: python -m trilha_briefing exportar {a.pasta} --para copy (o aprendizado vai para a copy)")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="trilha_briefing", description="Briefing, marca e estratégia por cliente")
     sub = ap.add_subparsers(dest="comando", required=True)
@@ -281,6 +305,13 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("fechar-ciclo"); s.add_argument("pasta"); s.add_argument("--nome", required=True)
     s.set_defaults(f=cmd_fechar_ciclo)
     s = sub.add_parser("apresentar"); s.add_argument("pasta"); s.add_argument("--saida", default="dist"); s.set_defaults(f=cmd_apresentar)
+    s = sub.add_parser("registrar-resultados", help="o retorno do Trilha-ads (ads/<id>/retornos) nas hipóteses")
+    s.add_argument("retorno"); s.add_argument("pasta"); s.set_defaults(f=cmd_registrar_resultados)
+    s = sub.add_parser("decidir", help="registra a decisão sobre uma hipótese, com o aprendizado")
+    s.add_argument("pasta"); s.add_argument("hipotese"); s.add_argument("resultado", choices=resultados.DECISOES)
+    s.add_argument("--aprendizado", help="o que aprendemos: vai para a copy e para a próxima rodada")
+    s.add_argument("--fim", type=date.fromisoformat, help="data da decisão (padrão: hoje)")
+    s.set_defaults(f=cmd_decidir)
     a = ap.parse_args(argv)
     return a.f(a)
 

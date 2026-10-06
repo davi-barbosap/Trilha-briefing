@@ -112,9 +112,15 @@ Também entram:
 ## Ciclo
 
 - **Semanal:** fica no Trilha-ads (dossiê, raio-x do funil, relatório). Esta ferramenta não repete esses números.
+- **A cada período de teste:**
+  - o Trilha-ads grava o retorno (`raio-x … --retorno ads/<id>/retornos`);
+  - `registrar-resultados` liga os códigos às hipóteses e diz quais têm volume para decidir;
+  - o assessor decide contra o critério combinado (`decidir … --aprendizado`), e o aprendizado vai para a copy.
+
+  Decidir antes do volume mínimo é ler ruído: a ferramenta avisa, mas não impede.
 - **Trimestral:**
   - `fechar-ciclo --nome 2026-T4` guarda uma cópia do estado e um resumo em `historico/`;
-  - atualize as hipóteses com os resultados;
+  - confira se nenhuma hipótese ficou `rodando` sem retorno registrado;
   - troque `estimados` da economia por taxas reais do CRM;
   - promova a `validada` o que a escuta e os dados confirmaram;
   - revise canais e grade;
