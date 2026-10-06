@@ -5,7 +5,7 @@ Briefing, marca e estratégia por cliente. É a ferramenta que guia o assessor a
 Serve para qualquer segmento. O exemplo (`clientes/_exemplo/`) é uma escola de inglês fictícia.
 
 O que sai daqui alimenta as outras ferramentas:
-- [Trilha](https://github.com/davi-barbosap/Trilha) recebe `marca.yaml`, `ofertas/` e a economia do `perfil.yaml`;
+- [Trilha-ads](https://github.com/davi-barbosap/Trilha-ads) recebe `marca.yaml`, `ofertas/` e a economia do `perfil.yaml`;
 - [Trilha-LP](https://github.com/davi-barbosap/Trilha-LP) recebe o rascunho do `pagina.yaml`;
 - [Trilha-copywritter](https://github.com/davi-barbosap/Trilha-copywritter) recebe o `copy.yaml`, com tudo o que a copy pode usar;
 - o cliente recebe a apresentação do plano em HTML.
