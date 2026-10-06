@@ -1,6 +1,6 @@
 # Contrato com o Trilha e a Trilha-LP
 
-O trilha-briefing é a fonte. O Trilha e a Trilha-LP recebem arquivos gerados por ele. O contrato é de dados, não de código: nenhum dos repositórios importa o outro.
+O trilha-briefing é a fonte. O Trilha-ads e a Trilha-LP recebem arquivos gerados por ele. O contrato é de dados, não de código: nenhum dos repositórios importa o outro.
 
 Os arquivos exportados trazem no topo o comentário "edite lá, não aqui". Uma mudança feita direto no arquivo gerado se perde na próxima exportação.
 
