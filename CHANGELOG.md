@@ -1,5 +1,18 @@
 # Mudanças
 
+## 0.5.1 — padrão de texto da Trilha (out/2026)
+
+- **O padrão de texto** mora no Trilha-copy (`trilha_copy/regras/padrao.yaml`). O briefing guarda a cópia das listas que usa em `trilha_briefing/regras/padrao-vocabularios.yaml`, e `tests/test_padrao.py` confere a cópia lista a lista contra o Trilha-copy na CI.
+- **Termos casam como palavra inteira:** "corra" não pega mais "ocorra". Antes, o briefing procurava o termo dentro das palavras.
+- **Regras novas no texto das ofertas:**
+  - garantia de resultado (bloqueia);
+  - prazo ou vaga no texto sem urgência ou escassez reais (bloqueia);
+  - promessa de ganho com número e sem ressalva;
+  - autoelogio;
+  - lista de promessas proibidas do segmento (imobiliário pelo playbook; saúde pelos registros profissionais).
+- **Adjetivo sem fato** usa a lista do padrão (mais ampla: "ótima localização", "perto de tudo", "profissionais qualificados"…) e a de prova vaga ("milhares de clientes").
+- **`exportar --para copy`** leva `preco`, a regra comercial por canal, para a copy conferir o preço no anúncio e na página.
+
 ## 0.5.0 — questionário reformulado e formulário do cliente (out/2026)
 
 ### Novo

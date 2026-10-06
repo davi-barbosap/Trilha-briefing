@@ -53,6 +53,7 @@ Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferra
 |---|---|---|
 | `cliente` | `briefing.yaml` | id, nome, segmento, playbook, WhatsApp, área |
 | `voz`, `posicionamento` | `plataforma.yaml` | inclui `voz.intensidade`, o termostato de 1 a 5 |
+| `preco` | `plataforma.yaml` | regra comercial por canal (anuncio, whatsapp, landing → nunca, a_partir_de, parcela, valor_cheio): a revisão da copy confere o preço no anúncio e na página |
 | `identidade_visual` | `plataforma.yaml` | cores, tipografia, logo e estilo de imagem: vão no briefing do criativo de cada peça, para a equipe de criação |
 | `compliance` | `plataforma.yaml` + `briefing.restricoes` | termos e promessas proibidas, registros, avisos, regras legais, o que não pode |
 | `personas`, `nao_atender` | `pesquisa.yaml` | com medos, crenças (método, interna, externa), micro-problemas, frases literais, sofisticação |
@@ -88,3 +89,7 @@ O `codigo` de cada célula da grade (`estrategia.grade`) é o código do criativ
 - é lido pelo raio-x do Trilha-ads (`codigo_criativo`).
 
 Use o mesmo código nas três pontas.
+
+## Padrão de texto
+
+As regras de texto público (termos proibidos, garantia de resultado, urgência, promessa de ganho, adjetivo vago…) moram no Trilha-copy, em `trilha_copy/regras/padrao.yaml`. O briefing guarda em `trilha_briefing/regras/padrao-vocabularios.yaml` só as listas que a revisão dele usa, e `tests/test_padrao.py` confere essa cópia contra o Trilha-copy na CI. Mudou lá? Copie para cá.
