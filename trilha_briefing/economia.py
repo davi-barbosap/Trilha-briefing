@@ -1,7 +1,7 @@
 """Quanto o cliente pode pagar por resultado, quanto custa validar e por qual evento dá para otimizar.
 
-As fórmulas são as do Trilha (`trilha/core/economia.py`, núcleo §3.1). Se mudarem lá, mudam aqui:
-a estratégia não pode prometer um teto de custo que o Trilha depois calcula diferente.
+As fórmulas são as do Trilha-ads (`trilha/core/economia.py`, núcleo §3.1). Se mudarem lá, mudam aqui:
+a estratégia não pode prometer um teto de custo que o Trilha-ads depois calcula diferente.
 """
 
 from __future__ import annotations

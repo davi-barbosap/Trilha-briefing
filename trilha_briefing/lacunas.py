@@ -5,6 +5,7 @@ Lacuna é informação que ainda não existe. Não é julgamento de qualidade: i
 
 from __future__ import annotations
 
+from trilha_briefing.campanhas import CANAIS_SEM_MIDIA, ErroRegras, regras_do_plano
 from trilha_briefing.esquema import FONTES_DE_ESCUTA, ClienteCompleto, Persona
 from trilha_briefing.revisao import bloqueantes
 
@@ -174,7 +175,7 @@ def _estrategia(c: ClienteCompleto) -> list[str]:
     if not e.krs:
         f.append("resultados-chave (krs)")
     if e.economia is None:
-        f.append("economia unitária (mesmos campos do perfil.yaml do Trilha)")
+        f.append("economia unitária (mesmos campos do perfil.yaml do Trilha-ads)")
     o = e.orcamento
     if o.verba_validacao is None or o.semanas_validacao is None:
         f.append("verba e prazo de validação: o máximo que o cliente aceita perder até saber se funciona")
@@ -192,7 +193,14 @@ def _estrategia(c: ClienteCompleto) -> list[str]:
         f.append("marcos")
     if e.medicao.pendentes():
         f.append(f"medição não pronta: {', '.join(e.medicao.pendentes())}")
+    if _falta_plano(c):
+        f.append(f"plano de campanhas (campanhas.yaml): python -m trilha_briefing plano {c.pasta} --sugerir")
     return f
+
+
+def _falta_plano(c: ClienteCompleto) -> bool:
+    pagos = [cp for cp in c.estrategia.canais if cp.status in ("ativo", "teste") and cp.canal not in CANAIS_SEM_MIDIA]
+    return bool(pagos) and not c.campanhas.campanhas
 
 
 VERIFICADORES = {
@@ -228,5 +236,11 @@ def bloqueios_aprovacao(c: ClienteCompleto) -> list[str]:
         b.append("nenhuma prova utilizável (número com fonte ou depoimento autorizado)")
     if not any(cp.status == "ativo" for cp in e.canais):
         b.append("nenhum canal ativo")
+    try:
+        exige_plano = regras_do_plano(c.campanhas).plano.obrigatorio_para_aprovar
+    except ErroRegras:
+        exige_plano = True  # regras quebradas: melhor travar do que aprovar sem conferir
+    if exige_plano and _falta_plano(c):
+        b.append("sem plano de campanhas (regras.plano.obrigatorio_para_aprovar)")
     b += [f"revisão: {a.texto}" for a in bloqueantes(c)]
     return b

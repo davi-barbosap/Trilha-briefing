@@ -102,7 +102,7 @@ class Cliente(_Base):
     id: Id
     nome: str
     segmento: str  # texto livre: odontologia, escola de idiomas, software B2B, loja de móveis…
-    playbook: str = "padrao"  # playbooks/<playbook>/ no Trilha
+    playbook: str = "padrao"  # playbooks/<playbook>/ no Trilha-ads
     site: str = ""
     redes: list[str] = Field(default_factory=list)
     whatsapp: Annotated[str, Field(pattern=r"^(55\d{10,11})?$")] = ""  # 55 + DDD + número, só dígitos
@@ -127,11 +127,16 @@ class Area(_Base):
 
 
 class Negocio(_Base):
+    """Como a empresa vende hoje. Os números de hoje (contatos e vendas por mês) são a base contra a qual a economia
+    é conferida: a taxa sai da conta, não do palpite."""
+
     o_que_vende: str
     modelo_receita: Literal["venda_direta", "comissao", "recorrencia"]
     tipo_compra: Literal["necessidade", "desejo", "misto"]  # necessidade puxa busca; desejo puxa descoberta
     como_vende_hoje: list[str] = Field(default_factory=list)  # indicação, loja, WhatsApp, representante…
     ciclo_venda_dias: int | None = None
+    contatos_mes: int | None = Field(default=None, ge=0)  # contatos novos num mês normal, hoje, somando os canais
+    vendas_mes: int | None = Field(default=None, ge=0)  # vendas (ou clientes novos) num mês normal, hoje
     time_comercial: str = ""  # quem atende o lead, quantas pessoas, que papéis
     crm: str = ""
     marketplaces: list[str] = Field(default_factory=list)  # onde a categoria já é comprada (iFood, Mercado Livre…)
@@ -293,7 +298,7 @@ class Sazonalidade(_Base):
 
 
 class Maturidade(_Base):
-    """Nota de maturidade do Trilha (núcleo §3.2), de 0 a 3 por dimensão."""
+    """Nota de maturidade do Trilha-ads (núcleo §3.2), de 0 a 3 por dimensão."""
 
     rastreamento: Nota | None = None
     crm: Nota | None = None
@@ -555,7 +560,7 @@ class VendasForaDoDigital(_Base):
 
 
 class Aderencia(_Base):
-    """Diagnóstico de aderência ao digital do Trilha (núcleo §3.5), na parte que vale para qualquer segmento."""
+    """Diagnóstico de aderência ao digital do Trilha-ads (núcleo §3.5), na parte que vale para qualquer segmento."""
 
     perfil_compradores: str = ""
     reputacao: Literal["ativo", "neutra", "obstaculo", "nao_avaliado"] = "nao_avaliado"
@@ -629,7 +634,7 @@ class Kr(_Base):
 
 
 class Economia(_Base):
-    """Mesmos campos do `economia` do perfil.yaml do Trilha (núcleo §3.1)."""
+    """Mesmos campos do `economia` do perfil.yaml do Trilha-ads (núcleo §3.1)."""
 
     modelo_receita: Literal["venda_direta", "comissao", "recorrencia"]
     ticket_medio: float | None = None
@@ -774,6 +779,50 @@ class Hipoteses(_Base):
     hipoteses: list[Hipotese] = Field(default_factory=list)
 
 
+# ---------- campanhas.yaml ----------
+
+MetodoTeste = Literal["ab_plataforma", "conjuntos_separados", "comparacao_no_conjunto"]
+
+
+class Conjunto(_Base):
+    """Conjunto de anúncios (Meta, TikTok) ou grupo de anúncios (Google)."""
+
+    id: Id
+    publico: str = ""  # quem: região, idade, interesses ou "amplo"
+    palavras_chave: list[str] = Field(default_factory=list)  # Google: as buscas do grupo
+    correspondencia: Literal["ampla", "frase", "exata"] | None = None
+    exclusoes: list[str] = Field(default_factory=list)  # "leads dos últimos 30 dias", "clientes"
+    celulas: list[str] = Field(default_factory=list)  # códigos da grade que viram anúncios aqui
+    verba_mensal: float | None = Field(default=None, gt=0)  # só se o orçamento for do conjunto; vazio = o da campanha
+    id_plataforma: str = ""  # só com regras.espelho.ids_da_plataforma
+
+
+class TestePlanejado(_Base):
+    hipotese: str
+    metodo: MetodoTeste | None = None  # vazio = regras.testes.metodo_padrao
+
+
+class Campanha(_Base):
+    id: Id
+    canal: Canal  # um dos canais de estrategia.yaml
+    plataforma: str  # meta, google, tiktok, linkedin…
+    evento: MetricaPrincipal | None = None  # vazio = evento de otimização da estratégia
+    fase: str = "fundacao"  # uma das fases de regras.fases.ordem
+    verba_mensal: float | None = Field(default=None, gt=0)  # vazio = verba_pct do canal × verba mensal
+    conjuntos: list[Conjunto] = Field(default_factory=list)
+    negativas: list[str] = Field(default_factory=list)  # Google: palavras-chave negativas
+    testes: list[TestePlanejado] = Field(default_factory=list)
+    id_plataforma: str = ""
+    observacoes: str = ""
+
+
+class PlanoCampanhas(_Base):
+    """As decisões de mídia aprovadas com o cliente. A estrutura real fica nas plataformas."""
+
+    regras: dict[str, Any] = Field(default_factory=dict)  # sobrescreve as regras padrão só para este cliente
+    campanhas: list[Campanha] = Field(default_factory=list)
+
+
 # ---------- leitura da pasta ----------
 
 ARQUIVOS = {
@@ -783,6 +832,7 @@ ARQUIVOS = {
     "provas": ("provas.yaml", Provas),
     "estrategia": ("estrategia.yaml", Estrategia),
     "hipoteses": ("hipoteses.yaml", Hipoteses),
+    "campanhas": ("campanhas.yaml", PlanoCampanhas),
 }
 
 
@@ -796,6 +846,7 @@ class ClienteCompleto:
     ofertas: list[Oferta] = field(default_factory=list)
     estrategia: Estrategia = field(default_factory=Estrategia)
     hipoteses: Hipoteses = field(default_factory=Hipoteses)
+    campanhas: PlanoCampanhas = field(default_factory=PlanoCampanhas)
     ausentes: list[str] = field(default_factory=list)
 
     def persona(self, pid: str) -> Persona | None:
@@ -901,4 +952,41 @@ def _referencias(lidos: dict[str, Any], ofertas: list[Oferta], pasta: Path) -> d
             problemas.append(f"{rotulo}: personas inexistentes {faltam}")
     if problemas:
         erros["provas.yaml"] = "; ".join(problemas)
+    plano = lidos.get("campanhas")
+    if plano is not None:
+        problemas = _referencias_do_plano(plano, est, codigos, ids)
+        if problemas:
+            erros["campanhas.yaml"] = "; ".join(problemas)
     return erros
+
+
+def _referencias_do_plano(plano: PlanoCampanhas, est: Estrategia, codigos: list[str], hipoteses: list[str]) -> list[str]:
+    from trilha_briefing.campanhas import ErroRegras, regras_do_plano  # campanhas importa este módulo
+
+    try:
+        regras = regras_do_plano(plano)
+    except ErroRegras as e:
+        return [str(e)]
+    problemas = []
+    ids = [cp.id for cp in plano.campanhas]
+    if len(ids) != len(set(ids)):
+        problemas.append("ids de campanha repetidos")
+    canais = {cp.canal for cp in est.canais if cp.status != "descartado"}
+    for cp in plano.campanhas:
+        if cp.canal not in canais:
+            problemas.append(f"{cp.id}: canal '{cp.canal}' não está entre os canais ativos, em teste ou futuros da estratégia")
+        if cp.fase not in regras.fases.ordem:
+            problemas.append(f"{cp.id}: fase '{cp.fase}' fora de regras.fases.ordem {regras.fases.ordem}")
+        conj = [cj.id for cj in cp.conjuntos]
+        if len(conj) != len(set(conj)):
+            problemas.append(f"{cp.id}: ids de conjunto repetidos")
+        for cj in cp.conjuntos:
+            faltam = [x for x in cj.celulas if x not in codigos]
+            if faltam:
+                problemas.append(f"{cp.id}.{cj.id}: células fora da grade {faltam}")
+        faltam = [t.hipotese for t in cp.testes if t.hipotese not in hipoteses]
+        if faltam:
+            problemas.append(f"{cp.id}: hipóteses inexistentes {faltam}")
+        if not regras.espelho.ids_da_plataforma and (cp.id_plataforma or any(cj.id_plataforma for cj in cp.conjuntos)):
+            problemas.append(f"{cp.id}: id_plataforma preenchido, mas regras.espelho.ids_da_plataforma está desligado")
+    return problemas

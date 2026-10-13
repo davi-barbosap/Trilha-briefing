@@ -9,6 +9,7 @@ from __future__ import annotations
 from html import escape
 from pathlib import Path
 
+from trilha_briefing import campanhas as plano
 from trilha_briefing.economia import calcular, conversoes_na_validacao
 from trilha_briefing.esquema import ClienteCompleto
 
@@ -184,6 +185,16 @@ def gerar_html(c: ClienteCompleto) -> str:
             f"<tr><td>{escape(cp.canal.replace('_', ' '))}</td><td>{escape(cp.plataforma)}</td><td>{STATUS_CANAL[cp.status]}</td>"
             f"<td>{'' if cp.verba_pct is None else f'{cp.verba_pct:g}%'}</td><td>{escape(cp.justificativa)}</td></tr>" for cp in ativos)
         corpo += f"<div class=\"tabela\"><table><thead><tr><th>Canal</th><th>Onde</th><th>Quando</th><th>Verba</th><th>Por quê</th></tr></thead><tbody>{linhas}</tbody></table></div>"
+    if c.campanhas.campanhas:
+        linhas = ""
+        for cp in c.campanhas.campanhas:
+            v = plano.verba_da(c, cp)
+            linhas += (f"<tr><td>{escape(plano.legivel(cp.canal))}</td><td>{escape(plano.legivel(cp.plataforma))}</td>"
+                       f"<td>{escape(plano.legivel(plano.evento_da(c, cp)))}</td><td>{_brl(v) if v else '—'}</td>"
+                       f"<td>{escape(plano.legivel(cp.fase))}</td></tr>")
+        corpo += ("<p class=\"rotulo\">Como a verba se divide</p><div class=\"tabela\"><table><thead><tr><th>Campanha</th>"
+                  "<th>Onde</th><th>Otimiza por</th><th>Verba/mês</th><th>Fase</th></tr></thead>"
+                  f"<tbody>{linhas}</tbody></table></div>")
     if est.marcos:
         corpo += "<p class=\"rotulo\">Marcos</p><ol class=\"passos\">" + "".join(
             f"<li><strong>{escape(m.quando)}</strong> — {escape(m.nome)}{': ' + escape(m.entrega) if m.entrega else ''}</li>" for m in est.marcos) + "</ol>"

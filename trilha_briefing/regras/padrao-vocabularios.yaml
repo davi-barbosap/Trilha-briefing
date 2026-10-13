@@ -1,0 +1,237 @@
+# Cópia dos vocabulários do padrão de texto da Trilha que o briefing usa.
+#
+# O arquivo canônico é trilha_copy/regras/padrao.yaml, no Trilha-copy. NÃO edite aqui: mude lá e copie para cá.
+# A CI confere lista a lista (tests/test_padrao.py) e quebra se esta cópia ficar diferente.
+# Notação: termo inteiro; radical* (começo de palavra); re:expressão (regex com borda no começo).
+
+versao: 2026-10
+janela_garantia_palavras: 8
+registro_por_segmento:
+  imobiliario:
+  - CRECI
+  saude:
+  - CRM
+  - CRO
+  - CRP
+  - CRN
+  - CREFITO
+  - COREN
+  - CRF
+  - CRBM
+  educacao_fisica:
+  - CREF
+  juridico:
+  - OAB
+vocabularios:
+  adjetivo_vago:
+  - melhor
+  - melhores
+  - qualidade
+  - excelencia
+  - excelente
+  - excelentes
+  - incrivel
+  - lider
+  - unico no mercado
+  - top
+  - otimo
+  - otima
+  - otimos
+  - otimas
+  - diferenciad*
+  - inovador*
+  - privilegiad*
+  - padrao superior
+  - perto de tudo
+  - regiao em crescimento
+  - solucao completa
+  - solucoes completas
+  - atendimento personalizado
+  - atendimento diferenciado
+  - profissionais qualificados
+  - equipe qualificada
+  - equipe especializada
+  - ampla experiencia
+  - anos de experiencia
+  - referencia no mercado
+  - referencia em
+  - menor preco
+  - precos baixos
+  - preco justo
+  - condicoes especiais
+  - condicao especial
+  - comprovad*
+  prova_vaga:
+  - milhares de
+  - centenas de
+  - diversos clientes
+  - varios clientes
+  - muitos clientes
+  - inumeros
+  - inumeras
+  - muita gente
+  - explodiu
+  - bombou
+  - sucesso absoluto
+  - empresas confiam
+  - lideres do setor
+  frase_egoista:
+  - exija
+  - nao aceite imitacoes
+  - evite imitacoes
+  - cuidado com imitacoes
+  - somos lideres
+  - lider de mercado
+  - lideres de mercado
+  - a melhor empresa
+  - os melhores do mercado
+  - nossa missao
+  - temos orgulho
+  - orgulho em
+  - nos orgulhamos
+  - nao aceite substitutos
+  - cuidado com falsificacoes
+  - insista
+  - somos os melhores
+  - somos referencia
+  - a maior empresa
+  - ninguem faz como nos
+  garantia_de_resultado:
+  - resultado garantido
+  - resultados garantidos
+  - sucesso garantido
+  - 100% garantido
+  - risco zero
+  - sem risco
+  - sem riscos
+  - retorno certo
+  - lucro certo
+  - lucro garantido
+  - retorno garantido
+  - renda garantida
+  - valorizacao garantida
+  - valorizacao certa
+  - aprovacao garantida
+  - credito garantido
+  - financiamento garantido
+  - cura definitiva
+  - emagrecimento garantido
+  - fluencia garantida
+  - aprovacao certa
+  - re:valoriza\w* garantid\w*
+  - re:garant\w* (de )?valoriza\w*
+  resultado_garantivel:
+  - resultado*
+  - valoriz*
+  - aprovac*
+  - aprovad*
+  - credito
+  - financiamento
+  - renda
+  - retorno
+  - lucro
+  - cura
+  - emagrec*
+  - fluencia
+  - emprego
+  - vendas
+  - faturamento
+  inversao_de_risco:
+  - dinheiro de volta
+  - devolucao
+  - devolvemos
+  - re:garantia de \d+ dias
+  - re:\d+ dias de garantia
+  - garantia incondicional
+  - teste gratis
+  - sem compromisso
+  - cancele quando quiser
+  promessa_de_ganho:
+  - ganh*
+  - fatur*
+  - lucr*
+  - renda extra
+  - renda mensal
+  - renda passiva
+  - dinheiro extra
+  - ficar rico
+  - enriquec*
+  - milionari*
+  - primeiro milhao
+  - independencia financeira
+  - liberdade financeira
+  - rentabilidade
+  - rendiment*
+  - valoriz*
+  - re:retorno de \d
+  - re:dobr\w* (o |a |seu |sua )?(salario|faturamento|renda|vendas|lucro)
+  ressalva_de_resultado:
+  - resultados variam
+  - resultado varia
+  - nao e garantia
+  - nao ha garantia
+  - sem garantia de
+  - resultado individual
+  - resultados individuais
+  - nao e resultado tipico
+  - nao representa resultado tipico
+  - nao representa a media
+  - re:resultado (dela|dele|do cliente|da cliente)
+  urgencia:
+  - ultimas vagas
+  - ultimas unidades
+  - ultimos dias
+  - so hoje
+  - so ate
+  - acaba hoje
+  - termina hoje
+  - vagas limitadas
+  - por tempo limitado
+  - ultima chance
+  - corra
+  - encerra*
+  - nao perca
+  - urgente
+  - ultimas horas
+  - ultimo lote
+  - ultima turma
+  - ultima oportunidade
+  - somente hoje
+  - apenas hoje
+  - so amanha
+  - poucas vagas
+  - poucas unidades
+  - estoque limitado
+  - unidades limitadas
+  - ate esgotar
+  - enquanto durar*
+  - oferta relampago
+  - agora ou nunca
+  - prazo final
+  - virada de lote
+  - esgotando
+  - quase esgotad*
+  - re:restam? (so |apenas )?\d+
+  - re:faltam (so |apenas )?\d+ (dias|horas|vagas|unidades|lugares)
+  - re:(o )?preco (sobe|aumenta) (amanha|na segunda|semana que vem)
+  promessa_proibida_imobiliario:
+  - aprovacao garantida
+  - credito garantido
+  - financiamento garantido
+  - sem consulta
+  - sem consulta ao spc
+  - sem consulta ao serasa
+  - sem analise de credito
+  - valorizacao garantida
+  - retorno garantido
+  promessa_proibida_saude:
+  - cura
+  - curar
+  - cura definitiva
+  - resultado garantido
+  - sem efeitos colaterais
+  - 100% seguro
+  - o melhor medico
+  - o melhor dentista
+  - milagr*
+  - re:(perca|emagreca|elimine) \d+ ?(kg|quilos)

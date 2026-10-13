@@ -16,13 +16,15 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Literal
 
+from trilha_briefing import campanhas as cp_
+from trilha_briefing import padrao
 from trilha_briefing.economia import calcular, conversoes_no_teto
 from trilha_briefing.esquema import ClienteCompleto, Item
 
 Nivel = Literal["bloqueia", "atencao", "sugestao"]
 NIVEIS: tuple[Nivel, ...] = ("bloqueia", "atencao", "sugestao")
-PALAVRAS_VAGAS = re.compile(r"\b(melhor(es)?|qualidade|excelencia|excelente|incrivel|lider|unico no mercado)\b")
 TOLERANCIA_TICKET = 0.10
+TOLERANCIA_FECHAMENTO = 0.1  # a economia pode supor até 10% acima do que a empresa fecha hoje
 
 
 @dataclass(frozen=True)
@@ -83,24 +85,47 @@ def _consistencia(c: ClienteCompleto, avisos: list[Aviso]) -> None:
         if base and abs(ticket - base) / base > TOLERANCIA_TICKET:
             avisos.append(Aviso("atencao", f"ticket da oferta principal ({_brl(ticket)}) diferente do usado na economia "
                                            f"({_brl(base)}): os tetos de custo partem de um valor que não é o vendido"))
+    contatos, vendas = b.negocio.contatos_mes, b.negocio.vendas_mes
+    if e and contatos and vendas is not None:
+        hoje = vendas / contatos
+        if e.taxa_fechamento > hoje * (1 + TOLERANCIA_FECHAMENTO):
+            avisos.append(Aviso("atencao", f"a economia supõe fechar {e.taxa_fechamento:.0%} dos contatos, mas hoje a "
+                                           f"empresa fecha {hoje:.0%} ({vendas} de {contatos} por mês). Contato de anúncio "
+                                           "costuma fechar menos que indicação: os tetos de custo estão otimistas"))
     maximo, teto = b.restricoes.verba_mensal_max, est.orcamento.teto_mensal
     if maximo and teto and maximo != teto:
         avisos.append(Aviso("atencao", f"teto de verba diferente: briefing diz {_brl(maximo)}, estratégia diz {_brl(teto)}"))
 
 
+def segmentos(c: ClienteCompleto) -> set[str]:
+    """Segmentos com regra própria no padrão de texto: o playbook e o que os registros profissionais revelam."""
+    saida = {c.briefing.cliente.playbook} - {"", "padrao"}
+    registros = " ".join(c.plataforma.compliance.registros_profissionais).upper()
+    for seg, siglas in padrao.carregar()["registro_por_segmento"].items():
+        if any(s in registros for s in siglas):
+            saida.add(seg)
+    return saida
+
+
 def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
+    """As afirmações das ofertas que viram copy, pelo padrão de texto da Trilha (vocabulários em
+    regras/padrao-vocabularios.yaml, cópia do Trilha-copy)."""
     pl = c.plataforma
     proibidos = [(t, "termo proibido") for t in pl.voz.termos_proibidos]
     ja = {_norm(t) for t in pl.voz.termos_proibidos}
     proibidos += [(t, "promessa proibida") for t in pl.compliance.promessas_proibidas if _norm(t) not in ja]
+    for seg in segmentos(c):
+        proibidos += [(t, "proibido no segmento") for t in padrao.carregar()["vocabularios"].get(f"promessa_proibida_{seg}", [])
+                      if _norm(t) not in ja]
     for o in c.ofertas:
         textos = [("promessa", o.promessa.texto if o.promessa else ""), ("cta", o.cta), ("subtitulo", o.subtitulo)]
         textos += [(f"diferenciais[{i}]", d.texto) for i, d in enumerate(o.diferenciais)]
         textos += [(f"beneficios[{i}]", f"{x.titulo} {x.texto}") for i, x in enumerate(o.beneficios)]
         for onde, texto in textos:
             for termo, motivo in proibidos:
-                if termo and _norm(termo) in _norm(texto):
+                if termo and padrao.contem_termo(texto, termo):
                     avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.{onde}: {motivo} — \"{termo}\""))
+        _afirmacoes(o, textos, avisos)
         if o.promessa:
             p = o.promessa
             if not p.prazo:
@@ -110,8 +135,10 @@ def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
             if not p.condicao:
                 avisos.append(Aviso("atencao", f"ofertas.{o.id}.promessa sem condição: diga para quem e em que situação ela vale"))
         for i, d in enumerate(o.diferenciais):
-            if PALAVRAS_VAGAS.search(_norm(d.texto)) and not re.search(r"\d", d.texto):
-                avisos.append(Aviso("sugestao", f"ofertas.{o.id}.diferenciais[{i}]: adjetivo sem fato (\"{d.texto}\")"))
+            vago = padrao.achar("adjetivo_vago", d.texto) + padrao.achar("prova_vaga", d.texto)
+            if vago and not re.search(r"\d", d.texto):
+                avisos.append(Aviso("sugestao", f"ofertas.{o.id}.diferenciais[{i}]: adjetivo sem fato (\"{d.texto}\"): troque por "
+                                                "número, nome ou detalhe"))
         if o.escassez and not (o.escassez.real and o.escassez.evidencia):
             avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.escassez sem evidência: escassez falsa é publicidade enganosa (CDC)"))
         if o.urgencia:
@@ -127,6 +154,32 @@ def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
         sem_resposta = [ob.objecao for ob in o.objecoes if not ob.resposta]
         if sem_resposta:
             avisos.append(Aviso("atencao", f"ofertas.{o.id}: objeção sem resposta — {sem_resposta[0]}"))
+
+
+def _afirmacoes(o, textos: list[tuple[str, str]], avisos: list[Aviso]) -> None:
+    """Garantia de resultado, autoelogio, promessa de ganho e prazo no texto da oferta (padrão de texto)."""
+    tudo = "\n".join(t for _, t in textos)
+    com_ressalva = bool(padrao.achar("ressalva_de_resultado", tudo))
+    for onde, texto in textos:
+        for frase in re.split(r"(?<=[.!?…])\s+|\n+", texto):
+            if padrao.garante_resultado(frase):
+                avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.{onde}: garante um resultado que não depende só da empresa "
+                                                f"(\"{frase.strip()[:60]}\"): mostre o que já aconteceu, com prova, ou garanta "
+                                                "o que a empresa controla (prazo, devolução, teste)"))
+            elif (not com_ressalva and padrao.achar("promessa_de_ganho", frase)
+                  and re.search(r"(r\$|%|\bmil\b)", _norm(frase))):
+                avisos.append(Aviso("atencao", f"ofertas.{o.id}.{onde}: promessa de ganho com número (\"{frase.strip()[:60]}\"): "
+                                               "diga de quem é o resultado e que não é o típico (CDC e políticas do Meta)"))
+    egoista = padrao.achar("frase_egoista", tudo)
+    if egoista:
+        avisos.append(Aviso("atencao", f"ofertas.{o.id}: autoelogio ou pedido egoísta (\"{egoista[0]}\"): um bom vendedor não "
+                                       "diria isso com o cliente na frente dele"))
+    prazo = padrao.achar("urgencia", tudo)
+    urgencia_ok = o.urgencia and o.urgencia.real and (o.urgencia.motivo or o.urgencia.evidencia)
+    escassez_ok = o.escassez and o.escassez.real and o.escassez.evidencia
+    if prazo and not (urgencia_ok or escassez_ok):
+        avisos.append(Aviso("bloqueia", f"ofertas.{o.id}: o texto fala em \"{prazo[0]}\", mas a oferta não tem urgência ou "
+                                        "escassez reais registradas: prazo ou vaga inventados são publicidade enganosa (CDC)"))
 
 
 def _provas(c: ClienteCompleto, avisos: list[Aviso]) -> None:
@@ -230,13 +283,112 @@ def _canais(c: ClienteCompleto, avisos: list[Aviso]) -> None:
             avisos.append(Aviso("atencao", f"risco alto sem resposta: {r.descricao} (nota {r.nota})"))
 
 
-REGRAS = [_origem, _consistencia, _copy, _provas, _crencas, _marca, _economia, _volume, _canais]
+def _campanhas(c: ClienteCompleto, avisos: list[Aviso]) -> None:
+    """O plano de campanhas contra as regras (padrão do repositório + as do cliente) e contra a estratégia."""
+    if not c.campanhas.campanhas:
+        return
+    regras = cp_.regras_do_plano(c.campanhas)
+
+    def aviso(nivel: str, texto: str) -> None:
+        if nivel != "desligada":
+            avisos.append(Aviso(nivel, texto))  # type: ignore[arg-type]
+
+    est = c.estrategia
+    # verba: o plano e a estratégia precisam bater
+    verbas = [cp_.verba_da(c, cp) for cp in c.campanhas.campanhas]
+    soma = sum(v for v in verbas if v)
+    teto = est.orcamento.teto_mensal or c.briefing.restricoes.verba_mensal_max
+    if teto and soma > teto:
+        aviso("bloqueia", f"campanhas.yaml: as campanhas somam {_brl(soma)}/mês, acima do teto combinado ({_brl(teto)})")
+    elif est.orcamento.verba_mensal and abs(soma - est.orcamento.verba_mensal) > 0.05 * est.orcamento.verba_mensal:
+        aviso("atencao", f"campanhas.yaml: as campanhas somam {_brl(soma)}/mês e a estratégia diz {_brl(est.orcamento.verba_mensal)}")
+    # 4. nomes com o código da célula
+    if "{codigo}" not in regras.nomes.anuncio:
+        aviso(regras.nomes.nivel, "regras.nomes.anuncio sem {codigo}: o raio-x não consegue ligar o anúncio à célula da grade")
+    if "{codigo}" not in regras.nomes.utm:
+        aviso(regras.nomes.nivel, "regras.nomes.utm sem {codigo}: o lead chega ao Kommo sem o código do criativo")
+    pendentes = est.medicao.pendentes()
+    for cp in c.campanhas.campanhas:
+        conta = cp_.contas(c, cp, regras)
+        if not cp.conjuntos:
+            aviso("atencao", f"{cp.id}: campanha sem conjunto")
+        if cp.canal.startswith("busca_"):
+            sem = [cj.id for cj in cp.conjuntos if not cj.palavras_chave]
+            if sem:
+                aviso("atencao", f"{cp.id}: campanha de busca com grupo sem palavra-chave ({', '.join(sem)})")
+        # 2. poucos conjuntos, conforme a verba aguenta
+        if conta.conjuntos_que_cabem is not None and cp.conjuntos:
+            ritmo = (f"cerca de {conta.eventos_semana:.0f} {cp_.legivel(conta.evento, plural=True)} por semana no teto de custo "
+                     f"({cp_.brl(conta.custo)}); o {cp_.legivel(cp.plataforma)} pede {conta.limite} por conjunto para sair "
+                     "do aprendizado")
+            if conta.conjuntos_que_cabem == 0:
+                aviso(regras.aprendizado.nivel, f"{cp.id}: {ritmo}, e nem um conjunto chega lá"
+                      + (": junte tudo em um conjunto só" if len(cp.conjuntos) > 1 else "")
+                      + ". Ele vai ficar em aprendizado limitado: suba a verba ou otimize por um evento mais acima do funil")
+            elif len(cp.conjuntos) > conta.conjuntos_que_cabem:
+                aviso(regras.aprendizado.nivel, f"{cp.id}: {len(cp.conjuntos)} conjuntos, mas a verba aguenta "
+                      f"{conta.conjuntos_que_cabem} ({ritmo}): junte as células em menos conjuntos")
+        # 3. cada hipótese diz como vai ser testada
+        onde = {x: cj.id for cj in cp.conjuntos for x in cj.celulas}
+        for t in cp.testes:
+            h = cp_.hipotese(c, t.hipotese)
+            if h is None:
+                continue
+            metodo = cp_.metodo_do(t, regras)
+            if metodo is None:
+                aviso(regras.testes.nivel, f"{cp.id}: teste da {h.id} sem método (ab_plataforma, conjuntos_separados "
+                                           "ou comparacao_no_conjunto)")
+            fora = [x for x in h.codigos if x not in onde]
+            if fora:
+                aviso(regras.testes.nivel, f"{cp.id}: a {h.id} testa {', '.join(fora)}, que não estão em nenhum conjunto da campanha")
+            elif metodo == "conjuntos_separados" and len({onde[x] for x in h.codigos}) < len(h.codigos):
+                aviso(regras.testes.nivel, f"{cp.id}: a {h.id} usa conjuntos separados, mas as variações estão no mesmo conjunto")
+            if metodo == "comparacao_no_conjunto" and not regras.testes.comparacao_conclui and regras.testes.nivel != "desligada":
+                aviso("sugestao", f"{cp.id}: a {h.id} é comparação dentro do conjunto: a plataforma reparte a verba como "
+                                  "quiser, então o resultado é direcional e não conclui a hipótese")
+            ev = h.evento or est.metrica_principal
+            semana = cp_.por_semana(conta.verba, cp_.custo_teto(c, ev))
+            prazo = cp_.prazo_semanas(c, h)
+            precisa = h.minimo_conversoes * h.variacoes
+            if semana and prazo and precisa / semana > prazo:
+                aviso(regras.testes.nivel, f"{cp.id}: a {h.id} precisa de {precisa} {cp_.legivel(ev, plural=True)}; a campanha compra cerca de "
+                                           f"{semana:.0f} por semana no teto, ou seja, {precisa / semana:.0f} semanas, mais que "
+                                           f"as {prazo:.0f} do prazo")
+        # 5. fase só com o que ela exige
+        if cp.fase in regras.fases.ordem and pendentes:
+            ate = regras.fases.ordem[: regras.fases.ordem.index(cp.fase) + 1]
+            if any(regras.fases.entrar.get(f) and regras.fases.entrar[f].medicao_completa for f in ate):
+                aviso(regras.fases.nivel, f"{cp.id}: em {cp_.legivel(cp.fase)}, mas a medição não está completa "
+                                          f"({', '.join(pendentes)})")
+    # cobertura da grade e dos canais
+    prioridade = {cel.codigo: cel.prioridade for cel in est.grade}
+    sem = cp_.celulas_sem_campanha(c)
+    if [x for x in sem if prioridade.get(x) == 1]:
+        aviso("atencao", f"células de prioridade 1 sem campanha: {', '.join(x for x in sem if prioridade.get(x) == 1)}")
+    if [x for x in sem if prioridade.get(x) != 1]:
+        aviso("sugestao", f"células sem campanha: {', '.join(x for x in sem if prioridade.get(x) != 1)}")
+    testadas = {t.hipotese for cp in c.campanhas.campanhas for t in cp.testes}
+    for h in c.hipoteses.hipoteses:
+        if (h.horizonte == "nucleo" and h.resultado in ("planejada", "rodando") and h.codigos and h.id not in testadas
+                and regras.testes.nivel != "desligada"):
+            aviso("sugestao", f"hipótese {h.id} sem teste em nenhuma campanha do plano")
+    for canal in cp_.canais_sem_campanha(c):
+        aviso("sugestao", f"canal {canal} ativo ou em teste na estratégia e sem campanha no plano")
+
+
+REGRAS = [_origem, _consistencia, _copy, _provas, _crencas, _marca, _economia, _volume, _canais, _campanhas]
 
 
 def revisar(c: ClienteCompleto) -> list[Aviso]:
     avisos: list[Aviso] = []
     for regra in REGRAS:
         regra(c, avisos)
+    return sorted(avisos, key=lambda a: NIVEIS.index(a.nivel))
+
+
+def avisos_do_plano(c: ClienteCompleto) -> list[Aviso]:
+    avisos: list[Aviso] = []
+    _campanhas(c, avisos)
     return sorted(avisos, key=lambda a: NIVEIS.index(a.nivel))
 
 
