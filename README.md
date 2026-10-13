@@ -71,6 +71,7 @@ A revisão separa os avisos em três níveis:
 ## Documentação
 
 - [Método](docs/metodo.md): princípios, etapas, ciclo trimestral e onde fomos críticos com as fontes.
+- [Implantação em 10 dias úteis](docs/implantacao-10-dias.md): as seis etapas do site ligadas às ferramentas, e onde o prazo e a aprovação ainda não conversam.
 - [Contrato com o Trilha e a Trilha-LP](docs/contrato.md): o que vai para onde.
 - [Decisões](docs/decisoes/): por que as coisas são como são.
 - [Mudanças](CHANGELOG.md).
