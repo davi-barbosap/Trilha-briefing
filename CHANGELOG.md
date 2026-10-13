@@ -1,5 +1,69 @@
 # Mudanças
 
+## 0.6.0 — caminho de volta do Trilha-ads (out/2026)
+
+- **`registrar-resultados <retorno.yaml> <pasta>`:** lê o retorno do período que o Trilha-ads grava em `ads/<id>/retornos/` (contrato `retorno`).
+  - **O que faz:** liga cada código de criativo às hipóteses, conta no evento de cada uma e registra a medição em `hipoteses.yaml`: `conversoes_obtidas` (a variação mais fraca) e `rodando`, sem reescrever o arquivo.
+  - **O que mostra:** quais hipóteses já têm volume para decidir e quais ainda não, quando as variações não são códigos e o retorno não separa, e os motivos de perda mais comuns.
+  - **O que guarda:** uma cópia do retorno em `resultados/`, no Trilha-clientes.
+- **`decidir <pasta> <hipotese> validada|refutada|inconclusiva --aprendizado "…"`:** registra a decisão do assessor. O aprendizado é obrigatório para validar ou refutar e vai para a copy na próxima exportação.
+- **Editor de YAML:** edita um campo de um item de lista pelo `id` (`hipoteses[id].resultado`), mantendo os comentários. Identificadores simples saem sem aspas.
+
+## 0.5.1 — padrão de texto da Trilha (out/2026)
+
+- **O padrão de texto** mora no Trilha-copy (`trilha_copy/regras/padrao.yaml`). O briefing guarda a cópia das listas que usa em `trilha_briefing/regras/padrao-vocabularios.yaml`, e `tests/test_padrao.py` confere a cópia lista a lista contra o Trilha-copy na CI.
+- **Termos casam como palavra inteira:** "corra" não pega mais "ocorra". Antes, o briefing procurava o termo dentro das palavras.
+- **Regras novas no texto das ofertas:**
+  - garantia de resultado (bloqueia);
+  - prazo ou vaga no texto sem urgência ou escassez reais (bloqueia);
+  - promessa de ganho com número e sem ressalva;
+  - autoelogio;
+  - lista de promessas proibidas do segmento (imobiliário pelo playbook; saúde pelos registros profissionais).
+- **Adjetivo sem fato** usa a lista do padrão (mais ampla: "ótima localização", "perto de tudo", "profissionais qualificados"…) e a de prova vaga ("milhares de clientes").
+- **`exportar --para copy`** leva `preco`, a regra comercial por canal, para a copy conferir o preço no anúncio e na página.
+
+## 0.5.0 — questionário reformulado e formulário do cliente (out/2026)
+
+### Novo
+- **As perguntas viraram dado** (`trilha_briefing/questionario/perguntas.yaml`), conferido ao carregar:
+  - o campo existe no esquema;
+  - as opções cabem no campo;
+  - a condição cita uma pergunta anterior que o cliente vê, com valores que ela tem.
+
+  As regras para formular perguntas novas ficam no topo do arquivo.
+- **Questionário reformulado:** 203 perguntas.
+  - **Por momento:** 105 do cliente (cerca de 80 visíveis, o resto por condição), 58 da reunião e 40 do assessor.
+  - **No formulário:** 27 perguntas de escolha. Só 11 são obrigatórias, e cada pergunta tem ajuda com exemplo.
+  - **Genérico:** a primeira pergunta é o tipo de negócio, e as perguntas de saúde, imóveis, B2B, educação, produto digital, e-commerce e veículos só aparecem para quem é do ramo.
+  - **Fatos no lugar de taxas:** contatos e vendas por mês. A margem vem como "de cada R$ 100", e a verba de teste como limite de perda.
+  - **O técnico** (acessos, rastreamento, IDs do CRM) foi para o assessor.
+  - **O abstrato** (história e crença da marca, big idea, "e daí?") foi para a reunião.
+- **`questionario --formulario`:** formulário do cliente num HTML só.
+  - Progresso salvo no aparelho, uma parte por bloco, perguntas condicionais e "não sei, prefiro falar na reunião".
+  - No fim, a revisão das obrigatórias e as respostas para baixar ou copiar.
+  - Gerado sem cliente, aceita o nome no link (`?cliente=…&quem=…`), para publicar num endereço só.
+  - Testado em tela de celular no Chromium.
+- **`importar-respostas <arquivo|-> <pasta>`:**
+  - guarda as respostas em `respostas/<data>-questionario.json` e `.md`;
+  - preenche sozinho os campos simples, como hipótese (`fonte: empresa`), sem reescrever o arquivo (os comentários ficam) e sem sobrescrever valor existente;
+  - confere cada campo contra o esquema, e o que não cabe vai para "levar à mão" com o motivo (ex.: WhatsApp fora do padrão, bloco de economia incompleto);
+  - se a pasta ficaria inválida, nada é gravado.
+
+  No teste de ponta a ponta, 44 campos foram preenchidos sozinhos numa pasta nova.
+- **Tipo `telefone`:** "(11) 98765-4321" vira `5511987654321`.
+- **`briefing.negocio.contatos_mes` e `vendas_mes`:** a revisão avisa quando a economia supõe fechar mais do que a empresa fecha hoje.
+
+### Mudou
+- `questionario` em Markdown mostra quando uma pergunta é condicional.
+- O `novo` indica o formulário e a importação como próximos passos.
+- Decisão registrada em [docs/decisoes/002](docs/decisoes/002-questionario-e-formulario.md).
+
+## 0.4.1 — plano de campanhas chega à copy (out/2026)
+
+- **`exportar --para copy`** leva o bloco `veiculacao`: onde cada célula vira anúncio (plataforma, campanha, conjunto), com o nome do anúncio e os parâmetros de URL já resolvidos pelas regras de nomes do plano. O Trilha-copy só preenche o código e a versão da peça e gera a lista de subida. Antes, o nome e a UTM de cada anúncio eram montados à mão na hora de subir, longe do plano.
+- Sem `campanhas.yaml`, o bloco não sai. É opcional e o contrato continua na versão 1.
+- **`identidade_visual`** também vai para a copy (cores, tipografia, logo, estilo de imagem): o Trilha-copy põe no briefing do criativo de cada peça, para a equipe de criação.
+
 ## 0.4.0 — plano de campanhas (out/2026)
 
 ### Novo

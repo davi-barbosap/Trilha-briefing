@@ -207,3 +207,36 @@ class TestSugestaoEAprovacao(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestVeiculacaoParaCopy(Base):
+    """O plano diz onde cada célula vira anúncio; o Trilha-copy só preenche código e versão da peça."""
+
+    def test_copy_recebe_nomes_e_parametros_do_plano(self):
+        from trilha_briefing.exportar import pacote_copy
+        locais = pacote_copy(carregar_cliente(self.pasta))["veiculacao"]
+        pt01 = next(l for l in locais if l["codigo"] == "PT01")
+        self.assertEqual(pt01["plataforma"], "meta")
+        self.assertEqual(pt01["campanha"], "_exemplo | meta-profissional")
+        self.assertEqual(pt01["anuncio"], "{codigo} | v{versao}")
+        self.assertIn("utm_campaign=meta-profissional", pt01["parametros_url"])
+        self.assertIn("utm_content={codigo}", pt01["parametros_url"])
+        self.assertNotIn("VA01", [l["codigo"] for l in locais])  # célula fora do plano não tem onde rodar
+
+    def test_moldes_do_cliente_valem(self):
+        from trilha_briefing.exportar import pacote_copy
+        self.regras(nomes={"anuncio": "{codigo}-{versao} {conjunto}", "utm": "utm_content={codigo}&utm_term={conjunto}"})
+        pt01 = next(l for l in pacote_copy(carregar_cliente(self.pasta))["veiculacao"] if l["codigo"] == "PT01")
+        self.assertEqual(pt01["anuncio"], "{codigo}-{versao} amplo")
+        self.assertEqual(pt01["parametros_url"], "utm_content={codigo}&utm_term=amplo")
+
+    def test_identidade_visual_vai_para_o_criativo(self):
+        from trilha_briefing.exportar import pacote_copy
+        iv = pacote_copy(carregar_cliente(self.pasta))["identidade_visual"]
+        self.assertEqual(iv["tipografia"]["titulos"], "Poppins")
+        self.assertIn("estilo_imagem", iv)
+
+    def test_sem_plano_nao_tem_veiculacao(self):
+        from trilha_briefing.exportar import pacote_copy
+        (self.pasta / "campanhas.yaml").unlink()
+        self.assertNotIn("veiculacao", pacote_copy(carregar_cliente(self.pasta)))

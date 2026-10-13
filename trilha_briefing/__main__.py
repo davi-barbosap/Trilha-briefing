@@ -2,6 +2,8 @@
 
     python -m trilha_briefing novo <id>                       cria clientes/<id>/ a partir do modelo
     python -m trilha_briefing questionario [--para cliente|reuniao|assessor]   perguntas do briefing
+    python -m trilha_briefing questionario --formulario questionario.html [--cliente "Nome"] [--quem-recebe "Davi"]
+    python -m trilha_briefing importar-respostas <respostas.json|-> <pasta>   respostas do formulário → pasta do cliente
     python -m trilha_briefing validar <pasta>                 confere o esquema de todos os arquivos
     python -m trilha_briefing lacunas <pasta>                 o que falta por etapa e o que bloqueia a aprovação
     python -m trilha_briefing revisar <pasta>                 avisos críticos (promessa, prova, verba, canais…)
@@ -12,6 +14,8 @@
     python -m trilha_briefing exportar <pasta> --para trilha|lp|copy [--saida dist]
     python -m trilha_briefing apresentar <pasta> [--saida dist]
     python -m trilha_briefing fechar-ciclo <pasta> --nome 2026-T4   guarda o estado antes da revisão trimestral
+    python -m trilha_briefing registrar-resultados <retorno.yaml> <pasta>   o retorno do Trilha-ads nas hipóteses
+    python -m trilha_briefing decidir <pasta> <hipotese> validada|refutada|inconclusiva --aprendizado "…"
 """
 
 from __future__ import annotations
@@ -19,10 +23,13 @@ from __future__ import annotations
 import argparse
 import shutil
 import sys
+from datetime import date
 from pathlib import Path
 
 from trilha_briefing import campanhas as plano_campanhas
-from trilha_briefing import questionario
+from trilha_briefing import questionario, resultados
+from trilha_briefing.questionario import importar as importacao
+from trilha_briefing.questionario.formulario import gerar_formulario
 from trilha_briefing.apresentar import apresentar
 from trilha_briefing.ciclo import fechar_ciclo
 from trilha_briefing.canais import recomendacoes_gerais, sugerir
@@ -57,13 +64,36 @@ def cmd_novo(a) -> int:
     shutil.copytree(MODELO, destino)
     briefing = destino / "briefing.yaml"
     briefing.write_text(briefing.read_text(encoding="utf-8").replace("ID_DO_CLIENTE", a.id), encoding="utf-8")
-    print(f"✓ {destino} criado. Próximo passo: python -m trilha_briefing questionario --cliente \"Nome\" > questionario.md")
+    print(f"✓ {destino} criado. Próximos passos:\n"
+          f"  1. python -m trilha_briefing questionario --formulario questionario-{a.id}.html --cliente \"Nome\"\n"
+          f"     mande o arquivo (ou o link do formulário publicado) para o cliente responder\n"
+          f"  2. python -m trilha_briefing importar-respostas respostas.json {destino}")
     return 0
 
 
 def cmd_questionario(a) -> int:
+    if a.formulario:
+        destino = Path(a.formulario)
+        destino.write_text(gerar_formulario(a.cliente, a.quem_recebe), encoding="utf-8")
+        print(f"✓ {destino}: formulário do cliente ({len(questionario.perguntas('cliente'))} perguntas). Abre em qualquer "
+              f"navegador, salva o progresso no aparelho e devolve um arquivo de respostas para importar-respostas.")
+        return 0
     print(questionario.gerar(a.cliente, para="assessor" if a.assessor else a.para))
     return 0
+
+
+def cmd_importar_respostas(a) -> int:
+    try:
+        # "-": o cliente usou "Copiar respostas" e o texto veio colado (pbpaste | … importar-respostas - <pasta>)
+        respostas = importacao.ler_texto(sys.stdin.read()) if a.respostas == "-" else a.respostas
+        rel = importacao.importar(respostas, a.pasta)
+    except importacao.RespostasInvalidas as e:
+        print(f"✗ {e}")
+        return 1
+    print(importacao.em_texto(rel), end="")
+    if not rel.erro:
+        print(f"Próximo passo: python -m trilha_briefing lacunas {a.pasta}")
+    return 1 if rel.erro else 0
 
 
 def cmd_validar(a) -> int:
@@ -229,6 +259,27 @@ def cmd_fechar_ciclo(a) -> int:
     return 0
 
 
+def cmd_registrar_resultados(a) -> int:
+    try:
+        rel = resultados.registrar(a.retorno, a.pasta)
+    except resultados.RetornoInvalido as e:
+        print(f"✗ {e}")
+        return 1
+    print(resultados.em_texto(rel), end="")
+    return 1 if rel.erro else 0
+
+
+def cmd_decidir(a) -> int:
+    try:
+        mudou = resultados.decidir(a.pasta, a.hipotese, a.resultado, a.aprendizado or "", a.fim)
+    except ValueError as e:
+        print(f"✗ {e}")
+        return 1
+    print("✓ " + "; ".join(mudou))
+    print(f"Próximo passo: python -m trilha_briefing exportar {a.pasta} --para copy (o aprendizado vai para a copy)")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="trilha_briefing", description="Briefing, marca e estratégia por cliente")
     sub = ap.add_subparsers(dest="comando", required=True)
@@ -236,7 +287,12 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("questionario"); s.add_argument("--cliente", default="")
     s.add_argument("--para", choices=["cliente", "reuniao", "assessor"], default="cliente")
     s.add_argument("--assessor", action="store_true", help="o mesmo que --para assessor")
+    s.add_argument("--formulario", metavar="ARQUIVO.html", help="gera o formulário do cliente (★) num HTML só")
+    s.add_argument("--quem-recebe", default="a sua assessoria", help="para quem o cliente envia as respostas")
     s.set_defaults(f=cmd_questionario)
+    s = sub.add_parser("importar-respostas", help="leva as respostas do formulário para a pasta do cliente")
+    s.add_argument("respostas", help="arquivo .json baixado do formulário, ou - para colar o texto copiado")
+    s.add_argument("pasta"); s.set_defaults(f=cmd_importar_respostas)
     for nome, f in (("validar", cmd_validar), ("lacunas", cmd_lacunas), ("revisar", cmd_revisar),
                     ("economia", cmd_economia), ("canais", cmd_canais), ("grade", cmd_grade)):
         s = sub.add_parser(nome); s.add_argument("pasta"); s.set_defaults(f=f)
@@ -249,6 +305,13 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("fechar-ciclo"); s.add_argument("pasta"); s.add_argument("--nome", required=True)
     s.set_defaults(f=cmd_fechar_ciclo)
     s = sub.add_parser("apresentar"); s.add_argument("pasta"); s.add_argument("--saida", default="dist"); s.set_defaults(f=cmd_apresentar)
+    s = sub.add_parser("registrar-resultados", help="o retorno do Trilha-ads (ads/<id>/retornos) nas hipóteses")
+    s.add_argument("retorno"); s.add_argument("pasta"); s.set_defaults(f=cmd_registrar_resultados)
+    s = sub.add_parser("decidir", help="registra a decisão sobre uma hipótese, com o aprendizado")
+    s.add_argument("pasta"); s.add_argument("hipotese"); s.add_argument("resultado", choices=resultados.DECISOES)
+    s.add_argument("--aprendizado", help="o que aprendemos: vai para a copy e para a próxima rodada")
+    s.add_argument("--fim", type=date.fromisoformat, help="data da decisão (padrão: hoje)")
+    s.set_defaults(f=cmd_decidir)
     a = ap.parse_args(argv)
     return a.f(a)
 

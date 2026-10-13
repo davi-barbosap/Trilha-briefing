@@ -5,7 +5,6 @@ from pathlib import Path
 
 import yaml
 
-from trilha_briefing import questionario
 from trilha_briefing.__main__ import main
 from trilha_briefing.apresentar import gerar_html
 from trilha_briefing.canais import sugerir
@@ -169,6 +168,16 @@ class TestGravidade(Base):
     def test_ticket_divergente(self):
         self.editar("ofertas/conversacao-adultos.yaml", lambda d: d["condicoes"].update(ticket_medio=900))
         self.assertTrue(any("ticket da oferta principal" in a for a in revisar(carregar_cliente(self.pasta))))
+
+    def test_fechamento_da_economia_contra_o_de_hoje(self):
+        # A economia supõe 8% de fechamento. Fechando 5% hoje, os tetos estão otimistas; fechando 10%, não.
+        def numeros(contatos, vendas):
+            self.editar("briefing.yaml", lambda d: d["negocio"].update(contatos_mes=contatos, vendas_mes=vendas))
+            return revisar(carregar_cliente(self.pasta))
+        self.assertTrue(any("supõe fechar 8% dos contatos, mas hoje a empresa fecha 5% (10 de 200 por mês)" in a
+                            for a in numeros(200, 10)))
+        self.assertFalse(any("supõe fechar" in a for a in numeros(200, 20)))
+        self.assertFalse(any("supõe fechar" in a for a in numeros(None, None)))
 
     def test_prova_de_autoridade_precisa_de_fonte_nao_de_autorizacao(self):
         from trilha_briefing.esquema import Prova, Provas
@@ -337,36 +346,6 @@ class TestApresentar(Base):
 
 
 class TestCli(Base):
-    def test_questionario_tres_momentos(self):
-        cliente = questionario.gerar("Escola")
-        self.assertIn("O que vocês vendem?", cliente)
-        self.assertNotIn("→", cliente)
-        self.assertNotIn("●", cliente)
-        reuniao = questionario.gerar("Escola", para="reuniao")
-        self.assertIn("● Se precisar escolher um", reuniao)
-        self.assertIn("Roteiro das entrevistas", reuniao)
-        assessor = questionario.gerar("Escola", assessor=True)
-        self.assertIn("→ `briefing.capacidade.leads_dia`", assessor)
-        self.assertIn("◆ Avaliações no Google", assessor)
-        self.assertEqual(assessor.count("→"), len(questionario.perguntas()))
-
-    def test_campos_do_questionario_existem(self):
-        # Cada "arquivo.campo" citado no questionário precisa existir no esquema.
-        from trilha_briefing import esquema as e
-        modelos = {"briefing": e.Briefing, "pesquisa": e.Pesquisa, "plataforma": e.Plataforma, "estrategia": e.Estrategia,
-                   "ofertas": e.Oferta}
-        import re
-        for _, _, _, campo in questionario.perguntas():
-            for arquivo, caminho in re.findall(r"\b(briefing|pesquisa|plataforma|estrategia|ofertas)\.([a-z0-9_.\[\]]+)", campo):
-                modelo = modelos[arquivo]
-                for parte in caminho.replace("[]", "").split(".")[:2]:
-                    self.assertIn(parte, modelo.model_fields, f"{arquivo}.{caminho} ({campo})")
-                    anotacao = modelo.model_fields[parte].annotation
-                    filhos = [a for a in getattr(anotacao, "__args__", (anotacao,)) if isinstance(a, type) and hasattr(a, "model_fields")]
-                    if not filhos:
-                        break
-                    modelo = filhos[0]
-
     def test_fechar_ciclo(self):
         self.assertEqual(main(["fechar-ciclo", str(self.pasta), "--nome", "2026-T4"]), 0)
         destino = self.pasta / "historico" / "2026-T4"
