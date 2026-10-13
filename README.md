@@ -186,6 +186,7 @@ Neste repositório, os comandos rodam também sobre o exemplo: `python -m trilha
 ## Documentação
 
 - [Método](docs/metodo.md): princípios, etapas, ciclo trimestral e onde fomos críticos com as fontes.
+- [Implantação em 10 dias úteis](docs/implantacao-10-dias.md): as seis etapas do método do site ligadas às ferramentas, e onde o prazo e a aprovação ainda não conversam.
 - [Contrato](docs/contrato.md): o que vai para o Trilha-ads, a Trilha-LP e o Trilha-copy.
 - [Decisões](docs/decisoes/): por que as coisas são como são.
 - [Mudanças](CHANGELOG.md).
