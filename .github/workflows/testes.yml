@@ -8,11 +8,12 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -e .
-      - name: Trilha-ads e Trilha-LP, para o teste de contrato
+      - name: Trilha-ads, Trilha-LP e Trilha-copy, para os testes de contrato e do padrão de texto
         run: |
           git clone --depth 1 https://github.com/davi-barbosap/Trilha-ads ../Trilha-ads
           git clone --depth 1 https://github.com/davi-barbosap/Trilha-LP ../Trilha-LP
-          pip install -e ../Trilha-ads -e ../Trilha-LP
+          git clone --depth 1 https://github.com/davi-barbosap/Trilha-copy ../Trilha-copy
+          pip install -e ../Trilha-ads -e ../Trilha-LP -e ../Trilha-copy
       - run: python -m unittest discover -s tests -v
       - name: O teste de contrato não pode ter sido pulado
         run: python -c "import trilha.core.oferta, trilha_lp.esquema"
@@ -29,4 +30,4 @@ jobs:
       - name: O pacote instalado leva as regras padrão e os modelos
         run: |
           pip install --no-deps --target /tmp/instalado .
-          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_briefing.campanhas as m, trilha_briefing; from pathlib import Path; assert '/tmp/instalado' in m.__file__, m.__file__; assert m.ARQUIVO_PADRAO.exists(); assert (Path(trilha_briefing.__file__).parent / 'modelo' / 'estrategia.yaml').exists(); m.regras_do_plano(); import trilha_briefing.questionario as q; assert '/tmp/instalado' in q.__file__; q.carregar()"
+          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_briefing.campanhas as m, trilha_briefing; from pathlib import Path; assert '/tmp/instalado' in m.__file__, m.__file__; assert m.ARQUIVO_PADRAO.exists(); assert (Path(trilha_briefing.__file__).parent / 'modelo' / 'estrategia.yaml').exists(); m.regras_do_plano(); import trilha_briefing.questionario as q; assert '/tmp/instalado' in q.__file__; q.carregar(); import trilha_briefing.padrao as pt; pt.carregar()"

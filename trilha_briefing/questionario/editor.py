@@ -88,8 +88,13 @@ def _valor_e_comentario(resto: str) -> tuple[str, str]:
     return resto.rstrip(), ""
 
 
+PALAVRAS_YAML = {"y", "n", "yes", "no", "on", "off", "true", "false", "null"}
+
+
 def _escalar(v: Any) -> str:
     if isinstance(v, str):
+        if re.fullmatch(r"[a-z][a-z0-9_-]*", v) and v not in PALAVRAS_YAML:
+            return v  # identificador simples (rodando, venda_direta) fica sem aspas, como no resto do arquivo
         return json.dumps(v, ensure_ascii=False)  # string JSON é escalar YAML válido
     if v is None:
         return "null"
@@ -210,6 +215,37 @@ class Arquivo:
             linhas[pos.linha] = f"{chave}: {_fluxo(atual)}" + (f"  {comentario}" if comentario else "")
         else:  # a chave não está escrita: acrescenta no fim do bloco do pai
             linhas[pos.depois_de:pos.depois_de] = _novas(partes[pos.escritas:], valor, pos.nivel_filhos)
+        return self._aplicar(linhas)
+
+    def definir_no_item(self, lista: str, id_item: str, campo: str, valor: Any) -> str:
+        """Define `campo` no item da lista de topo `lista` cujo id é `id_item`, sobrescrevendo (é registro explícito,
+        não preenchimento): 'preenchido', 'invalido' (motivo em self.motivo) ou 'ausente' (lista, item ou formato
+        que não dá para editar por linha, como item em uma linha só)."""
+        topo = localizar(self.linhas, (lista,))
+        if topo is None:
+            return "ausente"
+        cabeca = re.compile(rf"^(\s*)-\s+id:\s*[\"']?{re.escape(id_item)}[\"']?\s*(#.*)?$")
+        inicio = next((i for i in range(topo + 1, len(self.linhas)) if cabeca.match(self.linhas[i])), None)
+        if inicio is None:
+            return "ausente"
+        traco = len(cabeca.match(self.linhas[inicio]).group(1))
+        nivel = traco + 2
+        fim = next((j for j in range(inicio + 1, len(self.linhas)) if _significativa(self.linhas[j])
+                    and _indent(self.linhas[j]) <= traco), len(self.linhas))
+        linhas = list(self.linhas)
+        alvo = next((j for j in range(inicio + 1, fim) if _indent(linhas[j]) == nivel and _eh_chave(linhas[j], campo)), None)
+        nova = f"{' ' * nivel}{campo}: {_escalar(valor)}"
+        if alvo is None:
+            ultima = max(j for j in range(inicio, fim) if _significativa(linhas[j]))
+            linhas.insert(ultima + 1, nova)
+        else:
+            _, _, resto = linhas[alvo].partition(":")
+            texto, comentario = _valor_e_comentario(resto)
+            continua = alvo + 1  # valor em bloco (| ou >) ocupa as linhas mais recuadas que seguem
+            if texto.strip()[:1] in ("|", ">"):
+                while continua < fim and (not linhas[continua].strip() or _indent(linhas[continua]) > nivel):
+                    continua += 1
+            linhas[alvo:continua] = [nova + (f"  {comentario}" if comentario and texto.strip()[:1] not in ("|", ">") else "")]
         return self._aplicar(linhas)
 
     def acrescentar(self, partes: tuple[str, ...], item: Any) -> str:

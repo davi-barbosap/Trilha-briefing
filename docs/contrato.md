@@ -53,6 +53,7 @@ Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferra
 |---|---|---|
 | `cliente` | `briefing.yaml` | id, nome, segmento, playbook, WhatsApp, área |
 | `voz`, `posicionamento` | `plataforma.yaml` | inclui `voz.intensidade`, o termostato de 1 a 5 |
+| `preco` | `plataforma.yaml` | regra comercial por canal (anuncio, whatsapp, landing → nunca, a_partir_de, parcela, valor_cheio): a revisão da copy confere o preço no anúncio e na página |
 | `identidade_visual` | `plataforma.yaml` | cores, tipografia, logo e estilo de imagem: vão no briefing do criativo de cada peça, para a equipe de criação |
 | `compliance` | `plataforma.yaml` + `briefing.restricoes` | termos e promessas proibidas, registros, avisos, regras legais, o que não pode |
 | `personas`, `nao_atender` | `pesquisa.yaml` | com medos, crenças (método, interna, externa), micro-problemas, frases literais, sofisticação |
@@ -65,6 +66,18 @@ Gera `dist/<id>/copy.yaml`, versionado pelo campo `contrato` (hoje `1`). A ferra
 O que não é utilizável nem chega à ferramenta de copy: um depoimento sem autorização não pode ir parar num anúncio por engano.
 
 Mudou um campo que a copy usa? Suba a versão do contrato e ajuste o `trilha_copy` junto. Bloco novo e opcional não sobe a versão: a copy ignora o que ainda não conhece.
+
+## Do Trilha-ads de volta — `registrar-resultados`
+
+O Trilha-ads grava `ads/<id>/retornos/<inicio>_<fim>.yaml` (contrato `retorno`, versão 1). O briefing aceita só as versões que conhece.
+
+| Bloco | O que é | O que o briefing faz |
+|---|---|---|
+| `cliente`, `periodo` | o id do cliente e o período medido | recusa retorno de outro cliente; o período nomeia a cópia em `resultados/` |
+| `por_codigo` | por código de criativo: leads, qualificados, agendamentos, comparecimentos, vendas; com gasto, os custos | liga às hipóteses pelo `codigos` e conta no evento de cada uma (`evento` ou a métrica principal) |
+| `motivos_perda` | motivo do Kommo, categoria do playbook e quantos leads | lista os mais comuns no relatório, para o assessor registrar as objeções reais |
+
+Uma hipótese é comparável pelo retorno quando cada variação é um código (`variacoes` igual ao número de `codigos`). Quando as variações estão dentro de um código (página × WhatsApp no mesmo anúncio), o retorno não separa e o relatório diz isso. `tests/test_resultados.py` gera um retorno com o código do Trilha-ads e o registra aqui.
 
 ## Teste de contrato
 
@@ -88,3 +101,7 @@ O `codigo` de cada célula da grade (`estrategia.grade`) é o código do criativ
 - é lido pelo raio-x do Trilha-ads (`codigo_criativo`).
 
 Use o mesmo código nas três pontas.
+
+## Padrão de texto
+
+As regras de texto público (termos proibidos, garantia de resultado, urgência, promessa de ganho, adjetivo vago…) moram no Trilha-copy, em `trilha_copy/regras/padrao.yaml`. O briefing guarda em `trilha_briefing/regras/padrao-vocabularios.yaml` só as listas que a revisão dele usa, e `tests/test_padrao.py` confere essa cópia contra o Trilha-copy na CI. Mudou lá? Copie para cá.

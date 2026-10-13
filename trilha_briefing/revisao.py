@@ -17,12 +17,12 @@ from datetime import date
 from typing import Literal
 
 from trilha_briefing import campanhas as cp_
+from trilha_briefing import padrao
 from trilha_briefing.economia import calcular, conversoes_no_teto
 from trilha_briefing.esquema import ClienteCompleto, Item
 
 Nivel = Literal["bloqueia", "atencao", "sugestao"]
 NIVEIS: tuple[Nivel, ...] = ("bloqueia", "atencao", "sugestao")
-PALAVRAS_VAGAS = re.compile(r"\b(melhor(es)?|qualidade|excelencia|excelente|incrivel|lider|unico no mercado)\b")
 TOLERANCIA_TICKET = 0.10
 TOLERANCIA_FECHAMENTO = 0.1  # a economia pode supor até 10% acima do que a empresa fecha hoje
 
@@ -97,19 +97,35 @@ def _consistencia(c: ClienteCompleto, avisos: list[Aviso]) -> None:
         avisos.append(Aviso("atencao", f"teto de verba diferente: briefing diz {_brl(maximo)}, estratégia diz {_brl(teto)}"))
 
 
+def segmentos(c: ClienteCompleto) -> set[str]:
+    """Segmentos com regra própria no padrão de texto: o playbook e o que os registros profissionais revelam."""
+    saida = {c.briefing.cliente.playbook} - {"", "padrao"}
+    registros = " ".join(c.plataforma.compliance.registros_profissionais).upper()
+    for seg, siglas in padrao.carregar()["registro_por_segmento"].items():
+        if any(s in registros for s in siglas):
+            saida.add(seg)
+    return saida
+
+
 def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
+    """As afirmações das ofertas que viram copy, pelo padrão de texto da Trilha (vocabulários em
+    regras/padrao-vocabularios.yaml, cópia do Trilha-copy)."""
     pl = c.plataforma
     proibidos = [(t, "termo proibido") for t in pl.voz.termos_proibidos]
     ja = {_norm(t) for t in pl.voz.termos_proibidos}
     proibidos += [(t, "promessa proibida") for t in pl.compliance.promessas_proibidas if _norm(t) not in ja]
+    for seg in segmentos(c):
+        proibidos += [(t, "proibido no segmento") for t in padrao.carregar()["vocabularios"].get(f"promessa_proibida_{seg}", [])
+                      if _norm(t) not in ja]
     for o in c.ofertas:
         textos = [("promessa", o.promessa.texto if o.promessa else ""), ("cta", o.cta), ("subtitulo", o.subtitulo)]
         textos += [(f"diferenciais[{i}]", d.texto) for i, d in enumerate(o.diferenciais)]
         textos += [(f"beneficios[{i}]", f"{x.titulo} {x.texto}") for i, x in enumerate(o.beneficios)]
         for onde, texto in textos:
             for termo, motivo in proibidos:
-                if termo and _norm(termo) in _norm(texto):
+                if termo and padrao.contem_termo(texto, termo):
                     avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.{onde}: {motivo} — \"{termo}\""))
+        _afirmacoes(o, textos, avisos)
         if o.promessa:
             p = o.promessa
             if not p.prazo:
@@ -119,8 +135,10 @@ def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
             if not p.condicao:
                 avisos.append(Aviso("atencao", f"ofertas.{o.id}.promessa sem condição: diga para quem e em que situação ela vale"))
         for i, d in enumerate(o.diferenciais):
-            if PALAVRAS_VAGAS.search(_norm(d.texto)) and not re.search(r"\d", d.texto):
-                avisos.append(Aviso("sugestao", f"ofertas.{o.id}.diferenciais[{i}]: adjetivo sem fato (\"{d.texto}\")"))
+            vago = padrao.achar("adjetivo_vago", d.texto) + padrao.achar("prova_vaga", d.texto)
+            if vago and not re.search(r"\d", d.texto):
+                avisos.append(Aviso("sugestao", f"ofertas.{o.id}.diferenciais[{i}]: adjetivo sem fato (\"{d.texto}\"): troque por "
+                                                "número, nome ou detalhe"))
         if o.escassez and not (o.escassez.real and o.escassez.evidencia):
             avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.escassez sem evidência: escassez falsa é publicidade enganosa (CDC)"))
         if o.urgencia:
@@ -136,6 +154,32 @@ def _copy(c: ClienteCompleto, avisos: list[Aviso]) -> None:
         sem_resposta = [ob.objecao for ob in o.objecoes if not ob.resposta]
         if sem_resposta:
             avisos.append(Aviso("atencao", f"ofertas.{o.id}: objeção sem resposta — {sem_resposta[0]}"))
+
+
+def _afirmacoes(o, textos: list[tuple[str, str]], avisos: list[Aviso]) -> None:
+    """Garantia de resultado, autoelogio, promessa de ganho e prazo no texto da oferta (padrão de texto)."""
+    tudo = "\n".join(t for _, t in textos)
+    com_ressalva = bool(padrao.achar("ressalva_de_resultado", tudo))
+    for onde, texto in textos:
+        for frase in re.split(r"(?<=[.!?…])\s+|\n+", texto):
+            if padrao.garante_resultado(frase):
+                avisos.append(Aviso("bloqueia", f"ofertas.{o.id}.{onde}: garante um resultado que não depende só da empresa "
+                                                f"(\"{frase.strip()[:60]}\"): mostre o que já aconteceu, com prova, ou garanta "
+                                                "o que a empresa controla (prazo, devolução, teste)"))
+            elif (not com_ressalva and padrao.achar("promessa_de_ganho", frase)
+                  and re.search(r"(r\$|%|\bmil\b)", _norm(frase))):
+                avisos.append(Aviso("atencao", f"ofertas.{o.id}.{onde}: promessa de ganho com número (\"{frase.strip()[:60]}\"): "
+                                               "diga de quem é o resultado e que não é o típico (CDC e políticas do Meta)"))
+    egoista = padrao.achar("frase_egoista", tudo)
+    if egoista:
+        avisos.append(Aviso("atencao", f"ofertas.{o.id}: autoelogio ou pedido egoísta (\"{egoista[0]}\"): um bom vendedor não "
+                                       "diria isso com o cliente na frente dele"))
+    prazo = padrao.achar("urgencia", tudo)
+    urgencia_ok = o.urgencia and o.urgencia.real and (o.urgencia.motivo or o.urgencia.evidencia)
+    escassez_ok = o.escassez and o.escassez.real and o.escassez.evidencia
+    if prazo and not (urgencia_ok or escassez_ok):
+        avisos.append(Aviso("bloqueia", f"ofertas.{o.id}: o texto fala em \"{prazo[0]}\", mas a oferta não tem urgência ou "
+                                        "escassez reais registradas: prazo ou vaga inventados são publicidade enganosa (CDC)"))
 
 
 def _provas(c: ClienteCompleto, avisos: list[Aviso]) -> None:
