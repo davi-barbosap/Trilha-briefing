@@ -28,7 +28,9 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, 
 | Comando | O que faz |
 |---|---|
 | `novo <id>` | Cria a pasta do cliente a partir do modelo comentado. |
-| `questionario` | Gera as perguntas do briefing em três momentos. ★ É o questionário que o cliente responde sozinho, em uns 30 minutos (`--para cliente`). ● É o roteiro da reunião de kickoff e da escuta (`--para reuniao`). ◆ É o que o assessor levanta com dados. A versão `--para assessor` mostra o momento e o campo que cada pergunta preenche. |
+| `questionario --formulario arquivo.html` | Gera o **formulário do cliente** (★) num arquivo HTML só. Abre em qualquer navegador e salva o progresso no aparelho. Mostra as perguntas do ramo do cliente, por condição. No fim, o cliente baixa ou copia as respostas e envia para você. Gerado sem `--cliente`, serve para todos: publicado num endereço, o nome vai no link (`?cliente=Nome&quem=Davi`). |
+| `importar-respostas <respostas.json\|-> <pasta>` | Leva as respostas para a pasta do cliente. Guarda o original em `respostas/` e preenche sozinho os campos simples (como hipótese, `fonte: empresa`), sem sobrescrever o que já tem valor. O que não cabe vai numa lista "levar à mão", com o destino e o motivo. `-` lê o texto que o cliente copiou e colou. |
+| `questionario [--para cliente\|reuniao\|assessor]` | O questionário em Markdown. ★ cliente; ● roteiro do kickoff e da escuta; ◆ tudo, com o campo que cada pergunta preenche. As perguntas ficam em `trilha_briefing/questionario/perguntas.yaml`, editável e conferido contra o esquema. |
 | `validar` | Confere o esquema de todos os arquivos e as referências entre eles: personas e ofertas citadas existem, ids não se repetem e a pasta tem o nome do cliente. |
 | `lacunas` | Mostra o que falta em cada etapa e o que bloqueia a aprovação da estratégia. |
 | `revisar` | Dá avisos em três gravidades e sai com erro se algo bloqueia (lista abaixo). |
@@ -40,8 +42,11 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, 
 | `economia` | Calcula os tetos de custo (CAC, custo por lead, por qualificado e por agendamento) e a verba mínima viável. Compara as conversões que a verba de validação compra com o mínimo de cada hipótese. |
 | `canais` | Sugere a ordem dos canais por intenção e atenção e compara com o que está no plano. A busca vem antes quando há demanda; a descoberta sobe quando a compra é por desejo ou o público ainda não conhece o problema. |
 | `grade` | Monta a grade públicos × argumentos, com o código de cada célula. Cada célula vira peças de copy com aquele código. |
+| `plano [--sugerir]` | Mostra o **plano de campanhas** em números: verba de cada campanha, quantos eventos ela compra por semana no teto de custo, quantos conjuntos cabem para sair do aprendizado, os testes e o prazo para concluir, os nomes e UTMs, e o que cada campanha precisa para mudar de fase. `--sugerir` grava um rascunho a partir dos canais, da grade, da verba e da economia. |
 | `apresentar` | Gera o plano em HTML para o cliente. O que ainda não foi validado aparece marcado como hipótese; afirmações refutadas e riscos marcados como internos ficam de fora. |
 | `fechar-ciclo --nome 2026-T4` | Guarda uma cópia do estado e um resumo antes da revisão trimestral. |
+| `registrar-resultados <retorno.yaml> <pasta>` | **O caminho de volta.** Lê o retorno do Trilha-ads (`ads/<id>/retornos/`): o resultado de cada código de criativo e os motivos de perda do período. Liga os códigos às hipóteses, registra a medição (conversões da variação mais fraca, `rodando`) e diz quais já têm volume para decidir. Guarda uma cópia em `resultados/`. |
+| `decidir <pasta> <hipotese> validada\|refutada\|inconclusiva --aprendizado "…"` | Registra a decisão do assessor e o aprendizado, que vão para a copy na próxima exportação. |
 
 ### 3. Exportação: o contrato com as outras ferramentas
 
@@ -49,11 +54,21 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas: nasce aqui, 
 |---|---|---|
 | `exportar --para trilha` | `marca.yaml`, `ofertas/`, `perfil.parcial.yaml` | Trilha-ads (cadastro, economia e verba) |
 | `exportar --para lp --oferta <id> [--origem meta\|google]` | rascunho de `pagina.yaml` por oferta e origem | Trilha-LP |
-| `exportar --para copy` | `copy.yaml`: personas, voz, ofertas, provas utilizáveis, compliance, grade e hipóteses | Trilha-copy |
+| `exportar --para copy` | `copy.yaml`: personas, voz, ofertas, provas utilizáveis, compliance, grade, hipóteses e onde cada célula vira anúncio (nomes e parâmetros de URL do plano) | Trilha-copy |
 
 Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima exportação sobrescreve o que for mudado à mão. Detalhes em [contrato](docs/contrato.md).
 
 ## Como faz
+
+- **Padrão de texto da Trilha.** As afirmações das ofertas que viram copy (promessa, chamada, diferenciais, benefícios) passam pelo mesmo padrão do Trilha-copy:
+  - termos e promessas proibidos, inclusive os do segmento;
+  - garantia de resultado;
+  - prazo sem urgência real;
+  - promessa de ganho sem ressalva;
+  - autoelogio;
+  - adjetivo sem fato.
+
+  O padrão mora no Trilha-copy; aqui fica a cópia das listas, conferida na CI ([contrato](docs/contrato.md#padrão-de-texto)).
 
 - **Origem de cada afirmação.** Toda afirmação importante diz de onde veio (`fonte`: empresa, consumidor, mercado, dados, assessor) e se já foi confirmada (`status`: hipótese, validada, refutada). A opinião do dono não passa como voz do consumidor.
 - **Escuta antes da estratégia.** A aprovação exige registro de escuta e uma objeção vinda dela para cada persona da oferta principal.
@@ -66,6 +81,7 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
   - código do criativo chegando no lead;
   - relatório definido.
 - **Hipóteses que dá para concluir.** Cada uma tem célula da grade, critério de sucesso e volume mínimo por variação. A revisão avisa quando a verba não compra conversões suficientes para concluir o teste.
+- **Plano de campanhas com regras editáveis.** Cinco regras guiam o plano: ele registra decisões e não espelha a conta; poucos conjuntos, só quantos a verba aguenta; cada hipótese diz como vai ser testada; nomes curtos com o código da célula; e mudança de fase quando os números batem. Todas mudam em `trilha_briefing/regras/campanhas.yaml` (para todos) ou no bloco `regras:` do `campanhas.yaml` (para um cliente), inclusive a gravidade de cada uma ([método](docs/metodo.md)).
 
 **O que bloqueia a aprovação.** `lacunas` só libera a estratégia para o cliente quando houver:
 - objetivo com meta, prazo e resultados-chave;
@@ -111,6 +127,7 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
                      objeções, inversão de risco, urgência e escassez reais
   estrategia.yaml    objetivo, economia, evento de otimização, verba, canais, grade, riscos, marcos, medição
   hipoteses.yaml     testes com códigos da grade, critério de sucesso e volume mínimo por variação
+  campanhas.yaml     plano de campanhas: canal, evento, verba, fase, conjuntos, células, testes e regras do cliente
   historico/<ciclo>/ cópia do estado em cada fechamento de ciclo, com resumo.md
 ```
 
@@ -119,15 +136,15 @@ Os arquivos exportados trazem no topo o aviso "edite lá, não aqui": a próxima
 - **Não escreve copy nem página.** O rascunho de página sai cru, para reescrever na Trilha-LP; a copy é estruturada e revisada no Trilha-copy.
 - **Não lê as contas de anúncio nem o Kommo.** Isso é do Trilha-ads.
 - **Não decide.** Sugere a ordem dos canais e confere a consistência; quem decide é o assessor, com o cliente.
-- **Ainda não monta o plano de campanhas:** campanhas e conjuntos por canal, públicos, palavras-chave, nomes, fases e critérios para escalar. É o próximo passo.
-- **Ainda não recebe os resultados de volta.** O resultado de cada hipótese é registrado à mão em `hipoteses.yaml`.
-- **O questionário é Markdown:** as respostas do cliente são transcritas à mão para os arquivos.
+- **Não espelha a conta de anúncios.** O plano registra decisões; a estrutura real fica nas plataformas e quem compara é o Trilha-ads (quando houver coleta).
+- **Não decide o teste.** Mede, diz se há volume e mostra o critério combinado; validar ou refutar é decisão do assessor (`decidir`).
+- **Não monta persona, oferta nem prova sozinho.** O formulário traz a matéria-prima (clientes reais, dúvidas, frases, provas), mas organizar isso é trabalho do assessor, depois da escuta.
 
 ## Situação atual
 
-Versão 0.3.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
-- o plano de campanhas;
-- o caminho de volta dos resultados do Trilha-ads para as hipóteses e as personas.
+Versão 0.6.0, em uso no exemplo e sem cliente real ainda. Próximos passos:
+- os motivos de perda do retorno sugerirem objeções nas personas e nas ofertas (hoje o relatório lista, e o assessor registra);
+- o Trilha-ads comparar o plano com o que está rodando, quando houver coleta.
 
 ## Como usar
 
@@ -137,7 +154,9 @@ pip install -e .
 # Clientes reais ficam no Trilha-clientes (privado), pasta briefing/
 cd ../Trilha-clientes
 python -m trilha_briefing novo minha-cliente --pasta briefing
-python -m trilha_briefing questionario --cliente "Minha Cliente" > questionario.md   # ★ envie ao cliente
+python -m trilha_briefing questionario --formulario questionario-minha-cliente.html --cliente "Minha Cliente" --quem-recebe "Seu nome"
+#   ★ envie o arquivo (ou o link do formulário publicado); o cliente devolve um .json
+python -m trilha_briefing importar-respostas respostas-minha-cliente.json briefing/minha-cliente
 python -m trilha_briefing questionario --para reuniao           # ● roteiro do kickoff e da escuta
 python -m trilha_briefing questionario --para assessor          # tudo, com o momento e o campo de cada pergunta
 
@@ -147,11 +166,17 @@ python -m trilha_briefing revisar   briefing/minha-cliente
 python -m trilha_briefing economia  briefing/minha-cliente
 python -m trilha_briefing canais    briefing/minha-cliente
 python -m trilha_briefing grade     briefing/minha-cliente
+python -m trilha_briefing plano     briefing/minha-cliente --sugerir   # rascunho do campanhas.yaml
+python -m trilha_briefing plano     briefing/minha-cliente             # o plano em números e o que não fecha
 
 python -m trilha_briefing exportar  briefing/minha-cliente --para copy   --saida copy                   # copy/minha-cliente/copy.yaml
 python -m trilha_briefing exportar  briefing/minha-cliente --para trilha --saida ads                    # ads/minha-cliente/...
 python -m trilha_briefing exportar  briefing/minha-cliente --para lp --oferta X --saida lp/minha-cliente # lp/minha-cliente/X-meta/...
 python -m trilha_briefing apresentar briefing/minha-cliente     # dist/minha-cliente/plano.html (não versionar)
+
+# O caminho de volta: o retorno do Trilha-ads nas hipóteses
+python -m trilha_briefing registrar-resultados ads/minha-cliente/retornos/2026-10-01_2026-10-31.yaml briefing/minha-cliente
+python -m trilha_briefing decidir briefing/minha-cliente h01-gancho validada --aprendizado "…"
 
 python -m trilha_briefing fechar-ciclo briefing/minha-cliente --nome 2026-T4
 ```
@@ -161,6 +186,7 @@ Neste repositório, os comandos rodam também sobre o exemplo: `python -m trilha
 ## Documentação
 
 - [Método](docs/metodo.md): princípios, etapas, ciclo trimestral e onde fomos críticos com as fontes.
+- [Implantação em 10 dias úteis](docs/implantacao-10-dias.md): as seis etapas do método do site ligadas às ferramentas, e onde o prazo e a aprovação ainda não conversam.
 - [Contrato](docs/contrato.md): o que vai para o Trilha-ads, a Trilha-LP e o Trilha-copy.
 - [Decisões](docs/decisoes/): por que as coisas são como são.
 - [Mudanças](CHANGELOG.md).

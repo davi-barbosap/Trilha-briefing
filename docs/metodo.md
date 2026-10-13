@@ -25,20 +25,36 @@ kickoff ─► pesquisa ─► marca ─► provas ─► ofertas ─► estrat�
 
 | Etapa | Arquivo | Pergunta | Quem preenche |
 |---|---|---|---|
-| Kickoff | `briefing.yaml` | O que o cliente quer, como vende hoje, o que já tentou, o que não pode? | cliente (questionário) + assessor |
+| Kickoff | `briefing.yaml` | O que o cliente quer, como vende hoje, o que já tentou, o que não pode? | cliente (formulário) + assessor |
 | Pesquisa | `pesquisa.yaml` | Quem compra, por quê, o que trava; concorrentes, SWOT, sazonalidade, maturidade | assessor, com escuta real |
 | Marca | `plataforma.yaml` | Como quer ser lembrada, como fala, sobre o que fala | assessor + cliente |
 | Provas | `provas.yaml` | O que sustenta cada promessa (com fonte e autorização) | cliente fornece, assessor organiza |
 | Ofertas | `ofertas/<id>.yaml` | O que se vende, para quem, com que promessa, em que degrau da escada | assessor |
 | Estratégia | `estrategia.yaml` | Objetivo, economia, verba, canais, grade de criativos, riscos, marcos, medição | assessor; aprovado com o cliente |
+| Plano de campanhas | `campanhas.yaml` | Que campanhas, com que verba, evento, público, células, testes, nomes e fase | assessor; aprovado com o cliente |
 | Testes | `hipoteses.yaml` | O que está sendo testado e o que já se aprendeu | assessor |
 
 ## Ferramentas por etapa
 
-**Kickoff.** 77 perguntas em três momentos:
-- ★ **cliente:** o cliente responde sozinho antes da reunião (`questionario`, cerca de 30 minutos);
-- ● **reunião:** aprofundar com o dono e com quem atende (`questionario --para reuniao`, cerca de 90 minutos);
+**Kickoff.** O questionário tem três momentos (`trilha_briefing/questionario/perguntas.yaml`, editável):
+- ★ **cliente:** o cliente responde sozinho, no formulário (`questionario --formulario`).
+  - São cerca de 80 perguntas visíveis e outras que só aparecem pelo ramo ou por uma resposta anterior. Levam cerca de 40 minutos, com progresso salvo, e "não sei" é uma resposta aceita.
+  - As respostas entram com `importar-respostas`.
+- ● **reunião:** aprofundar com o dono e com quem atende (`questionario --para reuniao`, cerca de 90 minutos). É aqui que entram o que pede conversa: a história e a crença da marca, a big idea, os diferenciais com o "e daí?" e a visita aos bastidores.
 - ◆ **assessor:** o que você levanta com acessos, dados e escuta (`questionario --para assessor` mostra tudo, com o campo de cada pergunta).
+
+Como formular as perguntas:
+- **A linguagem é a do dono:** sem jargão.
+- **Uma coisa por pergunta.**
+- **Fato no lugar de taxa:** contatos e vendas por mês, e não "quantos de 10 fecham". A taxa sai da conta, e a revisão avisa quando a economia supõe fechar mais do que a empresa fecha hoje.
+- **As palavras exatas do cliente,** sem nome.
+- **Quem sabe responde:** o técnico fica com o assessor.
+
+As regras completas estão no topo do `perguntas.yaml`. Por que formulário próprio, e não Google Forms: [decisão 002](decisoes/002-questionario-e-formulario.md).
+
+**Ponto crítico.** O formulário é longo de propósito: é ele que poupa a primeira reunião de virar entrevista. Mas comprimento cobra adesão.
+- **Se o cliente desistir no meio:** o que ele já respondeu está salvo, e o resto vira pauta da reunião.
+- **Se acontecer sempre:** corte perguntas no `perguntas.yaml`, em vez de aceitar respostas pela metade.
 
 Também entram:
 - o mapa de stakeholders por influência × interesse;
@@ -74,6 +90,19 @@ Também entram:
 - **Riscos:** probabilidade × impacto e a resposta a cada um.
 - **Quando:** marcos (fundação → validação → decisão), sem cronograma semana a semana.
 
+**Plano de campanhas.** É como a estratégia vira campanhas, conjuntos e anúncios. `plano --sugerir` monta um rascunho a partir dos canais, da grade, da verba e da economia; `plano` mostra o que ele significa em números e o que não fecha. Cinco regras guiam o plano, e todas podem ser mudadas (abaixo):
+
+1. **O plano registra decisões, não espelha a conta.** Ele guarda o que o cliente aprova: canal, plataforma, evento de otimização, verba, fase, públicos, palavras-chave, que célula roda onde. A estrutura real (IDs, conjuntos pausados) fica nas plataformas, e o Trilha-ads compara o planejado com o que está rodando. Subir campanha a partir do plano não é o objetivo: as interfaces mudam e o erro sai caro.
+2. **Poucos conjuntos, só quantos a verba aguenta.** Um conjunto precisa de cerca de 50 eventos de otimização por semana para sair do aprendizado no Meta. O plano calcula, no teto de custo, quantos eventos a verba de cada campanha compra e quantos conjuntos cabem. As células da grade viram anúncios dentro de poucos conjuntos; o criativo escolhe a pessoa.
+3. **Cada hipótese diz como vai ser testada.** Duas células no mesmo conjunto não são um teste justo: a plataforma reparte a verba como quiser. O plano pede o método (teste A/B da plataforma, conjuntos separados com a mesma verba, ou comparação dentro do conjunto, que é só direcional) e confere se o volume fecha no prazo.
+4. **Nomes curtos, com o código da célula como âncora.** O anúncio se chama `PT01 | v1` e o `utm_content` é o código. As características do criativo (persona, argumento, formato) ficam nos arquivos, ligadas ao código, e não no nome, que alguém digita à mão.
+5. **Muda de fase quando os números batem, não pelo calendário.** Fundação → validação → otimização → escala. Cada fase tem o que exige para entrar (medição completa; custo até um múltiplo do teto com um volume mínimo; semanas estáveis), e o `plano` mostra isso em reais. Na escala, a verba sobe aos poucos.
+
+**Onde mudar as regras.**
+- **Para todos os clientes:** `trilha_briefing/regras/campanhas.yaml`. Registre no CHANGELOG.
+- **Só para um cliente:** bloco `regras:` no `campanhas.yaml` dele, com só as chaves que mudam. Exemplo: `regras: { aprendizado: { nivel: sugestao } }`.
+- **Cada regra tem gravidade:** bloqueia, atenção, sugestão ou `desligada`. Também é configurável se o plano é obrigatório para aprovar a estratégia (`plano.obrigatorio_para_aprovar`, desligado por padrão).
+
 **Testes.**
 - A ordem para mexer quando algo não vai bem: criativo → público → objetivo → página → oferta. É a mesma ordem de diagnóstico do dossiê do Trilha-ads.
 - Cada hipótese aponta os códigos da grade que testa, a etapa do funil em que o volume é contado, o mínimo **por variação** e quantas variações disputam. A verba de validação precisa pagar mínimo × variações; a conta usa o custo no teto, que é o ponto de equilíbrio. Acima do teto, a verba compra menos.
@@ -83,9 +112,15 @@ Também entram:
 ## Ciclo
 
 - **Semanal:** fica no Trilha-ads (dossiê, raio-x do funil, relatório). Esta ferramenta não repete esses números.
+- **A cada período de teste:**
+  - o Trilha-ads grava o retorno (`raio-x … --retorno ads/<id>/retornos`);
+  - `registrar-resultados` liga os códigos às hipóteses e diz quais têm volume para decidir;
+  - o assessor decide contra o critério combinado (`decidir … --aprendizado`), e o aprendizado vai para a copy.
+
+  Decidir antes do volume mínimo é ler ruído: a ferramenta avisa, mas não impede.
 - **Trimestral:**
   - `fechar-ciclo --nome 2026-T4` guarda uma cópia do estado e um resumo em `historico/`;
-  - atualize as hipóteses com os resultados;
+  - confira se nenhuma hipótese ficou `rodando` sem retorno registrado;
   - troque `estimados` da economia por taxas reais do CRM;
   - promova a `validada` o que a escuta e os dados confirmaram;
   - revise canais e grade;
